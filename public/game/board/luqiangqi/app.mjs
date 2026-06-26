@@ -21,30 +21,11 @@ const els = {
   gameSubtitle: document.querySelector("#gameSubtitle"),
   setupPanel: document.querySelector("#setupPanel"),
   onlinePanel: document.querySelector("#onlinePanel"),
-  modelPanel: document.querySelector("#modelPanel"),
   playerCountField: document.querySelector("#playerCountField"),
   difficultyField: document.querySelector("#difficultyField"),
   playerCount: document.querySelector("#playerCountSelect"),
   difficulty: document.querySelector("#difficultySelect"),
   onlinePlayerCount: document.querySelector("#onlinePlayerCountSelect"),
-  modelHomeStep: document.querySelector("#modelHomeStep"),
-  modelLocalStep: document.querySelector("#modelLocalStep"),
-  modelApiStep: document.querySelector("#modelApiStep"),
-  chooseLocalModel: document.querySelector("#chooseLocalModelButton"),
-  chooseApiModel: document.querySelector("#chooseApiModelButton"),
-  modelLocalBack: document.querySelector("#modelLocalBackButton"),
-  modelApiBack: document.querySelector("#modelApiBackButton"),
-  ollamaCommand: document.querySelector("#ollamaCommandText"),
-  copyOllamaCommand: document.querySelector("#copyOllamaCommandButton"),
-  ollamaUrl: document.querySelector("#ollamaUrlInput"),
-  ollamaModel: document.querySelector("#ollamaModelInput"),
-  modelLocalDifficulty: document.querySelector("#modelLocalDifficultySelect"),
-  startLocalModel: document.querySelector("#startLocalModelButton"),
-  apiKey: document.querySelector("#apiKeyInput"),
-  apiBaseUrl: document.querySelector("#apiBaseUrlInput"),
-  apiModel: document.querySelector("#apiModelInput"),
-  modelApiDifficulty: document.querySelector("#modelApiDifficultySelect"),
-  startApiModel: document.querySelector("#startApiModelButton"),
   newGame: document.querySelector("#newGameButton"),
   toolbox: document.querySelector("#toolbox"),
   statusTitle: document.querySelector("#statusTitle"),
@@ -68,17 +49,7 @@ const els = {
   roomState: document.querySelector("#roomStateText"),
   roomCode: document.querySelector("#roomCodeText"),
   copyRoom: document.querySelector("#copyRoomButton"),
-  externalCard: document.querySelector("#externalCard"),
-  externalLinkText: document.querySelector("#externalLinkText"),
-  copyExternal: document.querySelector("#copyExternalButton"),
   toast: document.querySelector("#toast")
-};
-
-const subtitles = {
-  ai: "人机对弈",
-  local: "同屏多人",
-  online: "房间联机",
-  model: "外脑对弈"
 };
 
 let mode = "ai";
@@ -86,8 +57,6 @@ let tool = "move";
 let onlineRoom = null;
 let onlineStep = "home";
 let onlineRoomRole = "host";
-let modelStep = "home";
-let modelConfig = null;
 let eventSource = null;
 let game = createGame();
 let aiTimer = null;
@@ -109,38 +78,33 @@ function getClientId() {
 
 function createGame() {
   const onlineCount = Number(els.onlinePlayerCount?.value || els.playerCount?.value || 2);
-  const playerCount = mode === "ai" || mode === "model" ? 2 : mode === "online" ? onlineCount : Number(els.playerCount?.value || 2);
-  const external = mode === "model";
-  const aiName = external ? modelAiName() : "AI";
+  const playerCount = mode === "ai" ? 2 : mode === "online" ? onlineCount : Number(els.playerCount?.value || 2);
   const state = createInitialState({
     playerCount,
     mode,
-    aiDifficulty: external ? modelConfig?.difficulty || "steady" : els.difficulty?.value || "steady",
-    aiEngine: external ? modelConfig?.provider || "ollama" : "builtin",
-    aiSlots: mode === "ai" || mode === "model" ? [1] : [],
-    names: mode === "ai" || mode === "model" ? ["你", aiName] : Array.from({ length: playerCount }, (_, index) => `玩家 ${index + 1}`)
+    aiDifficulty: els.difficulty?.value || "steady",
+    aiEngine: "builtin",
+    aiSlots: mode === "ai" ? [1] : [],
+    names: mode === "ai"
+      ? [tr("player.you", "你"), tr("player.ai", "AI")]
+      : Array.from({ length: playerCount }, (_, index) => defaultPlayerName(index))
   });
-  state.aiEngine = external ? modelConfig?.provider || "ollama" : "builtin";
+  state.aiEngine = "builtin";
   return state;
 }
 
-function modelAiName() {
-  return {
-    ollama: "本地模型",
-    api: "云端模型"
-  }[modelConfig?.provider] || "外脑";
+function tr(key, fallback = "") {
+  return window.SMC_PREFS?.t(key, fallback) || fallback || key;
 }
 
-function providerName(value) {
-  return {
-    ollama: "本地模型",
-    api: "云端 API"
-  }[value] || "外脑";
+function fmt(key, vars = {}, fallback = "") {
+  return Object.entries(vars).reduce((text, [name, value]) => text.replaceAll(`{${name}}`, value), tr(key, fallback));
 }
 
-function shortErrorNote(value) {
-  const text = String(value || "").trim();
-  return text.length > 80 ? `${text.slice(0, 80)}...` : text;
+function defaultPlayerName(index) {
+  if (index === 0) return tr("player.one", "玩家 1");
+  if (index === 1) return tr("player.two", "玩家 2");
+  return `${tr("status.player", "玩家")} ${index + 1}`;
 }
 
 function showToast(message) {
@@ -167,21 +131,39 @@ function currentPlayer() {
   return game.players[game.current];
 }
 
+function localizedPieceLabel(player) {
+  return window.SMC_PREFS?.pieceLabel("luqiangqi", player.id, player.label) || player.label;
+}
+
+function displayPlayerName(player) {
+  if (!player) return "";
+  if (mode === "ai") return player.id === 0 ? tr("player.you", "你") : tr("player.ai", "AI");
+  if (mode === "online") {
+    const seat = onlineRoom?.seats?.[player.id];
+    if (seat?.name) return seat.name;
+  }
+  return defaultPlayerName(player.id);
+}
+
+function goalText(player) {
+  if (player.goal.edge === "row") {
+    return tr(player.goal.value === 0 ? "luqiangqi.goalNorth" : "luqiangqi.goalSouth", player.goal.value === 0 ? "目标 北线" : "目标 南线");
+  }
+  return tr(player.goal.value === 0 ? "luqiangqi.goalWest" : "luqiangqi.goalEast", player.goal.value === 0 ? "目标 西线" : "目标 东线");
+}
+
 function canAct() {
   if (game.winner !== null) return false;
-  if (mode === "model" && !modelConfig) return false;
   if (mode === "online") return onlineRoom?.started && onlineRoom.mySeat === game.current;
-  if (mode === "ai" || mode === "model") return currentPlayer()?.kind !== "ai";
+  if (mode === "ai") return currentPlayer()?.kind !== "ai";
   return true;
 }
 
 function actionLockedReason() {
-  if (game.winner !== null) return "对局已结束";
-  if (mode === "model" && !modelConfig) return "请先选择外脑";
-  if (mode === "online" && !onlineRoom?.started) return "等待玩家入座";
-  if (mode === "online" && onlineRoom?.mySeat !== game.current) return "还没轮到你";
-  if (mode === "ai" && currentPlayer()?.kind === "ai") return "AI 思考中";
-  if (mode === "model" && currentPlayer()?.kind === "ai") return "外脑思考中";
+  if (game.winner !== null) return tr("status.gameOver", "对局已结束");
+  if (mode === "online" && !onlineRoom?.started) return tr("status.waitingSeat", "等待玩家入座");
+  if (mode === "online" && onlineRoom?.mySeat !== game.current) return tr("status.notYourTurn", "还没轮到你");
+  if (mode === "ai" && currentPlayer()?.kind === "ai") return tr("status.aiThinking", "AI 思考中");
   return "";
 }
 
@@ -194,23 +176,6 @@ function resetOfflineGame() {
   tool = "move";
   render();
   queueAi();
-}
-
-function resetModelHome() {
-  aiRequestId += 1;
-  closeEvents();
-  onlineRoom = null;
-  modelStep = "home";
-  modelConfig = null;
-  game = createInitialState({ playerCount: 2, mode: "model", names: ["你", "外脑"] });
-  tool = "move";
-  render();
-}
-
-function startModelGame(config) {
-  modelConfig = config;
-  modelStep = config.provider === "api" ? "api" : "local";
-  resetOfflineGame();
 }
 
 function closeEvents() {
@@ -268,22 +233,22 @@ async function api(path, payload) {
     body: JSON.stringify(payload)
   });
   const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data.error || "请求失败");
+  if (!response.ok) throw new Error(data.error || tr("status.illegalMove", "请求失败"));
   return data;
 }
 
 async function fetchRoom(code) {
-  const response = await fetch(`/api/rooms/${code}?clientId=${encodeURIComponent(clientId)}`);
+  const response = await fetch(`/api/luqiangqi/rooms/${code}?clientId=${encodeURIComponent(clientId)}`);
   const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data.error || "房间不存在");
+  if (!response.ok) throw new Error(data.error || tr("status.enterRoomCode", "房间不存在"));
   return data;
 }
 
 function connectRoomEvents(code) {
   closeEvents();
-  eventSource = new EventSource(`/events/${code}?clientId=${encodeURIComponent(clientId)}`);
+  eventSource = new EventSource(`/api/luqiangqi/rooms/${code}/events?clientId=${encodeURIComponent(clientId)}`);
   eventSource.onmessage = (event) => withRoomState(JSON.parse(event.data));
-  eventSource.onerror = () => showToast("联机同步正在重连");
+  eventSource.onerror = () => showToast(tr("status.waiting", "联机同步正在重连"));
 }
 
 async function restoreActiveRoom({ quiet = false } = {}) {
@@ -298,42 +263,18 @@ async function restoreActiveRoom({ quiet = false } = {}) {
     onlineStep = "room";
     withRoomState(room);
     connectRoomEvents(room.code);
-    if (!quiet) showToast("已回到房间");
+    if (!quiet) showToast(tr("status.roomJoined", "已回到房间"));
     return true;
   } catch {
     clearActiveRoom();
-    if (!quiet) showToast("原房间已失效");
+    if (!quiet) showToast(tr("status.enterRoomCode", "原房间已失效"));
     return false;
   }
 }
 
-function externalStateUrl() {
-  if (!onlineRoom?.external?.stateUrl) return "";
-  return new URL(onlineRoom.external.stateUrl, window.location.origin).href;
-}
-
-function absoluteExternalUrl(value) {
-  return value ? new URL(value, window.location.origin).href : "";
-}
-
-function externalAccessText() {
-  const external = onlineRoom?.external;
-  if (!external) return "";
-  const seat = Number(external.seat ?? 1);
-  const controlUrl = absoluteExternalUrl(external.controlUrl || external.controlPath);
-  const freshControlUrl = controlUrl ? new URL(controlUrl) : null;
-  if (freshControlUrl) freshControlUrl.searchParams.set("fresh", String(Date.now()));
-  return [
-    "墙路棋外部玩家控制页",
-    `座位：玩家 ${seat + 1}`,
-    `${freshControlUrl?.href || ""}`,
-    "打开后页面里会显示当前局面、刷新链接和可直接打开的合法动作链接。"
-  ].join("\n");
-}
-
 async function createRoom() {
   try {
-    const room = await api("/api/rooms", {
+    const room = await api("/api/luqiangqi/rooms", {
       clientId,
       name: els.onlineName.value,
       playerCount: Number(els.onlinePlayerCount.value)
@@ -343,7 +284,7 @@ async function createRoom() {
     withRoomState(room);
     saveActiveRoom(room, onlineRoomRole);
     connectRoomEvents(room.code);
-    showToast("房间已创建");
+    showToast(tr("status.roomCreated", "房间已创建"));
   } catch (error) {
     showToast(error.message.includes("Failed") ? "请先用启动脚本打开游戏" : error.message);
   }
@@ -351,9 +292,9 @@ async function createRoom() {
 
 async function joinRoom() {
   const code = els.joinCode.value.trim().toUpperCase();
-  if (!code) return showToast("请输入房间码");
+  if (!code) return showToast(tr("status.enterRoomCode", "请输入房间码"));
   try {
-    const room = await api(`/api/rooms/${code}/join`, {
+    const room = await api(`/api/luqiangqi/rooms/${code}/join`, {
       clientId,
       name: els.onlineName.value
     });
@@ -362,7 +303,7 @@ async function joinRoom() {
     withRoomState(room);
     saveActiveRoom(room, onlineRoomRole);
     connectRoomEvents(room.code);
-    showToast("已加入房间");
+    showToast(tr("status.roomJoined", "已加入房间"));
   } catch (error) {
     showToast(error.message.includes("Failed") ? "请先用启动脚本打开游戏" : error.message);
   }
@@ -377,7 +318,7 @@ async function sendAction(action) {
 
   if (mode === "online") {
     try {
-      const room = await api(`/api/rooms/${onlineRoom.code}/action`, { clientId, action });
+      const room = await api(`/api/luqiangqi/rooms/${onlineRoom.code}/action`, { clientId, action });
       withRoomState(room);
     } catch (error) {
       showToast(error.message);
@@ -387,7 +328,7 @@ async function sendAction(action) {
 
   const result = applyAction(game, action);
   if (!result.ok) {
-    showToast(result.reason || "这步不合法");
+    showToast(result.reason || tr("status.illegalMove", "这步不合法"));
     return;
   }
   game = result.state;
@@ -398,52 +339,18 @@ async function sendAction(action) {
 
 function queueAi() {
   clearTimeout(aiTimer);
-  if ((mode !== "ai" && mode !== "model") || game.winner !== null || currentPlayer()?.kind !== "ai") return;
+  if (mode !== "ai" || game.winner !== null || currentPlayer()?.kind !== "ai") return;
   const requestId = aiRequestId + 1;
   aiRequestId = requestId;
-  aiTimer = setTimeout(async () => {
+  aiTimer = setTimeout(() => {
     const snapshot = JSON.parse(JSON.stringify(game));
-    const external = mode === "model";
-    const engine = external ? modelConfig?.provider || snapshot.aiEngine || "ollama" : "builtin";
-    let action = null;
-    let note = "";
-
-    if (!external) {
-      action = chooseAiAction(snapshot, snapshot.aiDifficulty);
-    } else {
-      try {
-        const result = await api("/api/ai/action", {
-          state: snapshot,
-          provider: engine,
-          difficulty: snapshot.aiDifficulty,
-          config: modelConfig
-        });
-        action = result.action;
-        note = result.note || "";
-        if (result.source === "builtin-fallback") {
-          showToast(shortErrorNote(note) ? `外脑暂不可用：${shortErrorNote(note)}` : "外脑暂不可用，已用高速 AI");
-        }
-      } catch (error) {
-        action = chooseAiAction(snapshot, snapshot.aiDifficulty);
-        note = error.message;
-        showToast(shortErrorNote(note) ? `外脑未响应：${shortErrorNote(note)}` : "外脑未响应，已用高速 AI");
-      }
-    }
-
-    if (requestId !== aiRequestId || (mode !== "ai" && mode !== "model") || game.winner !== null || currentPlayer()?.kind !== "ai") return;
+    const action = chooseAiAction(snapshot, snapshot.aiDifficulty);
+    if (requestId !== aiRequestId || mode !== "ai" || game.winner !== null || currentPlayer()?.kind !== "ai") return;
     if (!action) return;
     const result = applyAction(game, action);
     if (result.ok) {
       game = result.state;
       render();
-    } else if (external) {
-      const fallback = chooseAiAction(game, game.aiDifficulty);
-      const fallbackResult = fallback ? applyAction(game, fallback) : null;
-      if (fallbackResult?.ok) {
-        game = fallbackResult.state;
-        render();
-        showToast(note || "外脑返回了非法动作，已用高速 AI");
-      }
     }
   }, 520);
 }
@@ -555,7 +462,7 @@ function renderPawns(svg) {
       y: center.y + 0.5,
       class: "pawn-label"
     });
-    label.textContent = player.label;
+    label.textContent = localizedPieceLabel(player);
     group.appendChild(label);
     svg.appendChild(group);
   }
@@ -594,17 +501,15 @@ function renderPlayers() {
 
     const info = document.createElement("div");
     const name = document.createElement("strong");
-    name.textContent = mode === "online" ? seats[player.id]?.name || player.name : player.name;
+    name.textContent = displayPlayerName(player);
     const meta = document.createElement("small");
-    const seatText = mode === "online" && !seats[player.id]?.occupied ? "空位" : player.goal.edge === "row"
-      ? `目标 ${player.goal.value === 0 ? "北线" : "南线"}`
-      : `目标 ${player.goal.value === 0 ? "西线" : "东线"}`;
-    meta.textContent = `${player.label} · ${seatText}`;
+    const seatText = mode === "online" && !seats[player.id]?.occupied ? tr("status.emptySeat", "空位") : goalText(player);
+    meta.textContent = `${localizedPieceLabel(player)} · ${seatText}`;
     info.append(name, meta);
 
     const walls = document.createElement("span");
     walls.className = "wall-pill";
-    walls.textContent = `${player.walls} 墙`;
+    walls.textContent = `${player.walls} ${tr("luqiangqi.wallUnit", "墙")}`;
 
     card.append(dot, info, walls);
     els.players.appendChild(card);
@@ -614,10 +519,8 @@ function renderPlayers() {
 function renderLog() {
   els.log.replaceChildren();
   const startText = mode === "online" && !onlineRoom?.started
-    ? "等待房间满员"
-    : mode === "model" && !modelConfig
-      ? "选择一个外脑类型"
-      : "棋局开始";
+    ? tr("status.waitingRoomFull", "等待房间满员")
+    : tr("status.gameStarted", "棋局开始");
   const entries = game.log?.length ? game.log : [{ text: startText }];
   for (const entry of entries.slice(0, 18)) {
     const item = document.createElement("li");
@@ -628,18 +531,16 @@ function renderLog() {
 
 function renderStatus() {
   const player = currentPlayer();
-  els.gameSubtitle.textContent = subtitles[mode];
-  els.turnEyebrow.textContent = game.winner !== null ? "终局" : `第 ${game.turn} 手`;
+  els.gameSubtitle.textContent = tr(`common.caption.${mode}`, mode);
+  els.turnEyebrow.textContent = game.winner !== null ? tr("status.final", "终局") : fmt("status.round", { turn: game.turn }, `第 ${game.turn} 手`);
 
   if (game.winner !== null) {
-    els.statusTitle.textContent = `${game.players[game.winner].name} 获胜`;
-  } else if (mode === "model" && !modelConfig) {
-    els.statusTitle.textContent = "选择外脑";
+    els.statusTitle.textContent = fmt("status.win", { name: displayPlayerName(game.players[game.winner]) }, `${displayPlayerName(game.players[game.winner])} 获胜`);
   } else if (mode === "online" && !onlineRoom?.started) {
     const occupied = onlineRoom?.seats?.filter((seat) => seat.occupied).length || 0;
-    els.statusTitle.textContent = `等待玩家 ${occupied}/${game.playerCount}`;
+    els.statusTitle.textContent = fmt("status.waitingPlayers", { count: occupied, total: game.playerCount }, `等待玩家 ${occupied}/${game.playerCount}`);
   } else {
-    els.statusTitle.textContent = `轮到 ${player.name}`;
+    els.statusTitle.textContent = fmt("status.turn", { name: displayPlayerName(player) }, `轮到 ${displayPlayerName(player)}`);
   }
 
   els.pathMetric.textContent = game.players.map((item) => shortestPath(game, item.id)).join(" / ");
@@ -649,22 +550,16 @@ function renderStatus() {
   els.onlineHomeStep.classList.toggle("hidden", onlineStep !== "home");
   els.onlineJoinStep.classList.toggle("hidden", onlineStep !== "join");
   els.onlineRoomStep.classList.toggle("hidden", onlineStep !== "room");
-  els.modelHomeStep.classList.toggle("hidden", modelStep !== "home");
-  els.modelLocalStep.classList.toggle("hidden", modelStep !== "local");
-  els.modelApiStep.classList.toggle("hidden", modelStep !== "api");
   els.roomCard.classList.toggle("hidden", !onlineRoom || onlineStep !== "room");
-  els.externalCard.classList.toggle("hidden", !onlineRoom?.external || onlineStep !== "room");
-  els.roomStepTitle.textContent = onlineRoomRole === "guest" ? "已加入房间" : "房间已创建";
+  els.roomStepTitle.textContent = onlineRoomRole === "guest" ? tr("status.roomJoined", "已加入房间") : tr("status.roomCreated", "房间已创建");
   els.roomState.textContent = onlineRoom
     ? onlineRoom.started
-      ? "对局进行中"
-      : `等待玩家 ${occupied}/${onlineRoom.playerCount}`
-    : "等待玩家";
+      ? tr("status.gameStarted", "对局进行中")
+      : fmt("status.waitingPlayers", { count: occupied, total: onlineRoom.playerCount }, `等待玩家 ${occupied}/${onlineRoom.playerCount}`)
+    : tr("common.waitingPlayers", "等待玩家");
   els.roomCode.textContent = onlineRoom?.code || "-----";
-  els.externalLinkText.textContent = onlineRoom?.external ? "外部可接入" : "未启用";
-  els.setupPanel.classList.toggle("hidden", mode === "online" || mode === "model");
+  els.setupPanel.classList.toggle("hidden", mode === "online");
   els.onlinePanel.classList.toggle("hidden", mode !== "online");
-  els.modelPanel.classList.toggle("hidden", mode !== "model");
   els.playerCountField.classList.toggle("hidden", mode === "ai");
   els.difficultyField.classList.toggle("hidden", mode !== "ai");
 }
@@ -703,10 +598,6 @@ els.modeTabs.addEventListener("click", (event) => {
     });
     return;
   }
-  if (mode === "model") {
-    resetModelHome();
-    return;
-  }
   resetOfflineGame();
 });
 
@@ -732,38 +623,6 @@ els.onlinePlayerCount.addEventListener("change", () => {
   }
 });
 els.difficulty.addEventListener("change", resetOfflineGame);
-els.chooseLocalModel.addEventListener("click", () => {
-  modelStep = "local";
-  render();
-});
-els.chooseApiModel.addEventListener("click", () => {
-  modelStep = "api";
-  render();
-});
-els.modelLocalBack.addEventListener("click", resetModelHome);
-els.modelApiBack.addEventListener("click", resetModelHome);
-els.copyOllamaCommand.addEventListener("click", async () => {
-  await navigator.clipboard?.writeText(els.ollamaCommand.textContent);
-  showToast("启动命令已复制");
-});
-els.startLocalModel.addEventListener("click", () => {
-  startModelGame({
-    provider: "ollama",
-    difficulty: els.modelLocalDifficulty.value,
-    ollamaUrl: els.ollamaUrl.value.trim(),
-    ollamaModel: els.ollamaModel.value.trim()
-  });
-});
-els.startApiModel.addEventListener("click", () => {
-  if (!els.apiKey.value.trim()) return showToast("请输入 API Key");
-  startModelGame({
-    provider: "api",
-    difficulty: els.modelApiDifficulty.value,
-    apiKey: els.apiKey.value.trim(),
-    apiBaseUrl: els.apiBaseUrl.value.trim(),
-    apiModel: els.apiModel.value.trim()
-  });
-});
 els.createRoom.addEventListener("click", createRoom);
 els.chooseJoin.addEventListener("click", () => {
   onlineStep = "join";
@@ -781,15 +640,11 @@ els.joinCode.addEventListener("input", () => {
 els.copyRoom.addEventListener("click", async () => {
   if (!onlineRoom) return;
   await navigator.clipboard?.writeText(onlineRoom.code);
-  showToast("房间码已复制");
-});
-els.copyExternal.addEventListener("click", async () => {
-  const text = externalAccessText() || externalStateUrl();
-  if (!text) return;
-  await navigator.clipboard?.writeText(text);
-  showToast("外部接入链接已复制");
+  showToast(tr("status.roomCodeCopied", "房间码已复制"));
 });
 
 restoreActiveRoom({ quiet: true }).then((restored) => {
   if (!restored) render();
 });
+
+window.addEventListener("smc:languagechange", render);

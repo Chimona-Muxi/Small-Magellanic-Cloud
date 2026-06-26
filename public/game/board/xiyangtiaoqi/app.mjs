@@ -41,12 +41,6 @@ const els = {
   toast: document.querySelector("#toast")
 };
 
-const modeText = {
-  ai: "人机对弈",
-  local: "同屏对战",
-  online: "房间联机"
-};
-
 let mode = "ai";
 let game = createGame();
 let selectedPieceId = "";
@@ -84,8 +78,23 @@ function createGame() {
     mode,
     aiDifficulty: els.difficulty?.value || "steady",
     aiSlots: mode === "ai" ? [1] : [],
-    names: mode === "ai" ? ["你", "AI"] : ["墨方", "朱方"]
+    names: mode === "ai"
+      ? [tr("player.you", "你"), tr("player.ai", "AI")]
+      : mode === "online"
+        ? [tr("player.one", "玩家 1"), tr("player.two", "玩家 2")]
+        : [tr("player.black", "墨方"), tr("player.red", "朱方")]
   });
+}
+
+function tr(key, fallback = "") {
+  return window.SMC_PREFS?.t(key, fallback) || fallback || key;
+}
+
+function fmt(key, vars = {}, fallback = "") {
+  return Object.entries(vars).reduce(
+    (text, [name, value]) => text.replaceAll(`{${name}}`, value),
+    tr(key, fallback)
+  );
 }
 
 async function api(path, body = null, options = {}) {
@@ -96,7 +105,7 @@ async function api(path, body = null, options = {}) {
     ...options
   });
   const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data.error || "请求失败");
+  if (!response.ok) throw new Error(data.error || tr("status.illegalMove", "请求失败"));
   return data;
 }
 
@@ -121,7 +130,7 @@ function withRoom(room) {
 
 function connectRoom(code) {
   closeEvents();
-  eventSource = new EventSource(`/api/rooms/${code}/events?clientId=${encodeURIComponent(clientId)}`);
+  eventSource = new EventSource(`/api/xiyangtiaoqi/rooms/${code}/events?clientId=${encodeURIComponent(clientId)}`);
   eventSource.onmessage = (event) => {
     const room = JSON.parse(event.data);
     withRoom(room);
@@ -135,7 +144,7 @@ async function restoreRoom() {
   const saved = JSON.parse(localStorage.getItem(activeRoomKey()) || "null");
   if (!saved?.code) return;
   try {
-    const room = await api(`/api/rooms/${saved.code}?clientId=${encodeURIComponent(clientId)}`);
+    const room = await api(`/api/xiyangtiaoqi/rooms/${saved.code}?clientId=${encodeURIComponent(clientId)}`);
     mode = "online";
     onlineStep = "room";
     withRoom(room);
@@ -172,16 +181,29 @@ function currentPlayer() {
   return game.players[game.current];
 }
 
+function localizedPieceLabel(owner) {
+  const fallback = game.players[owner]?.label || "";
+  return window.SMC_PREFS?.pieceLabel("xiyangtiaoqi", owner, fallback) || fallback;
+}
+
+function displayPlayerName(player) {
+  const seat = onlineRoom?.seats?.[player.id];
+  if (mode === "online" && seat?.name) return seat.name;
+  if (mode === "ai") return player.id === 0 ? tr("player.you", "你") : tr("player.ai", "AI");
+  if (mode === "online") return player.id === 0 ? tr("player.one", "玩家 1") : tr("player.two", "玩家 2");
+  return player.id === 0 ? tr("player.black", "墨方") : tr("player.red", "朱方");
+}
+
 function myOnlineSeat() {
   return onlineRoom?.mySeat ?? -1;
 }
 
 function actionLockedReason() {
-  if (game.winner !== null) return "本局已经结束";
-  if (mode === "ai" && currentPlayer()?.kind === "ai") return "AI 思考中";
+  if (game.winner !== null) return tr("status.gameOver", "本局已经结束");
+  if (mode === "ai" && currentPlayer()?.kind === "ai") return tr("status.aiThinking", "AI 思考中");
   if (mode === "online") {
-    if (!onlineRoom?.started) return "等待对手入座";
-    if (myOnlineSeat() !== game.current) return "还没轮到你";
+    if (!onlineRoom?.started) return tr("status.waitingSeat", "等待对手入座");
+    if (myOnlineSeat() !== game.current) return tr("status.notYourTurn", "还没轮到你");
   }
   return "";
 }
@@ -212,7 +234,7 @@ async function submitAction(action) {
   if (!action) return;
   if (mode === "online") {
     try {
-      const room = await api(`/api/rooms/${onlineRoom.code}/action`, { clientId, action });
+      const room = await api(`/api/xiyangtiaoqi/rooms/${onlineRoom.code}/action`, { clientId, action });
       withRoom(room);
     } catch (error) {
       showToast(error.message);
@@ -221,7 +243,7 @@ async function submitAction(action) {
   }
 
   const result = applyAction(game, action);
-  if (!result.ok) return showToast(result.reason || "这步不合法");
+  if (!result.ok) return showToast(result.reason || tr("status.illegalMove", "这步不合法"));
   game = result.state;
   selectedPieceId = game.chain?.pieceId || "";
   render();
@@ -238,8 +260,8 @@ function onSquareClick(row, col) {
   const action = findActionTo(row, col);
   if (action) return submitAction(action);
 
-  if (mustCapture(game)) showToast("这一手必须吃子");
-  else showToast("请选择可移动的棋子");
+  if (mustCapture(game)) showToast(tr("status.mustCapture", "这一手必须吃子"));
+  else showToast(tr("status.selectPiece", "请选择可移动的棋子"));
 }
 
 function queueAi() {
@@ -260,12 +282,12 @@ function queueAi() {
 
 async function createOnlineRoom() {
   try {
-    const room = await api("/api/rooms", { clientId, name: els.onlineName.value });
+    const room = await api("/api/xiyangtiaoqi/rooms", { clientId, name: els.onlineName.value });
     onlineStep = "room";
     withRoom(room);
     saveActiveRoom(room);
     connectRoom(room.code);
-    showToast("房间已创建");
+    showToast(tr("status.roomCreated", "房间已创建"));
   } catch (error) {
     showToast(error.message);
   }
@@ -273,14 +295,14 @@ async function createOnlineRoom() {
 
 async function joinOnlineRoom() {
   const code = els.joinCode.value.trim().toUpperCase();
-  if (!code) return showToast("请输入房间码");
+  if (!code) return showToast(tr("status.enterRoomCode", "请输入房间码"));
   try {
-    const room = await api(`/api/rooms/${code}/join`, { clientId, name: els.onlineName.value });
+    const room = await api(`/api/xiyangtiaoqi/rooms/${code}/join`, { clientId, name: els.onlineName.value });
     onlineStep = "room";
     withRoom(room);
     saveActiveRoom(room);
     connectRoom(room.code);
-    showToast("已加入房间");
+    showToast(tr("status.roomJoined", "已加入房间"));
   } catch (error) {
     showToast(error.message);
   }
@@ -320,7 +342,7 @@ function renderBoard() {
       if (piece) {
         const pieceEl = document.createElement("div");
         pieceEl.className = `piece ${pieceClass(piece)}${piece.king ? " king" : ""}`;
-        pieceEl.textContent = piece.king ? "" : game.players[piece.owner].label;
+        pieceEl.textContent = piece.king ? "" : localizedPieceLabel(piece.owner);
         square.append(pieceEl);
         if (piece.id === selectedPieceId) square.classList.add("selected");
       }
@@ -334,16 +356,16 @@ function renderPlayers() {
   els.playerCards.innerHTML = game.players.map((player) => {
     const seat = onlineRoom?.seats?.[player.id];
     const suffix = mode === "online"
-      ? seat?.occupied ? (seat.connected ? "在线" : "已入座") : "等待"
-      : player.kind === "ai" ? "AI" : "玩家";
+      ? seat?.occupied ? (seat.connected ? tr("status.online", "在线") : tr("status.seated", "已入座")) : tr("status.waiting", "等待")
+      : player.kind === "ai" ? tr("player.ai", "AI") : tr("status.player", "玩家");
     return `
       <div class="player-card ${game.current === player.id && game.winner === null ? "active" : ""}">
         <span class="player-dot" style="background:${player.color}"></span>
         <div>
-          <strong>${player.name}</strong>
-          <small>${player.label}方 · ${suffix}</small>
+          <strong>${displayPlayerName(player)}</strong>
+          <small>${localizedPieceLabel(player.id)} · ${suffix}</small>
         </div>
-        <small>${player.id === 0 ? "先手" : "后手"}</small>
+        <small>${player.id === 0 ? tr("status.first", "先手") : tr("status.second", "后手")}</small>
       </div>
     `;
   }).join("");
@@ -352,7 +374,7 @@ function renderPlayers() {
 function renderMetrics() {
   els.metrics.innerHTML = scoreSummary(game).map((item) => `
     <div class="metric">
-      <span>${item.name}</span>
+      <span>${displayPlayerName(game.players[item.id])}</span>
       <strong>${item.pieces} / ${item.kings}</strong>
     </div>
   `).join("");
@@ -362,23 +384,23 @@ function renderLog() {
   const logs = game.log || [];
   els.logList.innerHTML = logs.length
     ? logs.map((entry) => `<div class="log-item">${entry.text}</div>`).join("")
-    : `<div class="log-item">暂无记录</div>`;
+    : `<div class="log-item">${tr("status.noLog", "暂无记录")}</div>`;
 }
 
 function renderStatus() {
-  els.modeCaption.textContent = modeText[mode];
-  els.turnMeta.textContent = game.winner !== null ? "终局" : `第 ${game.turn} 手`;
+  els.modeCaption.textContent = tr(`common.caption.${mode}`, mode);
+  els.turnMeta.textContent = game.winner !== null ? tr("status.final", "终局") : fmt("status.round", { turn: game.turn }, `第 ${game.turn} 手`);
 
   if (game.winner !== null) {
-    els.statusTitle.textContent = `${game.players[game.winner].name} 获胜`;
+    els.statusTitle.textContent = fmt("status.win", { name: displayPlayerName(game.players[game.winner]) }, `${displayPlayerName(game.players[game.winner])} 获胜`);
   } else if (mode === "online" && !onlineRoom?.started) {
-    els.statusTitle.textContent = "等待对手";
+    els.statusTitle.textContent = tr("status.waitingSeat", "等待对手");
   } else if (mode === "online" && myOnlineSeat() !== game.current) {
-    els.statusTitle.textContent = `轮到 ${currentPlayer().name}`;
+    els.statusTitle.textContent = fmt("status.turn", { name: displayPlayerName(currentPlayer()) }, `轮到 ${displayPlayerName(currentPlayer())}`);
   } else if (mode === "ai" && currentPlayer()?.kind === "ai") {
-    els.statusTitle.textContent = "AI 思考中";
+    els.statusTitle.textContent = tr("status.aiThinking", "AI 思考中");
   } else {
-    els.statusTitle.textContent = `轮到 ${currentPlayer().name}`;
+    els.statusTitle.textContent = fmt("status.turn", { name: displayPlayerName(currentPlayer()) }, `轮到 ${displayPlayerName(currentPlayer())}`);
   }
 
   els.capturePill.classList.toggle("active", mustCapture(game));
@@ -427,7 +449,7 @@ els.joinRoom.addEventListener("click", joinOnlineRoom);
 els.leaveRoom.addEventListener("click", leaveRoom);
 els.copyRoom.addEventListener("click", async () => {
   await navigator.clipboard?.writeText(onlineRoom?.code || "");
-  showToast("房间码已复制");
+  showToast(tr("status.roomCodeCopied", "房间码已复制"));
 });
 els.joinCode.addEventListener("input", () => {
   els.joinCode.value = els.joinCode.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 5);
@@ -438,5 +460,6 @@ restoreRoom();
 queueAi();
 
 window.addEventListener("beforeunload", closeEvents);
+window.addEventListener("smc:languagechange", render);
 
 console.info(explainDifficulty(els.difficulty.value));

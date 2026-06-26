@@ -16,6 +16,19 @@
   --smc-image: url("https://cdn.esawebb.org/archives/images/screen/weic2301d.jpg");
 }
 
+html[data-theme="light"] {
+  color-scheme: light;
+  --ink: #14201d;
+  --muted: #596861;
+  --dim: #7d8a85;
+  --line: rgba(20, 32, 29, 0.15);
+  --line-strong: rgba(20, 32, 29, 0.28);
+  --paper: #f8faf4;
+  --panel: rgba(255, 255, 255, 0.72);
+  --panel-solid: rgba(255, 255, 255, 0.92);
+  --shadow: 0 24px 76px rgba(43, 57, 52, 0.16);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -35,6 +48,34 @@ body {
     linear-gradient(180deg, #06090d 0%, #0a0f10 48%, #101516 100%);
 }
 
+html[data-lang="zh-CN"] body {
+  font-family: Inter, "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", ui-sans-serif, system-ui, sans-serif;
+}
+
+html[data-lang="zh-TW"] body {
+  font-family: Inter, "PingFang TC", "Microsoft JhengHei", "Noto Sans CJK TC", ui-sans-serif, system-ui, sans-serif;
+}
+
+html[data-lang="en"] body {
+  font-family: Inter, "SF Pro Display", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+}
+
+html[data-lang="fr"] body {
+  font-family: Inter, "Avenir Next", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+}
+
+html[data-lang="ja"] body {
+  font-family: Inter, "Hiragino Sans", "Yu Gothic", "Noto Sans JP", ui-sans-serif, system-ui, sans-serif;
+}
+
+html[data-lang="ko"] body {
+  font-family: Inter, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", ui-sans-serif, system-ui, sans-serif;
+}
+
+html[data-lang="ru"] body {
+  font-family: Inter, "PT Sans", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+}
+
 body::before {
   content: "";
   position: fixed;
@@ -49,6 +90,21 @@ body::before {
   opacity: 0.72;
   transform: translate(var(--tilt-x, 0), var(--tilt-y, 0)) scale(1.04);
   transition: transform 260ms ease-out;
+}
+
+html[data-theme="light"] body {
+  background:
+    radial-gradient(circle at 16% 10%, rgba(143, 184, 255, 0.14), transparent 34%),
+    radial-gradient(circle at 82% 18%, rgba(79, 199, 161, 0.12), transparent 28%),
+    linear-gradient(180deg, #eef5ee 0%, #f8faf4 50%, #edf4ee 100%);
+}
+
+html[data-theme="light"] body::before {
+  background-image:
+    linear-gradient(90deg, rgba(247, 250, 244, 0.8), rgba(247, 250, 244, 0.34) 50%, rgba(247, 250, 244, 0.72)),
+    linear-gradient(rgba(247, 250, 244, 0.04), rgba(247, 250, 244, 0.54)),
+    var(--smc-image);
+  opacity: 0.62;
 }
 
 body::after {
@@ -96,7 +152,7 @@ button {
 .brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 0;
   min-width: 0;
 }
 
@@ -159,6 +215,43 @@ button {
   background: rgba(255, 255, 255, 0.1);
 }
 
+.nav-select,
+.nav-toggle {
+  min-height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.08);
+  font: inherit;
+  font-weight: 750;
+}
+
+.nav-select {
+  max-width: 130px;
+  padding: 0 28px 0 12px;
+}
+
+.nav-toggle {
+  padding: 0 12px;
+}
+
+.nav-select:hover,
+.nav-toggle:hover {
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.13);
+}
+
+html[data-theme="light"] .site-header {
+  background: rgba(255, 255, 255, 0.42);
+  border-bottom-color: rgba(20, 32, 29, 0.1);
+}
+
+html[data-theme="light"] .site-nav .current,
+html[data-theme="light"] .nav-select,
+html[data-theme="light"] .nav-toggle {
+  background: rgba(255, 255, 255, 0.64);
+}
+
 .site-nav .next {
   border: 1px solid rgba(79, 199, 161, 0.34);
   color: #07120e;
@@ -205,7 +298,7 @@ button {
 .page-title h1 {
   margin: 0;
   max-width: 980px;
-  color: rgba(255, 255, 255, 0.94);
+  color: var(--ink);
   font-size: clamp(58px, 11vw, 148px);
   line-height: 0.88;
   letter-spacing: 0;
@@ -215,7 +308,7 @@ button {
 .hero-copy {
   max-width: 700px;
   margin: 0;
-  color: rgba(246, 244, 237, 0.86);
+  color: color-mix(in srgb, var(--ink) 86%, transparent);
   font-size: clamp(18px, 2.1vw, 25px);
   line-height: 1.55;
   text-shadow: 0 14px 38px rgba(0, 0, 0, 0.5);
@@ -450,7 +543,7 @@ button {
 
 .game-body footer {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   gap: 12px;
   margin-top: 20px;

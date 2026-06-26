@@ -1,3 +1,5 @@
+import "./preferences.mjs";
+
 const revealItems = [...document.querySelectorAll("[data-reveal]")];
 
 const observer = new IntersectionObserver((entries) => {

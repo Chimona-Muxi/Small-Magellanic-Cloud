@@ -2,11 +2,24 @@ import { createServer } from "node:http";
 import { readFile, stat } from "node:fs/promises";
 import { dirname, extname, join, normalize } from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  createInitialState as createLuqiangqiState,
+  applyAction as applyLuqiangqiAction
+} from "./public/game/board/luqiangqi/engine.mjs";
+import {
+  createInitialState as createCheckersState,
+  applyAction as applyCheckersAction
+} from "./public/game/board/xiyangtiaoqi/engine.mjs";
+import {
+  createInitialState as createTurkishState,
+  applyAction as applyTurkishAction
+} from "./public/game/board/tuerqitiaoqi/engine.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const publicDir = join(__dirname, "public");
 const port = Number(process.env.PORT || 5226);
 const host = process.env.HOST || (process.env.PORT ? "0.0.0.0" : "127.0.0.1");
+const roomTtlMs = 1000 * 60 * 60 * 6;
 
 const mime = {
   ".html": "text/html; charset=utf-8",
@@ -22,9 +35,309 @@ const mime = {
   ".ico": "image/x-icon"
 };
 
+const gameConfigs = {
+  luqiangqi: {
+    maxPlayers: 4,
+    defaultPlayers: 2,
+    names: ["玩家 1", "玩家 2", "玩家 3", "玩家 4"],
+    create(playerCount) {
+      return createLuqiangqiState({
+        playerCount,
+        mode: "online",
+        aiSlots: [],
+        names: this.names.slice(0, playerCount)
+      });
+    },
+    apply: applyLuqiangqiAction
+  },
+  xiyangtiaoqi: {
+    maxPlayers: 2,
+    defaultPlayers: 2,
+    names: ["玩家 1", "玩家 2"],
+    create() {
+      return createCheckersState({
+        mode: "online",
+        aiSlots: [],
+        names: this.names
+      });
+    },
+    apply: applyCheckersAction
+  },
+  tuerqitiaoqi: {
+    maxPlayers: 2,
+    defaultPlayers: 2,
+    names: ["玩家 1", "玩家 2"],
+    create() {
+      return createTurkishState({
+        mode: "online",
+        names: this.names
+      });
+    },
+    apply: applyTurkishAction
+  }
+};
+
+const roomStores = new Map(Object.keys(gameConfigs).map((key) => [key, new Map()]));
+
 function cleanPath(pathname) {
   const decoded = decodeURIComponent(pathname);
   return normalize(decoded).replace(/^(\.\.[/\\])+/, "");
+}
+
+function json(res, status, data) {
+  res.writeHead(status, {
+    "Content-Type": "application/json; charset=utf-8",
+    "Cache-Control": "no-store, max-age=0",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS"
+  });
+  res.end(JSON.stringify(data));
+}
+
+function sanitizeName(value, fallback) {
+  const text = String(value || "").trim().replace(/\s+/g, " ");
+  return text ? text.slice(0, 18) : fallback;
+}
+
+function makeRoomCode(store) {
+  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    let code = "";
+    for (let i = 0; i < 5; i += 1) code += alphabet[Math.floor(Math.random() * alphabet.length)];
+    if (!store.has(code)) return code;
+  }
+  return String(Date.now()).slice(-5).toUpperCase();
+}
+
+function readBody(req) {
+  return new Promise((resolve) => {
+    let body = "";
+    req.on("data", (chunk) => {
+      body += chunk;
+      if (body.length > 128 * 1024) req.destroy();
+    });
+    req.on("end", () => {
+      if (!body) return resolve({});
+      try {
+        resolve(JSON.parse(body));
+      } catch {
+        resolve({});
+      }
+    });
+    req.on("error", () => resolve({}));
+  });
+}
+
+function syncPlayerNames(room) {
+  for (const player of room.state.players || []) {
+    const seat = room.seats[player.id];
+    if (seat?.occupied) player.name = seat.name;
+  }
+}
+
+function publicRoom(room, clientId = "") {
+  syncPlayerNames(room);
+  const mySeat = room.seats.findIndex((seat) => seat.clientId === clientId);
+  return {
+    code: room.code,
+    game: room.game,
+    playerCount: room.playerCount,
+    started: room.started,
+    mySeat,
+    seats: room.seats.map(({ clientId: _clientId, ...seat }) => seat),
+    state: room.state,
+    updatedAt: room.updatedAt
+  };
+}
+
+function broadcast(room) {
+  for (const client of [...room.clients]) {
+    try {
+      client.res.write(`data: ${JSON.stringify(publicRoom(room, client.clientId))}\n\n`);
+    } catch {
+      room.clients.delete(client);
+    }
+  }
+}
+
+function cleanupRooms(store) {
+  const now = Date.now();
+  for (const [code, room] of store) {
+    if (!room.clients.size && now - room.updatedAt > roomTtlMs) store.delete(code);
+  }
+}
+
+function occupySeat(room, clientId, name) {
+  const existing = room.seats.findIndex((seat) => seat.clientId === clientId);
+  if (existing >= 0) {
+    room.seats[existing].name = sanitizeName(name, room.seats[existing].name);
+    room.seats[existing].occupied = true;
+    return existing;
+  }
+
+  const index = room.seats.findIndex((seat) => !seat.occupied);
+  if (index < 0) return -1;
+  room.seats[index] = {
+    occupied: true,
+    connected: false,
+    clientId,
+    name: sanitizeName(name, `玩家 ${index + 1}`)
+  };
+  return index;
+}
+
+function createRoom(gameKey, cfg, store, body) {
+  const playerCount = Math.max(2, Math.min(cfg.maxPlayers, Number(body.playerCount) || cfg.defaultPlayers));
+  const code = makeRoomCode(store);
+  const state = cfg.create(playerCount);
+  const seats = Array.from({ length: playerCount }, (_, index) => ({
+    occupied: false,
+    connected: false,
+    clientId: "",
+    name: cfg.names[index] || `玩家 ${index + 1}`
+  }));
+  const room = {
+    code,
+    game: gameKey,
+    playerCount,
+    started: false,
+    state,
+    seats,
+    clients: new Set(),
+    updatedAt: Date.now()
+  };
+  const seat = occupySeat(room, String(body.clientId || ""), body.name);
+  if (seat < 0) throw new Error("房间创建失败");
+  syncPlayerNames(room);
+  store.set(code, room);
+  return room;
+}
+
+function sendSse(req, res, room, clientId) {
+  const seatIndex = room.seats.findIndex((seat) => seat.clientId === clientId);
+  if (seatIndex >= 0) room.seats[seatIndex].connected = true;
+
+  res.writeHead(200, {
+    "Content-Type": "text/event-stream; charset=utf-8",
+    "Cache-Control": "no-store, no-transform",
+    Connection: "keep-alive",
+    "X-Accel-Buffering": "no"
+  });
+
+  const client = { clientId, res };
+  room.clients.add(client);
+  res.write(`data: ${JSON.stringify(publicRoom(room, clientId))}\n\n`);
+  broadcast(room);
+
+  req.on("close", () => {
+    room.clients.delete(client);
+    const active = [...room.clients].some((item) => item.clientId === clientId);
+    if (!active && seatIndex >= 0) {
+      room.seats[seatIndex].connected = false;
+      room.updatedAt = Date.now();
+      broadcast(room);
+    }
+  });
+}
+
+async function handleApi(req, res, url) {
+  if (req.method === "OPTIONS") {
+    json(res, 204, {});
+    return true;
+  }
+
+  const match = url.pathname.match(/^\/api\/([^/]+)\/rooms(?:\/([^/]+))?(?:\/([^/]+))?\/?$/);
+  if (!match) return false;
+
+  const [, gameKey, rawCode, action] = match;
+  const cfg = gameConfigs[gameKey];
+  const store = roomStores.get(gameKey);
+  if (!cfg || !store) {
+    json(res, 404, { error: "游戏不存在" });
+    return true;
+  }
+
+  cleanupRooms(store);
+
+  try {
+    if (!rawCode && req.method === "POST") {
+      const body = await readBody(req);
+      const room = createRoom(gameKey, cfg, store, body);
+      json(res, 200, publicRoom(room, String(body.clientId || "")));
+      return true;
+    }
+
+    const code = String(rawCode || "").trim().toUpperCase();
+    const room = store.get(code);
+    if (!room) {
+      json(res, 404, { error: "房间不存在" });
+      return true;
+    }
+
+    if (!action && req.method === "GET") {
+      const clientId = String(url.searchParams.get("clientId") || "");
+      json(res, 200, publicRoom(room, clientId));
+      return true;
+    }
+
+    if (action === "events" && req.method === "GET") {
+      const clientId = String(url.searchParams.get("clientId") || "");
+      sendSse(req, res, room, clientId);
+      return true;
+    }
+
+    if (action === "join" && req.method === "POST") {
+      const body = await readBody(req);
+      const clientId = String(body.clientId || "");
+      const seat = occupySeat(room, clientId, body.name);
+      if (seat < 0) {
+        json(res, 409, { error: "房间已满" });
+        return true;
+      }
+      room.started = room.seats.every((item) => item.occupied);
+      room.updatedAt = Date.now();
+      syncPlayerNames(room);
+      broadcast(room);
+      json(res, 200, publicRoom(room, clientId));
+      return true;
+    }
+
+    if (action === "action" && req.method === "POST") {
+      const body = await readBody(req);
+      const clientId = String(body.clientId || "");
+      const seat = room.seats.findIndex((item) => item.clientId === clientId);
+      if (seat < 0) {
+        json(res, 403, { error: "你还没有入座" });
+        return true;
+      }
+      if (!room.started) {
+        json(res, 409, { error: "等待玩家入座" });
+        return true;
+      }
+      if (room.state.current !== seat) {
+        json(res, 409, { error: "还没轮到你" });
+        return true;
+      }
+      const result = cfg.apply(room.state, body.action);
+      if (!result.ok) {
+        json(res, 400, { error: result.reason || "这步不合法" });
+        return true;
+      }
+      room.state = result.state;
+      room.updatedAt = Date.now();
+      syncPlayerNames(room);
+      broadcast(room);
+      json(res, 200, publicRoom(room, clientId));
+      return true;
+    }
+
+    json(res, 404, { error: "接口不存在" });
+    return true;
+  } catch (error) {
+    json(res, 500, { error: error.message || "服务器错误" });
+    return true;
+  }
 }
 
 async function resolveFile(pathname) {
@@ -53,6 +366,8 @@ function redirect(res, location) {
 const server = createServer(async (req, res) => {
   try {
     const url = new URL(req.url || "/", `http://${req.headers.host || `${host}:${port}`}`);
+
+    if (await handleApi(req, res, url)) return;
 
     if (url.pathname !== "/" && !extname(url.pathname) && !url.pathname.endsWith("/")) {
       return redirect(res, `${url.pathname}/${url.search}`);
