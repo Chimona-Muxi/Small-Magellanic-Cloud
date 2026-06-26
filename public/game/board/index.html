@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Board · Small Magellanic Cloud</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="site-shell">
+    <header class="site-header">
+      <a class="brand" href="/">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-text"><strong>Small Magellanic Cloud</strong><span>board games</span></span>
+      </a>
+      <nav class="site-nav trail" aria-label="当前位置">
+        <a href="/">Home</a>
+        <span>/</span>
+        <a href="/game/">Game</a>
+        <span>/</span>
+        <span class="current">Board</span>
+      </nav>
+    </header>
+
+    <main class="content-band compact">
+      <div class="route-strip" data-reveal>
+        <a href="/">Home</a><span>/</span><a href="/game/">Game</a><span>/</span><span>Board</span>
+      </div>
+      <div class="page-title" data-reveal>
+        <p class="eyebrow">board</p>
+        <h1>棋类系统</h1>
+        <p>目前的棋类项目以发布版方式收纳在这里，开发仍保留在各自原仓库中。</p>
+      </div>
+
+      <div class="board-grid">
+        <a class="game-card" href="/game/board/luqiangqi/" data-reveal>
+          <div class="game-visual"><span class="mini-board luqiangqi" aria-hidden="true"></span></div>
+          <div class="game-body">
+            <div class="game-meta">
+              <span class="tag">Path finding</span>
+              <span class="tag">AI</span>
+            </div>
+            <h3>路墙棋</h3>
+            <p>以路径、封锁和空间压迫为核心的策略棋。</p>
+            <footer><span>Open</span><span>/luqiangqi</span></footer>
+          </div>
+        </a>
+
+        <a class="game-card" href="/game/board/xiyangtiaoqi/" data-reveal>
+          <div class="game-visual"><span class="mini-board" aria-hidden="true"></span></div>
+          <div class="game-body">
+            <div class="game-meta">
+              <span class="tag">Checkers</span>
+              <span class="tag">Capture</span>
+            </div>
+            <h3>西洋跳棋</h3>
+            <p>强制吃子、连吃、升王，适合快速对局。</p>
+            <footer><span>Open</span><span>/xiyangtiaoqi</span></footer>
+          </div>
+        </a>
+
+        <a class="game-card" href="/game/board/tuerqitiaoqi/" data-reveal>
+          <div class="game-visual"><span class="mini-board tuerqitiaoqi" aria-hidden="true"></span></div>
+          <div class="game-body">
+            <div class="game-meta">
+              <span class="tag">Orthogonal</span>
+              <span class="tag">Turkish</span>
+            </div>
+            <h3>土耳其跳棋</h3>
+            <p>正交移动与长王机制带来不同于斜跳棋的节奏。</p>
+            <footer><span>Open</span><span>/tuerqitiaoqi</span></footer>
+          </div>
+        </a>
+      </div>
+    </main>
+  </div>
+  <script type="module" src="/site.mjs"></script>
+</body>
+</html>
