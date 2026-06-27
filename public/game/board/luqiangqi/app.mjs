@@ -529,6 +529,67 @@ function renderLog() {
   }
 }
 
+function recordLines() {
+  const playerLines = game.players.map((player) => `${displayPlayerName(player)}: ${localizedPieceLabel(player)} / ${goalText(player)} / ${player.walls} ${tr("luqiangqi.wallUnit", "墙")}`);
+  const logs = game.log?.length
+    ? [...game.log].reverse().map((entry, index) => `${index + 1}. ${entry.text || String(entry)}`)
+    : [tr("export.empty", "暂无记录")];
+  return [
+    tr("luqiangqi.title", "墙路棋"),
+    new Date().toLocaleString(),
+    `${tr("common.record", "记录")}: ${tr(`common.caption.${mode}`, mode)}`,
+    `${els.turnEyebrow.textContent} / ${els.statusTitle.textContent}`,
+    "",
+    ...playerLines,
+    "",
+    ...logs
+  ];
+}
+
+function downloadText(filename, text) {
+  const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, (char) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[char]);
+}
+
+function openPrintableRecord(title, text) {
+  const popup = window.open("", "_blank", "width=720,height=900");
+  if (!popup) {
+    showToast(tr("export.popupBlocked", "浏览器拦截了 PDF 窗口"));
+    return;
+  }
+  popup.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(title)}</title><style>body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;margin:36px;color:#17211e;}h1{font-size:26px;margin:0 0 18px;}pre{white-space:pre-wrap;line-height:1.7;font-size:13px;}</style></head><body><h1>${escapeHtml(title)}</h1><pre>${escapeHtml(text)}</pre></body></html>`);
+  popup.document.close();
+  popup.focus();
+  setTimeout(() => popup.print(), 180);
+}
+
+function exportGameRecord(format) {
+  const title = tr("luqiangqi.title", "墙路棋");
+  const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+  const text = recordLines().join("\n");
+  if (format === "pdf") {
+    openPrintableRecord(title, text);
+    return;
+  }
+  downloadText(`luqiangqi-${stamp}.lqq`, text);
+  showToast(tr("export.saved", "已导出棋谱"));
+}
+
 function renderStatus() {
   const player = currentPlayer();
   els.gameSubtitle.textContent = tr(`common.caption.${mode}`, mode);
@@ -642,6 +703,38 @@ els.copyRoom.addEventListener("click", async () => {
   await navigator.clipboard?.writeText(onlineRoom.code);
   showToast(tr("status.roomCodeCopied", "房间码已复制"));
 });
+
+function setExportMenuOpen(menu, open) {
+  menu.classList.toggle("open", open);
+  const button = menu.querySelector("[data-export-menu-toggle]");
+  if (button) button.setAttribute("aria-expanded", open ? "true" : "false");
+}
+
+function initExportMenus() {
+  const menus = [...document.querySelectorAll("[data-export-menu-root]")];
+  for (const menu of menus) {
+    const toggle = menu.querySelector("[data-export-menu-toggle]");
+    if (!toggle) continue;
+    toggle.addEventListener("click", (event) => {
+      event.stopPropagation();
+      const willOpen = !menu.classList.contains("open");
+      for (const other of menus) setExportMenuOpen(other, false);
+      setExportMenuOpen(menu, willOpen);
+    });
+    menu.addEventListener("click", (event) => event.stopPropagation());
+  }
+  document.addEventListener("click", () => {
+    for (const menu of menus) setExportMenuOpen(menu, false);
+  });
+  document.querySelectorAll("[data-export]").forEach((button) => {
+    button.addEventListener("click", () => {
+      exportGameRecord(button.dataset.export);
+      for (const menu of menus) setExportMenuOpen(menu, false);
+    });
+  });
+}
+
+initExportMenus();
 
 restoreActiveRoom({ quiet: true }).then((restored) => {
   if (!restored) render();

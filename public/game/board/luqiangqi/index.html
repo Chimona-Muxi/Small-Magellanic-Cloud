@@ -7,7 +7,20 @@
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <a class="site-back" href="/game/board/">Board</a>
+    <a class="site-back" href="/game/board/" data-i18n="nav.board">棋类</a>
+    <div class="settings-menu game-settings" data-settings-menu-root>
+      <button class="settings-trigger" type="button" data-settings-toggle data-i18n="settings.label" aria-expanded="false" aria-label="设置">设置</button>
+      <div class="settings-popover" data-settings-menu>
+        <label class="settings-field">
+          <span data-i18n="settings.language">语言：</span>
+          <select data-language-select aria-label="Language"></select>
+        </label>
+        <label class="settings-field">
+          <span data-i18n="settings.appearance">外观：</span>
+          <select data-theme-select aria-label="Appearance"></select>
+        </label>
+      </div>
+    </div>
     <main class="app-shell">
       <aside class="panel side-panel">
         <div class="brand">
@@ -23,14 +36,6 @@
           <button data-mode="local" data-i18n="common.mode.local">同屏</button>
           <button data-mode="online" data-i18n="common.mode.online">联机</button>
         </div>
-
-        <section class="control-block prefs-panel" aria-label="显示设置">
-          <label class="field compact">
-            <span data-i18n="common.language">语言</span>
-            <select data-language-select aria-label="Language"></select>
-          </label>
-          <button class="secondary theme-switch" type="button" data-theme-toggle>深色</button>
-        </section>
 
         <section class="control-block" id="setupPanel">
           <label class="field" id="playerCountField">
@@ -137,6 +142,13 @@
         <section>
           <div class="section-title" data-i18n="common.record">记录</div>
           <ol class="log-list" id="logList"></ol>
+          <div class="export-tools" data-export-menu-root>
+            <button class="export-trigger" type="button" data-export-menu-toggle data-i18n="export.label" aria-expanded="false">导出</button>
+            <div class="export-menu" data-export-menu>
+              <button type="button" data-export="pdf" data-i18n="export.asPdf">导出为 PDF</button>
+              <button type="button" data-export="record" data-i18n="export.asRecord">导出为棋谱</button>
+            </div>
+          </div>
         </section>
       </aside>
     </main>

@@ -360,6 +360,67 @@ function renderLog() {
     : `<div class="log-item">${tr("status.noLog", "暂无记录")}</div>`;
 }
 
+function recordLines() {
+  const playerLines = game.players.map((player) => `${displayPlayerName(player)}: ${player.label || player.color || ""}`);
+  const logs = game.log?.length
+    ? [...game.log].reverse().map((entry, index) => `${index + 1}. ${entry}`)
+    : [tr("export.empty", "暂无记录")];
+  return [
+    tr("tuerqitiaoqi.title", "土耳其跳棋"),
+    new Date().toLocaleString(),
+    `${tr("common.record", "记录")}: ${tr(`common.caption.${mode}`, mode)}`,
+    `${game.winner !== null ? tr("status.final", "终局") : fmt("status.round", { turn: game.turn }, `第 ${game.turn} 手`)}`,
+    "",
+    ...playerLines,
+    "",
+    ...logs
+  ];
+}
+
+function downloadText(filename, text) {
+  const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, (char) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[char]);
+}
+
+function openPrintableRecord(title, text) {
+  const popup = window.open("", "_blank", "width=720,height=900");
+  if (!popup) {
+    showToast(tr("export.popupBlocked", "浏览器拦截了 PDF 窗口"));
+    return;
+  }
+  popup.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(title)}</title><style>body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;margin:36px;color:#17211e;}h1{font-size:26px;margin:0 0 18px;}pre{white-space:pre-wrap;line-height:1.7;font-size:13px;}</style></head><body><h1>${escapeHtml(title)}</h1><pre>${escapeHtml(text)}</pre></body></html>`);
+  popup.document.close();
+  popup.focus();
+  setTimeout(() => popup.print(), 180);
+}
+
+function exportGameRecord(format) {
+  const title = tr("tuerqitiaoqi.title", "土耳其跳棋");
+  const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+  const text = recordLines().join("\n");
+  if (format === "pdf") {
+    openPrintableRecord(title, text);
+    return;
+  }
+  downloadText(`tuerqitiaoqi-${stamp}.pdn`, text);
+  showToast(tr("export.saved", "已导出棋谱"));
+}
+
 function renderPanels() {
   els.modeButtons.forEach((button) => {
     button.classList.toggle("active", button.dataset.mode === mode);
@@ -482,6 +543,38 @@ els.copyRoom.addEventListener("click", async () => {
 els.joinCode.addEventListener("input", () => {
   els.joinCode.value = els.joinCode.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 5);
 });
+
+function setExportMenuOpen(menu, open) {
+  menu.classList.toggle("open", open);
+  const button = menu.querySelector("[data-export-menu-toggle]");
+  if (button) button.setAttribute("aria-expanded", open ? "true" : "false");
+}
+
+function initExportMenus() {
+  const menus = [...document.querySelectorAll("[data-export-menu-root]")];
+  for (const menu of menus) {
+    const toggle = menu.querySelector("[data-export-menu-toggle]");
+    if (!toggle) continue;
+    toggle.addEventListener("click", (event) => {
+      event.stopPropagation();
+      const willOpen = !menu.classList.contains("open");
+      for (const other of menus) setExportMenuOpen(other, false);
+      setExportMenuOpen(menu, willOpen);
+    });
+    menu.addEventListener("click", (event) => event.stopPropagation());
+  }
+  document.addEventListener("click", () => {
+    for (const menu of menus) setExportMenuOpen(menu, false);
+  });
+  document.querySelectorAll("[data-export]").forEach((button) => {
+    button.addEventListener("click", () => {
+      exportGameRecord(button.dataset.export);
+      for (const menu of menus) setExportMenuOpen(menu, false);
+    });
+  });
+}
+
+initExportMenus();
 
 render();
 restoreRoom();

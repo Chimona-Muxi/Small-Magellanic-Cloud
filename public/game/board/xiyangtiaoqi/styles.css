@@ -715,3 +715,250 @@ html[data-lang="ko"] .piece.king::before {
       0 6px 14px rgba(18, 28, 24, 0.24);
   }
 }
+
+.site-back {
+  top: 16px;
+  right: 18px;
+  min-height: 38px;
+  padding: 0 14px;
+  opacity: 0.42;
+  transform: scale(0.92);
+  background: transparent;
+  border-color: transparent;
+  transition: opacity 180ms ease, transform 180ms ease, background 180ms ease, border-color 180ms ease;
+}
+
+.site-back:hover,
+.site-back:focus-visible {
+  opacity: 1;
+  transform: none;
+  background: var(--panel);
+  border-color: var(--line);
+}
+
+.settings-menu.game-settings {
+  position: fixed;
+  top: 16px;
+  right: 92px;
+  z-index: 80;
+}
+
+.settings-menu {
+  display: inline-flex;
+  position: relative;
+}
+
+.settings-trigger {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 82px;
+  max-width: 82px;
+  height: 38px;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  color: transparent;
+  background: transparent;
+  box-shadow: none;
+  font-size: 0;
+  font-weight: 850;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: max-width 180ms ease, padding 180ms ease, color 180ms ease, background 180ms ease, border-color 180ms ease;
+}
+
+.settings-trigger::before {
+  content: "⚙";
+  position: absolute;
+  left: 50%;
+  color: var(--ink);
+  font-size: 20px;
+  opacity: 0.72;
+  transform: translateX(-50%);
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.game-settings.open .settings-trigger,
+.game-settings:focus-within .settings-trigger,
+.game-settings:hover .settings-trigger {
+  padding: 0 14px;
+  border-color: var(--line);
+  color: var(--ink);
+  background: var(--panel);
+  font-size: 14px;
+}
+
+.game-settings.open .settings-trigger::before,
+.game-settings:focus-within .settings-trigger::before,
+.game-settings:hover .settings-trigger::before {
+  opacity: 0;
+  transform: translateX(-50%) scale(0.7);
+}
+
+.settings-popover {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 12px);
+  display: grid;
+  gap: 0;
+  width: min(310px, calc(100vw - 36px));
+  padding: 8px 18px;
+  border: 1px solid var(--line);
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: var(--shadow);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-6px);
+  transition: opacity 160ms ease, transform 160ms ease;
+  backdrop-filter: blur(18px);
+  z-index: 90;
+}
+
+.game-settings.open .settings-popover,
+.game-settings:focus-within .settings-popover {
+  opacity: 1;
+  pointer-events: auto;
+  transform: none;
+}
+
+.settings-field {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) minmax(92px, auto) 12px;
+  align-items: center;
+  min-height: 58px;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.settings-field + .settings-field {
+  border-top: 1px solid var(--line);
+}
+
+.settings-field::before {
+  color: var(--ink);
+  font-size: 18px;
+  opacity: 0.9;
+}
+
+.settings-field:first-child::before {
+  content: "🌐";
+  font-size: 17px;
+}
+
+.settings-field:nth-child(2)::before {
+  content: "◐";
+}
+
+.settings-field::after {
+  content: "›";
+  color: var(--muted);
+  font-size: 22px;
+  line-height: 1;
+}
+
+.settings-field select {
+  width: auto;
+  max-width: 150px;
+  height: 40px;
+  border: 0;
+  border-radius: 0;
+  color: var(--ink);
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 850;
+  text-align: right;
+  text-align-last: right;
+  appearance: none;
+  cursor: pointer;
+}
+
+.export-tools {
+  position: relative;
+  display: inline-flex;
+  margin-top: 12px;
+}
+
+.export-trigger,
+.export-menu button {
+  min-height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.62);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.export-trigger::after {
+  content: "⌄";
+  margin-left: 6px;
+  color: var(--muted);
+}
+
+.export-menu {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 8px);
+  z-index: 30;
+  display: grid;
+  min-width: 128px;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--panel) 94%, transparent);
+  box-shadow: var(--shadow);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(4px);
+  transition: opacity 140ms ease, transform 140ms ease;
+  backdrop-filter: blur(16px);
+}
+
+.export-tools.open .export-menu {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.export-menu button {
+  justify-content: flex-start;
+  width: 100%;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  text-align: left;
+}
+
+.export-menu button:hover,
+.export-menu button:focus-visible {
+  background: var(--chip);
+}
+
+html[data-theme="dark"] .site-back,
+html[data-theme="dark"] .settings-trigger,
+html[data-theme="dark"] .settings-popover,
+html[data-theme="dark"] .export-trigger {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+@media (max-width: 820px) {
+  .site-back {
+    top: 10px;
+    right: 10px;
+  }
+
+  .settings-menu.game-settings {
+    top: 10px;
+    right: 82px;
+  }
+}

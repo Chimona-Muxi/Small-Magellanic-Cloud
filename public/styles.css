@@ -8,6 +8,7 @@
   --paper: #080b0d;
   --panel: rgba(14, 18, 20, 0.72);
   --panel-solid: #111719;
+  --chip: rgba(255, 255, 255, 0.08);
   --green: #4fc7a1;
   --amber: #e7b95f;
   --blue: #8fb8ff;
@@ -26,6 +27,7 @@ html[data-theme="light"] {
   --paper: #f8faf4;
   --panel: rgba(255, 255, 255, 0.72);
   --panel-solid: rgba(255, 255, 255, 0.92);
+  --chip: rgba(20, 32, 29, 0.08);
   --shadow: 0 24px 76px rgba(43, 57, 52, 0.16);
 }
 
@@ -634,4 +636,224 @@ html[data-theme="light"] .nav-toggle {
     flex-direction: column;
     padding: 24px 18px;
   }
+}
+
+.site-nav {
+  opacity: 0.58;
+  transform: scale(0.96);
+  transform-origin: right center;
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.site-header:hover .site-nav,
+.site-nav:focus-within {
+  opacity: 1;
+  transform: none;
+}
+
+.site-nav:not(.trail) .current {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 38px;
+  width: 76px;
+  max-width: 76px;
+  height: 38px;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid transparent;
+  color: transparent;
+  background: transparent;
+  font-size: 0;
+  transition:
+    max-width 180ms ease,
+    padding 180ms ease,
+    color 180ms ease,
+    background 180ms ease,
+    border-color 180ms ease;
+}
+
+.site-nav:not(.trail) .current::before {
+  content: "⌂";
+  position: absolute;
+  color: var(--ink);
+  font-size: 20px;
+  line-height: 1;
+  opacity: 0.72;
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.site-nav:not(.trail) .current:hover,
+.site-nav:not(.trail) .current:focus-visible {
+  padding: 0 14px;
+  border-color: var(--line);
+  color: var(--ink);
+  background: var(--chip);
+  font-size: 14px;
+}
+
+.site-nav:not(.trail) .current:hover::before,
+.site-nav:not(.trail) .current:focus-visible::before {
+  opacity: 0;
+  transform: scale(0.7);
+}
+
+.settings-menu {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.settings-trigger {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  max-width: 82px;
+  min-width: 82px;
+  height: 38px;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  color: transparent;
+  background: transparent;
+  font-size: 0;
+  font-weight: 850;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    max-width 180ms ease,
+    padding 180ms ease,
+    color 180ms ease,
+    background 180ms ease,
+    border-color 180ms ease;
+}
+
+.settings-trigger::before {
+  content: "⚙";
+  position: absolute;
+  left: 50%;
+  color: var(--ink);
+  font-size: 20px;
+  opacity: 0.72;
+  transform: translateX(-50%);
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.settings-menu:hover .settings-trigger,
+.settings-menu.open .settings-trigger,
+.settings-menu:focus-within .settings-trigger {
+  border-color: var(--line);
+  padding: 0 14px;
+  color: var(--ink);
+  background: var(--chip);
+  font-size: 14px;
+}
+
+.settings-menu:hover .settings-trigger::before,
+.settings-menu.open .settings-trigger::before,
+.settings-menu:focus-within .settings-trigger::before {
+  opacity: 0;
+  transform: translateX(-50%) scale(0.7);
+}
+
+.settings-popover {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  z-index: 40;
+  display: grid;
+  gap: 0;
+  width: min(310px, calc(100vw - 36px));
+  padding: 8px 18px;
+  border: 1px solid var(--line);
+  border-radius: 26px;
+  background: color-mix(in srgb, var(--panel) 88%, transparent);
+  box-shadow: var(--shadow);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-6px);
+  transition: opacity 160ms ease, transform 160ms ease;
+  backdrop-filter: blur(18px);
+}
+
+.settings-menu.open .settings-popover,
+.settings-menu:focus-within .settings-popover {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.settings-field {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) minmax(92px, auto) 12px;
+  align-items: center;
+  min-height: 58px;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.settings-field + .settings-field {
+  border-top: 1px solid var(--line);
+}
+
+.settings-field::before {
+  color: var(--ink);
+  font-size: 18px;
+  opacity: 0.9;
+}
+
+.settings-field:first-child::before {
+  content: "🌐";
+  font-size: 17px;
+}
+
+.settings-field:nth-child(2)::before {
+  content: "◐";
+}
+
+.settings-field::after {
+  content: "›";
+  color: var(--muted);
+  font-size: 22px;
+  line-height: 1;
+}
+
+.settings-field select {
+  width: auto;
+  max-width: 150px;
+  height: 40px;
+  border: 0;
+  border-radius: 0;
+  color: var(--ink);
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 850;
+  text-align: right;
+  text-align-last: right;
+  appearance: none;
+  cursor: pointer;
+}
+
+@media (max-width: 680px) {
+  .settings-menu:hover .settings-trigger,
+  .settings-menu.open .settings-trigger,
+  .settings-menu:focus-within .settings-trigger {
+    max-width: 88px;
+  }
+
+  .settings-popover {
+    right: 0;
+  }
+}
+
+body:has(.site-nav.trail .settings-menu.open) .board-grid {
+  margin-top: clamp(58px, 8vh, 96px);
 }

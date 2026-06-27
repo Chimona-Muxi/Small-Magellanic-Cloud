@@ -18,8 +18,19 @@
       </a>
       <nav class="site-nav" aria-label="主导航">
         <span class="current" data-i18n="nav.home">Home</span>
-        <select class="nav-select" data-language-select aria-label="Language"></select>
-        <button class="nav-toggle" type="button" data-theme-toggle>深色</button>
+        <div class="settings-menu" data-settings-menu-root>
+          <button class="settings-trigger" type="button" data-settings-toggle data-i18n="settings.label" aria-expanded="false" aria-label="设置">设置</button>
+          <div class="settings-popover" data-settings-menu>
+            <label class="settings-field">
+              <span data-i18n="settings.language">语言：</span>
+              <select data-language-select aria-label="Language"></select>
+            </label>
+            <label class="settings-field">
+              <span data-i18n="settings.appearance">外观：</span>
+              <select data-theme-select aria-label="Appearance"></select>
+            </label>
+          </div>
+        </div>
       </nav>
     </header>
 
@@ -35,8 +46,8 @@
       <section class="content-band" id="modules">
         <div class="section-head" data-reveal>
           <p class="eyebrow" data-i18n="home.modules.eyebrow">modules</p>
-          <h2 data-i18n="home.modules.title">从一个清晰入口开始。</h2>
-          <p data-i18n="home.modules.copy">网站按模块生长：每个模块有自己的边界、路径和发布节奏，总入口只负责组织、发现和长期维护。</p>
+          <h2 data-i18n="home.modules.title">我的公开创作作品</h2>
+          <p data-i18n="home.modules.copy">网站存放了我认为有一定价值的项目，包括游戏、学习工具、资源库等等。</p>
         </div>
         <div class="module-grid">
           <a class="module-card" href="/game/" data-reveal>

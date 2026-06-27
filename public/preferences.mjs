@@ -23,6 +23,15 @@ const copy = {
     ko: "Home",
     ru: "Home"
   },
+  "nav.board": {
+    "zh-CN": "棋类",
+    "zh-TW": "棋類",
+    en: "Board",
+    fr: "Plateau",
+    ja: "ボード",
+    ko: "보드",
+    ru: "Игры"
+  },
   "site.subtitle": {
     "zh-CN": "personal systems",
     "zh-TW": "personal systems",
@@ -60,22 +69,22 @@ const copy = {
     ru: "modules"
   },
   "home.modules.title": {
-    "zh-CN": "从一个清晰入口开始。",
-    "zh-TW": "從一個清晰入口開始。",
-    en: "Start from one clear entrance.",
-    fr: "Commencer par une entree claire.",
-    ja: "ひとつの明快な入口から。",
-    ko: "하나의 분명한 입구에서 시작합니다.",
-    ru: "Начать с одного ясного входа."
+    "zh-CN": "我的公开创作作品",
+    "zh-TW": "我的公開創作作品",
+    en: "My Public Works",
+    fr: "Mes creations publiques",
+    ja: "公開している制作物",
+    ko: "나의 공개 창작물",
+    ru: "Мои открытые работы"
   },
   "home.modules.copy": {
-    "zh-CN": "网站按模块生长：每个模块有自己的边界、路径和发布节奏，总入口只负责组织、发现和长期维护。",
-    "zh-TW": "網站按模組生長：每個模組有自己的邊界、路徑和發布節奏，總入口只負責組織、發現和長期維護。",
-    en: "The site grows by modules. Each module keeps its own boundary, path and release rhythm.",
-    fr: "Le site grandit par modules, chacun avec sa limite, son chemin et son rythme.",
-    ja: "サイトはモジュールごとに育ちます。それぞれ境界、経路、公開のリズムを持ちます。",
-    ko: "사이트는 모듈 단위로 자라며, 각 모듈은 자기 경계와 경로, 공개 흐름을 갖습니다.",
-    ru: "Сайт растет модулями: у каждого есть границы, путь и ритм публикации."
+    "zh-CN": "网站存放了我认为有一定价值的项目，包括游戏、学习工具、资源库等等。",
+    "zh-TW": "網站存放了我認為有一定價值的項目，包括遊戲、學習工具、資源庫等等。",
+    en: "This site keeps projects I find valuable, including games, study tools, resource libraries and more.",
+    fr: "Ce site rassemble des projets que je trouve utiles, dont des jeux, outils d'etude et ressources.",
+    ja: "このサイトには、ゲーム、学習ツール、資料庫など、価値があると思うプロジェクトを置いています。",
+    ko: "이 사이트에는 게임, 학습 도구, 자료 모음 등 가치 있다고 생각하는 프로젝트를 둡니다.",
+    ru: "Здесь собраны проекты, которые я считаю полезными: игры, учебные инструменты, библиотеки ресурсов и другое."
   },
   "module.game.title": {
     "zh-CN": "Game",
@@ -355,6 +364,33 @@ const copy = {
     ja: "言語",
     ko: "언어",
     ru: "Язык"
+  },
+  "settings.label": {
+    "zh-CN": "设置",
+    "zh-TW": "設定",
+    en: "Settings",
+    fr: "Reglages",
+    ja: "設定",
+    ko: "설정",
+    ru: "Настройки"
+  },
+  "settings.language": {
+    "zh-CN": "语言：",
+    "zh-TW": "語言：",
+    en: "Language:",
+    fr: "Langue :",
+    ja: "言語：",
+    ko: "언어:",
+    ru: "Язык:"
+  },
+  "settings.appearance": {
+    "zh-CN": "外观：",
+    "zh-TW": "外觀：",
+    en: "Appearance:",
+    fr: "Apparence :",
+    ja: "外観：",
+    ko: "화면:",
+    ru: "Вид:"
   },
   "common.aiStrength": {
     "zh-CN": "AI 强度",
@@ -670,6 +706,78 @@ const copy = {
     ja: "ライトモードに切り替え",
     ko: "라이트 모드로 전환",
     ru: "Переключить на светлый режим"
+  },
+  "export.label": {
+    "zh-CN": "导出",
+    "zh-TW": "匯出",
+    en: "Export",
+    fr: "Exporter",
+    ja: "書き出し",
+    ko: "내보내기",
+    ru: "Экспорт"
+  },
+  "export.asPdf": {
+    "zh-CN": "导出为 PDF",
+    "zh-TW": "匯出為 PDF",
+    en: "Export as PDF",
+    fr: "Exporter en PDF",
+    ja: "PDFで書き出し",
+    ko: "PDF로 내보내기",
+    ru: "Экспорт в PDF"
+  },
+  "export.asRecord": {
+    "zh-CN": "导出为棋谱",
+    "zh-TW": "匯出為棋譜",
+    en: "Export notation",
+    fr: "Exporter la notation",
+    ja: "棋譜を書き出し",
+    ko: "기보로 내보내기",
+    ru: "Экспорт записи"
+  },
+  "export.pdf": {
+    "zh-CN": "PDF",
+    "zh-TW": "PDF",
+    en: "PDF",
+    fr: "PDF",
+    ja: "PDF",
+    ko: "PDF",
+    ru: "PDF"
+  },
+  "export.record": {
+    "zh-CN": "棋谱",
+    "zh-TW": "棋譜",
+    en: "Record",
+    fr: "Notation",
+    ja: "棋譜",
+    ko: "기보",
+    ru: "Запись"
+  },
+  "export.empty": {
+    "zh-CN": "暂无记录",
+    "zh-TW": "暫無記錄",
+    en: "No moves yet",
+    fr: "Aucun coup",
+    ja: "まだ記録がありません",
+    ko: "아직 기록이 없습니다",
+    ru: "Ходов пока нет"
+  },
+  "export.saved": {
+    "zh-CN": "已导出棋谱",
+    "zh-TW": "已匯出棋譜",
+    en: "Record exported",
+    fr: "Notation exportee",
+    ja: "棋譜を書き出しました",
+    ko: "기보를 내보냈습니다",
+    ru: "Запись экспортирована"
+  },
+  "export.popupBlocked": {
+    "zh-CN": "浏览器拦截了 PDF 窗口",
+    "zh-TW": "瀏覽器攔截了 PDF 視窗",
+    en: "The PDF window was blocked",
+    fr: "La fenetre PDF a ete bloquee",
+    ja: "PDFウィンドウがブロックされました",
+    ko: "PDF 창이 차단되었습니다",
+    ru: "Окно PDF заблокировано"
   },
   "player.you": {
     "zh-CN": "你",
@@ -1084,6 +1192,11 @@ function applyLanguage(lang = currentLanguage()) {
   for (const select of document.querySelectorAll("[data-language-select]")) {
     select.value = meta.value;
   }
+  fillThemeSelects();
+  for (const button of document.querySelectorAll("[data-settings-toggle]")) {
+    button.setAttribute("aria-label", t("settings.label"));
+    button.setAttribute("title", t("settings.label"));
+  }
 }
 
 function applyTheme(theme = currentTheme()) {
@@ -1092,6 +1205,9 @@ function applyTheme(theme = currentTheme()) {
   for (const button of document.querySelectorAll("[data-theme-toggle]")) {
     button.textContent = theme === "dark" ? t("theme.dark") : t("theme.light");
     button.setAttribute("aria-label", theme === "dark" ? t("theme.toLight") : t("theme.toDark"));
+  }
+  for (const select of document.querySelectorAll("[data-theme-select]")) {
+    select.value = theme;
   }
 }
 
@@ -1103,6 +1219,46 @@ function fillLanguageSelects() {
       }
     }
   }
+}
+
+function fillThemeSelects() {
+  for (const select of document.querySelectorAll("[data-theme-select]")) {
+    const value = select.value || currentTheme();
+    select.replaceChildren(new Option(t("theme.light"), "light"), new Option(t("theme.dark"), "dark"));
+    select.value = value === "dark" ? "dark" : "light";
+  }
+}
+
+function setSettingsMenuOpen(menu, open) {
+  menu.classList.toggle("open", open);
+  const button = menu.querySelector("[data-settings-toggle]");
+  if (button) button.setAttribute("aria-expanded", open ? "true" : "false");
+}
+
+function initSettingsMenus() {
+  const menus = [...document.querySelectorAll("[data-settings-menu-root]")];
+  if (!menus.length) return;
+
+  for (const menu of menus) {
+    const button = menu.querySelector("[data-settings-toggle]");
+    if (!button) continue;
+    button.addEventListener("click", (event) => {
+      event.stopPropagation();
+      const willOpen = !menu.classList.contains("open");
+      for (const other of menus) setSettingsMenuOpen(other, false);
+      setSettingsMenuOpen(menu, willOpen);
+    });
+    menu.addEventListener("click", (event) => event.stopPropagation());
+  }
+
+  document.addEventListener("click", () => {
+    for (const menu of menus) setSettingsMenuOpen(menu, false);
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+    for (const menu of menus) setSettingsMenuOpen(menu, false);
+  });
 }
 
 export function setLanguage(lang) {
@@ -1126,11 +1282,17 @@ export function toggleTheme() {
 
 export function initPreferences() {
   fillLanguageSelects();
+  fillThemeSelects();
   applyLanguage();
   applyTheme();
+  initSettingsMenus();
 
   for (const select of document.querySelectorAll("[data-language-select]")) {
     select.addEventListener("change", () => setLanguage(select.value));
+  }
+
+  for (const select of document.querySelectorAll("[data-theme-select]")) {
+    select.addEventListener("change", () => setTheme(select.value));
   }
 
   for (const button of document.querySelectorAll("[data-theme-toggle]")) {
