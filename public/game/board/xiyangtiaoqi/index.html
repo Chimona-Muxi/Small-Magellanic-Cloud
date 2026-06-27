@@ -4,11 +4,11 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>西洋跳棋</title>
-  <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="./styles.css?v=20260627d" />
 </head>
 <body>
-  <a class="site-back" href="/game/board/" data-i18n="nav.board">棋类</a>
-  <div class="settings-menu game-settings" data-settings-menu-root>
+  <div class="game-topbar">
+    <div class="settings-menu game-settings" data-settings-menu-root>
     <button class="settings-trigger" type="button" data-settings-toggle data-i18n="settings.label" aria-expanded="false" aria-label="设置">设置</button>
     <div class="settings-popover" data-settings-menu>
       <label class="settings-field">
@@ -20,6 +20,8 @@
         <select data-theme-select aria-label="Appearance"></select>
       </label>
     </div>
+    </div>
+    <a class="site-back" href="/game/board/" data-i18n="nav.board">棋类</a>
   </div>
   <main class="app-shell">
     <aside class="side-panel">
@@ -135,7 +137,7 @@
   </main>
 
   <div class="toast" id="toast" role="status"></div>
-  <script type="module" src="/preferences.mjs"></script>
-  <script type="module" src="./app.mjs"></script>
+  <script type="module" src="/preferences.mjs?v=20260627d"></script>
+  <script type="module" src="./app.mjs?v=20260627d"></script>
 </body>
 </html>

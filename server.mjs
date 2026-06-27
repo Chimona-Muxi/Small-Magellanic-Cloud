@@ -383,7 +383,9 @@ const server = createServer(async (req, res) => {
     const data = await readFile(filePath);
     res.writeHead(200, {
       "Content-Type": mime[extname(filePath)] || "application/octet-stream",
-      "Cache-Control": extname(filePath) === ".html" ? "no-store" : "public, max-age=300"
+      "Cache-Control": "no-store, max-age=0, must-revalidate",
+      "Pragma": "no-cache",
+      "Expires": "0"
     });
     res.end(data);
   } catch {

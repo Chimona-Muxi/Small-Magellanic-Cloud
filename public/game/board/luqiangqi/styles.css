@@ -937,3 +937,127 @@ html[data-theme="dark"] .brand-mark {
     right: 82px;
   }
 }
+/* 20260627 polish: compact game top tools and app-like settings rows. */
+.game-topbar {
+  position: fixed;
+  top: 16px;
+  right: 18px;
+  z-index: 180;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  pointer-events: auto;
+}
+
+.game-topbar .settings-menu.game-settings,
+.game-topbar .site-back {
+  position: relative !important;
+  inset: auto !important;
+  top: auto !important;
+  right: auto !important;
+  z-index: auto !important;
+}
+
+.game-topbar .site-back {
+  min-width: 54px !important;
+  height: 38px !important;
+  padding: 0 14px !important;
+  opacity: .62 !important;
+  transform: none !important;
+}
+
+.game-topbar .site-back:hover,
+.game-topbar .site-back:focus-visible {
+  opacity: 1 !important;
+}
+
+.settings-trigger {
+  width: 38px !important;
+  min-width: 38px !important;
+  max-width: 38px !important;
+  height: 38px !important;
+  padding: 0 !important;
+  border-color: transparent !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: transparent !important;
+  font-size: 0 !important;
+}
+
+.settings-trigger::before {
+  content: "⚙" !important;
+  font-size: 23px !important;
+  color: var(--text) !important;
+  opacity: .76;
+}
+
+.game-settings.open .settings-trigger,
+.game-settings:focus-within .settings-trigger,
+.game-settings:hover .settings-trigger {
+  width: 82px !important;
+  min-width: 82px !important;
+  max-width: 82px !important;
+  padding: 0 14px !important;
+  border-color: var(--line) !important;
+  background: var(--panel-soft) !important;
+  color: var(--text) !important;
+  font-size: 14px !important;
+}
+
+.game-settings.open .settings-trigger::before,
+.game-settings:focus-within .settings-trigger::before,
+.game-settings:hover .settings-trigger::before {
+  display: none !important;
+}
+
+.settings-popover {
+  right: 0 !important;
+  width: min(330px, calc(100vw - 28px)) !important;
+  padding: 10px !important;
+  border-radius: 28px !important;
+}
+
+.settings-field {
+  position: relative !important;
+  display: grid !important;
+  grid-template-columns: 34px minmax(76px, 1fr) minmax(96px, auto) !important;
+  align-items: center !important;
+  min-height: 64px !important;
+  padding: 0 14px !important;
+  border-radius: 18px !important;
+  overflow: hidden;
+}
+
+.settings-field:first-child::before {
+  content: "🌐" !important;
+}
+
+.settings-field:nth-child(2)::before {
+  content: "◐" !important;
+}
+
+.settings-field::after {
+  content: attr(data-value) "  ›" !important;
+  justify-self: end;
+  color: var(--text) !important;
+  font-size: 14px !important;
+  font-weight: 800;
+  opacity: .74;
+  transform: none !important;
+}
+
+.settings-field select {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  opacity: 0 !important;
+  cursor: pointer;
+}
+
+@media (max-width: 760px) {
+  .game-topbar {
+    top: 10px;
+    right: 10px;
+  }
+}

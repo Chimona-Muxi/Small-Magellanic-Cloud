@@ -1191,6 +1191,8 @@ function applyLanguage(lang = currentLanguage()) {
   }
   for (const select of document.querySelectorAll("[data-language-select]")) {
     select.value = meta.value;
+    const field = select.closest(".settings-field");
+    if (field) field.dataset.value = meta.label;
   }
   fillThemeSelects();
   for (const button of document.querySelectorAll("[data-settings-toggle]")) {
@@ -1208,6 +1210,8 @@ function applyTheme(theme = currentTheme()) {
   }
   for (const select of document.querySelectorAll("[data-theme-select]")) {
     select.value = theme;
+    const field = select.closest(".settings-field");
+    if (field) field.dataset.value = theme === "dark" ? t("theme.dark") : t("theme.light");
   }
 }
 
@@ -1226,6 +1230,8 @@ function fillThemeSelects() {
     const value = select.value || currentTheme();
     select.replaceChildren(new Option(t("theme.light"), "light"), new Option(t("theme.dark"), "dark"));
     select.value = value === "dark" ? "dark" : "light";
+    const field = select.closest(".settings-field");
+    if (field) field.dataset.value = select.value === "dark" ? t("theme.dark") : t("theme.light");
   }
 }
 
