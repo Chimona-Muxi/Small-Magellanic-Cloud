@@ -15,6 +15,10 @@
   --red: #ef746b;
   --shadow: 0 26px 90px rgba(0, 0, 0, 0.38);
   --smc-image: url("https://cdn.esawebb.org/archives/images/screen/weic2301d.jpg");
+  --icon-home: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='m3 11 9-8 9 8'/%3E%3Cpath fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M5 10v10h14V10'/%3E%3Cpath fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M9 20v-6h6v6'/%3E%3C/svg%3E");
+  --icon-settings: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='black' stroke-width='2' stroke-linecap='round' d='M4 7h16M4 17h16'/%3E%3Ccircle cx='9' cy='7' r='2' fill='none' stroke='black' stroke-width='2'/%3E%3Ccircle cx='15' cy='17' r='2' fill='none' stroke='black' stroke-width='2'/%3E%3C/svg%3E");
+  --icon-language: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='9' fill='none' stroke='black' stroke-width='2'/%3E%3Cpath fill='none' stroke='black' stroke-width='2' stroke-linecap='round' d='M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18'/%3E%3C/svg%3E");
+  --icon-appearance: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='4' fill='none' stroke='black' stroke-width='2'/%3E%3Cpath fill='none' stroke='black' stroke-width='2' stroke-linecap='round' d='M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41'/%3E%3C/svg%3E");
 }
 
 html[data-theme="light"] {
@@ -993,7 +997,78 @@ body:has(.site-nav.trail .settings-menu.open) .board-grid {
   position: absolute !important;
   inset: 0 !important;
   width: 100% !important;
+  max-width: none !important;
   height: 100% !important;
   opacity: 0 !important;
   cursor: pointer;
+}
+
+/* Final nav/settings normalization. */
+.site-nav {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+.site-nav:not(.trail) .current::before,
+.settings-trigger::before,
+.settings-field::before {
+  content: "" !important;
+  display: block !important;
+  flex: 0 0 auto;
+  width: 22px !important;
+  height: 22px !important;
+  color: inherit !important;
+  background: var(--ink) !important;
+  opacity: .78;
+  transform: none !important;
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: contain;
+  -webkit-mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+}
+
+.site-nav:not(.trail) .current::before {
+  mask-image: var(--icon-home);
+  -webkit-mask-image: var(--icon-home);
+}
+
+.settings-trigger::before {
+  position: static !important;
+  left: auto !important;
+  mask-image: var(--icon-settings);
+  -webkit-mask-image: var(--icon-settings);
+}
+
+.settings-field::before {
+  width: 24px !important;
+  height: 24px !important;
+  opacity: .82;
+}
+
+.settings-field:first-child::before {
+  mask-image: var(--icon-language);
+  -webkit-mask-image: var(--icon-language);
+}
+
+.settings-field:nth-child(2)::before {
+  mask-image: var(--icon-appearance);
+  -webkit-mask-image: var(--icon-appearance);
+}
+
+.settings-menu:not(.open):focus-within .settings-popover {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: translateY(-6px) !important;
+}
+
+.settings-menu.open .settings-popover {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  transform: translateY(0) !important;
+}
+
+body:has(.site-nav.trail .settings-menu.open) .board-grid {
+  margin-top: 0 !important;
 }

@@ -12,6 +12,9 @@
   --light-square: #e7eddf;
   --hint: #f0c95a;
   --shadow: 0 20px 70px rgba(30, 47, 39, 0.12);
+  --icon-settings: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='black' stroke-width='2' stroke-linecap='round' d='M4 7h16M4 17h16'/%3E%3Ccircle cx='9' cy='7' r='2' fill='none' stroke='black' stroke-width='2'/%3E%3Ccircle cx='15' cy='17' r='2' fill='none' stroke='black' stroke-width='2'/%3E%3C/svg%3E");
+  --icon-language: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='9' fill='none' stroke='black' stroke-width='2'/%3E%3Cpath fill='none' stroke='black' stroke-width='2' stroke-linecap='round' d='M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18'/%3E%3C/svg%3E");
+  --icon-appearance: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='4' fill='none' stroke='black' stroke-width='2'/%3E%3Cpath fill='none' stroke='black' stroke-width='2' stroke-linecap='round' d='M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41'/%3E%3C/svg%3E");
 }
 
 html[data-theme="dark"] {
@@ -1012,7 +1015,7 @@ html[data-theme="dark"] .export-trigger {
 .settings-trigger::before {
   content: "⚙" !important;
   font-size: 23px !important;
-  color: var(--text) !important;
+  color: var(--ink) !important;
   opacity: .76;
 }
 
@@ -1024,8 +1027,8 @@ html[data-theme="dark"] .export-trigger {
   max-width: 82px !important;
   padding: 0 14px !important;
   border-color: var(--line) !important;
-  background: var(--panel-soft) !important;
-  color: var(--text) !important;
+  background: var(--panel) !important;
+  color: var(--ink) !important;
   font-size: 14px !important;
 }
 
@@ -1064,7 +1067,7 @@ html[data-theme="dark"] .export-trigger {
 .settings-field::after {
   content: attr(data-value) "  ›" !important;
   justify-self: end;
-  color: var(--text) !important;
+  color: var(--ink) !important;
   font-size: 14px !important;
   font-weight: 800;
   opacity: .74;
@@ -1075,6 +1078,7 @@ html[data-theme="dark"] .export-trigger {
   position: absolute !important;
   inset: 0 !important;
   width: 100% !important;
+  max-width: none !important;
   height: 100% !important;
   opacity: 0 !important;
   cursor: pointer;
@@ -1084,5 +1088,194 @@ html[data-theme="dark"] .export-trigger {
   .game-topbar {
     top: 10px;
     right: 10px;
+  }
+}
+
+/* Final shared game header/settings normalization. */
+.game-topbar {
+  position: sticky !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 180;
+  width: 100%;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px clamp(14px, 3vw, 28px);
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--panel) 88%, transparent);
+  box-shadow: 0 12px 34px rgba(38, 48, 45, 0.08);
+  backdrop-filter: blur(18px);
+}
+
+.game-brand {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.game-brand strong,
+.game-brand span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.game-brand strong {
+  font-size: 15px;
+  line-height: 1.15;
+}
+
+.game-brand span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.game-nav {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.game-nav-link,
+.game-topbar .site-back {
+  position: static !important;
+  inset: auto !important;
+  z-index: auto !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 52px !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  padding: 0 13px !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 999px;
+  color: var(--ink);
+  background: color-mix(in srgb, var(--panel) 80%, transparent) !important;
+  box-shadow: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.game-topbar .settings-menu.game-settings {
+  position: relative !important;
+  inset: auto !important;
+  z-index: auto !important;
+}
+
+.settings-trigger::before,
+.settings-field::before {
+  content: "" !important;
+  display: block !important;
+  width: 22px !important;
+  height: 22px !important;
+  background: var(--ink) !important;
+  opacity: .78;
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: contain;
+  -webkit-mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+}
+
+.settings-trigger::before {
+  position: static !important;
+  left: auto !important;
+  transform: none !important;
+  mask-image: var(--icon-settings);
+  -webkit-mask-image: var(--icon-settings);
+}
+
+.settings-field:first-child::before {
+  mask-image: var(--icon-language);
+  -webkit-mask-image: var(--icon-language);
+}
+
+.settings-field:nth-child(2)::before {
+  mask-image: var(--icon-appearance);
+  -webkit-mask-image: var(--icon-appearance);
+}
+
+.game-settings.open .settings-trigger,
+.game-settings:hover .settings-trigger,
+.game-settings:focus-within .settings-trigger {
+  background: color-mix(in srgb, var(--panel) 80%, transparent) !important;
+  color: var(--ink) !important;
+}
+
+.settings-field::after {
+  color: var(--ink) !important;
+}
+
+.game-settings:not(.open):focus-within .settings-popover {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: translateY(-6px) !important;
+}
+
+.game-settings.open .settings-popover {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  transform: translateY(0) !important;
+}
+
+.app-shell {
+  min-height: calc(100vh - 64px);
+}
+
+@media (max-width: 760px) {
+  .game-topbar {
+    min-height: 52px;
+    padding: 8px 10px;
+    gap: 10px;
+  }
+
+  .game-brand strong {
+    max-width: 44vw;
+    font-size: 13px;
+  }
+
+  .game-brand span {
+    display: none;
+  }
+
+  .game-nav {
+    gap: 5px;
+  }
+
+  .game-nav-link,
+  .game-topbar .site-back {
+    min-width: 42px !important;
+    height: 34px !important;
+    min-height: 34px !important;
+    padding: 0 10px !important;
+    font-size: 12px;
+  }
+
+  .settings-trigger {
+    width: 34px !important;
+    min-width: 34px !important;
+    max-width: 34px !important;
+    height: 34px !important;
+  }
+
+  .game-settings.open .settings-trigger,
+  .game-settings:hover .settings-trigger,
+  .game-settings:focus-within .settings-trigger {
+    width: 74px !important;
+    min-width: 74px !important;
+    max-width: 74px !important;
   }
 }

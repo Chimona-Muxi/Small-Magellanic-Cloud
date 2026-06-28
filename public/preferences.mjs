@@ -15,40 +15,49 @@ const languageSet = new Set(languages.map((item) => item.value));
 
 const copy = {
   "nav.home": {
-    "zh-CN": "Home",
-    "zh-TW": "Home",
+    "zh-CN": "主页",
+    "zh-TW": "首頁",
     en: "Home",
     fr: "Accueil",
-    ja: "Home",
-    ko: "Home",
-    ru: "Home"
+    ja: "ホーム",
+    ko: "홈",
+    ru: "Главная"
+  },
+  "nav.game": {
+    "zh-CN": "游戏",
+    "zh-TW": "遊戲",
+    en: "Game",
+    fr: "Jeux",
+    ja: "ゲーム",
+    ko: "게임",
+    ru: "Игры"
   },
   "nav.board": {
     "zh-CN": "棋类",
     "zh-TW": "棋類",
-    en: "Board",
-    fr: "Plateau",
-    ja: "ボード",
-    ko: "보드",
-    ru: "Игры"
+    en: "Board Games",
+    fr: "Jeux de plateau",
+    ja: "ボードゲーム",
+    ko: "보드게임",
+    ru: "Настольные игры"
   },
   "site.subtitle": {
-    "zh-CN": "personal systems",
-    "zh-TW": "personal systems",
+    "zh-CN": "个人网站",
+    "zh-TW": "個人網站",
     en: "personal systems",
-    fr: "personal systems",
-    ja: "personal systems",
-    ko: "personal systems",
-    ru: "personal systems"
+    fr: "site personnel",
+    ja: "個人サイト",
+    ko: "개인 사이트",
+    ru: "личный сайт"
   },
   "home.eyebrow": {
-    "zh-CN": "private site",
-    "zh-TW": "private site",
+    "zh-CN": "私人网站",
+    "zh-TW": "私人網站",
     en: "private site",
     fr: "site prive",
-    ja: "private site",
-    ko: "private site",
-    ru: "private site"
+    ja: "個人サイト",
+    ko: "개인 사이트",
+    ru: "личный сайт"
   },
   "home.copy": {
     "zh-CN": "张墨霖的私人网站，用于日常生活、学习，欢迎参观。",
@@ -60,13 +69,13 @@ const copy = {
     ru: "Личный сайт Чжан Молиня для повседневной жизни и учебы. Добро пожаловать."
   },
   "home.modules.eyebrow": {
-    "zh-CN": "modules",
-    "zh-TW": "modules",
+    "zh-CN": "模块",
+    "zh-TW": "模組",
     en: "modules",
     fr: "modules",
-    ja: "modules",
-    ko: "modules",
-    ru: "modules"
+    ja: "モジュール",
+    ko: "모듈",
+    ru: "модули"
   },
   "home.modules.title": {
     "zh-CN": "我的公开创作作品",
@@ -87,17 +96,17 @@ const copy = {
     ru: "Здесь собраны проекты, которые я считаю полезными: игры, учебные инструменты, библиотеки ресурсов и другое."
   },
   "module.game.title": {
-    "zh-CN": "Game",
-    "zh-TW": "Game",
+    "zh-CN": "游戏",
+    "zh-TW": "遊戲",
     en: "Game",
-    fr: "Game",
-    ja: "Game",
-    ko: "Game",
-    ru: "Game"
+    fr: "Jeux",
+    ja: "ゲーム",
+    ko: "게임",
+    ru: "Игры"
   },
   "module.game.copy": {
-    "zh-CN": "棋类与互动游戏的集合，目前先收纳 board 模块。",
-    "zh-TW": "棋類與互動遊戲的集合，目前先收納 board 模組。",
+    "zh-CN": "棋类与互动游戏的集合，目前先收纳棋类模块。",
+    "zh-TW": "棋類與互動遊戲的集合，目前先收納棋類模組。",
     en: "A collection of board and interactive games. Board comes first.",
     fr: "Jeux de plateau et jeux interactifs, avec board pour commencer.",
     ja: "ボードゲームとインタラクティブゲームの集合です。まず board から。",
@@ -105,13 +114,13 @@ const copy = {
     ru: "Коллекция настольных и интерактивных игр. Сначала модуль board."
   },
   "module.study.title": {
-    "zh-CN": "Study Tools",
-    "zh-TW": "Study Tools",
+    "zh-CN": "学习工具",
+    "zh-TW": "學習工具",
     en: "Study Tools",
     fr: "Outils d'etude",
-    ja: "Study Tools",
-    ko: "Study Tools",
-    ru: "Study Tools"
+    ja: "学習ツール",
+    ko: "학습 도구",
+    ru: "Учебные инструменты"
   },
   "module.study.copy": {
     "zh-CN": "后续学习工具、笔记系统和小型实验可以从这里扩展。",
@@ -123,13 +132,13 @@ const copy = {
     ru: "Будущие учебные инструменты, заметки и эксперименты вырастут отсюда."
   },
   "module.lab.title": {
-    "zh-CN": "Lab",
-    "zh-TW": "Lab",
+    "zh-CN": "实验室",
+    "zh-TW": "實驗室",
     en: "Lab",
-    fr: "Lab",
-    ja: "Lab",
-    ko: "Lab",
-    ru: "Lab"
+    fr: "Labo",
+    ja: "ラボ",
+    ko: "랩",
+    ru: "Лаборатория"
   },
   "module.lab.copy": {
     "zh-CN": "用于保存阶段性作品、算法实验和可复用组件。",
@@ -150,8 +159,8 @@ const copy = {
     ru: "Игровой модуль"
   },
   "game.copy": {
-    "zh-CN": "互动游戏会按类型收纳。当前启用的是 board，后续可以继续加入策略、谜题、物理模拟或其他实验。",
-    "zh-TW": "互動遊戲會按類型收納。當前啟用的是 board，後續可以繼續加入策略、謎題、物理模擬或其他實驗。",
+    "zh-CN": "互动游戏会按类型收纳。当前启用的是棋类，后续可以继续加入策略、谜题、物理模拟或其他实验。",
+    "zh-TW": "互動遊戲會按類型收納。當前啟用的是棋類，後續可以繼續加入策略、謎題、物理模擬或其他實驗。",
     en: "Interactive games are grouped by type. Board is active first; strategy, puzzle and other experiments can follow.",
     fr: "Les jeux interactifs sont classes par type. Board est actif en premier.",
     ja: "インタラクティブゲームを種類別に整理します。まず board を公開しています。",
@@ -159,9 +168,9 @@ const copy = {
     ru: "Игры сгруппированы по типам. Сначала открыт раздел board."
   },
   "board.title": {
-    "zh-CN": "棋类系统",
-    "zh-TW": "棋類系統",
-    en: "Board System",
+    "zh-CN": "棋类",
+    "zh-TW": "棋類",
+    en: "Board Games",
     fr: "Jeux de plateau",
     ja: "ボードゲーム",
     ko: "보드게임",
@@ -177,8 +186,8 @@ const copy = {
     ru: "Опубликованные версии игр здесь, разработка остается в исходных репозиториях."
   },
   "game.board.copy": {
-    "zh-CN": "路墙棋、西洋跳棋、土耳其跳棋已经整理到同一个模块。",
-    "zh-TW": "路牆棋、西洋跳棋、土耳其跳棋已整理到同一個模組。",
+    "zh-CN": "路墙棋、西洋跳棋、土耳其跳棋已经整理到同一个棋类模块。",
+    "zh-TW": "路牆棋、西洋跳棋、土耳其跳棋已整理到同一個棋類模組。",
     en: "Wall Road Chess, Checkers and Turkish Draughts are collected in one board module.",
     fr: "Wall Road Chess, les dames et les dames turques sont reunis dans un meme module.",
     ja: "路墙棋、西洋跳棋、土耳其跳棋を同じ board モジュールにまとめています。",
@@ -294,13 +303,85 @@ const copy = {
     ru: "Ходы по вертикали и горизонтали дают более широкую тактику."
   },
   "open": {
-    "zh-CN": "Open",
-    "zh-TW": "Open",
+    "zh-CN": "打开",
+    "zh-TW": "打開",
     en: "Open",
     fr: "Ouvrir",
-    ja: "Open",
-    ko: "Open",
-    ru: "Open"
+    ja: "開く",
+    ko: "열기",
+    ru: "Открыть"
+  },
+  "tag.live": {
+    "zh-CN": "已上线",
+    "zh-TW": "已上線",
+    en: "Live",
+    fr: "En ligne",
+    ja: "公開中",
+    ko: "공개",
+    ru: "Доступно"
+  },
+  "tag.games": {
+    "zh-CN": "游戏",
+    "zh-TW": "遊戲",
+    en: "Games",
+    fr: "Jeux",
+    ja: "ゲーム",
+    ko: "게임",
+    ru: "Игры"
+  },
+  "tag.next": {
+    "zh-CN": "待扩展",
+    "zh-TW": "待擴展",
+    en: "Next",
+    fr: "A venir",
+    ja: "次へ",
+    ko: "다음",
+    ru: "Далее"
+  },
+  "tag.tools": {
+    "zh-CN": "工具",
+    "zh-TW": "工具",
+    en: "Tools",
+    fr: "Outils",
+    ja: "ツール",
+    ko: "도구",
+    ru: "Инструменты"
+  },
+  "tag.archive": {
+    "zh-CN": "归档",
+    "zh-TW": "歸檔",
+    en: "Archive",
+    fr: "Archive",
+    ja: "アーカイブ",
+    ko: "아카이브",
+    ru: "Архив"
+  },
+  "tag.research": {
+    "zh-CN": "研究",
+    "zh-TW": "研究",
+    en: "Research",
+    fr: "Recherche",
+    ja: "研究",
+    ko: "연구",
+    ru: "Исследования"
+  },
+  "tag.threeGames": {
+    "zh-CN": "3 款游戏",
+    "zh-TW": "3 款遊戲",
+    en: "3 games",
+    fr: "3 jeux",
+    ja: "3 本のゲーム",
+    ko: "게임 3개",
+    ru: "3 игры"
+  },
+  "footer.built": {
+    "zh-CN": "一个持续生长的个人网站。",
+    "zh-TW": "一個持續生長的個人網站。",
+    en: "Built as a growing personal site.",
+    fr: "Un site personnel en evolution.",
+    ja: "育っていく個人サイトです。",
+    ko: "계속 자라는 개인 사이트입니다.",
+    ru: "Личный сайт, который постепенно растет."
   },
   "common.mode.ai": {
     "zh-CN": "人机",

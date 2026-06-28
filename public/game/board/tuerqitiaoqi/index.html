@@ -7,22 +7,29 @@
   <link rel="stylesheet" href="./styles.css?v=20260627d" />
 </head>
 <body>
-  <div class="game-topbar">
-    <div class="settings-menu game-settings" data-settings-menu-root>
-    <button class="settings-trigger" type="button" data-settings-toggle data-i18n="settings.label" aria-expanded="false" aria-label="设置">设置</button>
-    <div class="settings-popover" data-settings-menu>
-      <label class="settings-field">
-        <span data-i18n="settings.language">语言：</span>
-        <select data-language-select aria-label="Language"></select>
-      </label>
-      <label class="settings-field">
-        <span data-i18n="settings.appearance">外观：</span>
-        <select data-theme-select aria-label="Appearance"></select>
-      </label>
-    </div>
-    </div>
-    <a class="site-back" href="/game/board/" data-i18n="nav.board">棋类</a>
-  </div>
+  <header class="game-topbar">
+    <a class="game-brand" href="/">
+      <strong>Small Magellanic Cloud</strong>
+      <span data-i18n="nav.board">棋类</span>
+    </a>
+    <nav class="game-nav" aria-label="游戏导航">
+      <a class="game-nav-link" href="/" data-i18n="nav.home">主页</a>
+      <a class="site-back" href="/game/board/" data-i18n="nav.board">棋类</a>
+      <div class="settings-menu game-settings" data-settings-menu-root>
+        <button class="settings-trigger" type="button" data-settings-toggle data-i18n="settings.label" aria-expanded="false" aria-label="设置">设置</button>
+        <div class="settings-popover" data-settings-menu>
+          <label class="settings-field">
+            <span data-i18n="settings.language">语言：</span>
+            <select data-language-select aria-label="Language"></select>
+          </label>
+          <label class="settings-field">
+            <span data-i18n="settings.appearance">外观：</span>
+            <select data-theme-select aria-label="Appearance"></select>
+          </label>
+        </div>
+      </div>
+    </nav>
+  </header>
   <main class="app-shell">
     <aside class="side-panel">
       <div class="brand">
