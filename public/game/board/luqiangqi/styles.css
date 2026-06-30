@@ -1040,7 +1040,7 @@ html[data-theme="dark"] .brand-mark {
 }
 
 .settings-field::after {
-  content: attr(data-value) "  ›" !important;
+  content: "›" !important;
   justify-self: end;
   color: var(--ink) !important;
   font-size: 14px !important;
@@ -1253,4 +1253,265 @@ html[data-theme="dark"] .brand-mark {
     min-width: 74px !important;
     max-width: 74px !important;
   }
+}
+
+/* 20260701 settings clarity pass. */
+:root {
+  --settings-surface: rgba(255, 255, 255, 0.98);
+  --settings-hover: rgba(31, 40, 38, 0.06);
+}
+
+html[data-theme="dark"] {
+  --settings-surface: rgba(17, 24, 21, 0.98);
+  --settings-hover: rgba(255, 255, 255, 0.06);
+}
+
+.settings-popover {
+  background: var(--settings-surface) !important;
+  box-shadow:
+    0 28px 90px rgba(0, 0, 0, 0.46),
+    0 0 0 1px color-mix(in srgb, var(--line) 86%, transparent) !important;
+  backdrop-filter: blur(24px) saturate(1.15);
+  overflow: visible;
+}
+
+.settings-field {
+  cursor: default;
+  position: relative;
+}
+
+.settings-field:hover,
+.settings-field:focus-within {
+  background: var(--settings-hover);
+}
+
+.settings-field.choice-open {
+  z-index: 80;
+}
+
+.settings-field > span {
+  pointer-events: none;
+}
+
+.settings-field::after {
+  pointer-events: none;
+  position: relative;
+  z-index: 3;
+}
+
+.settings-field select {
+  position: absolute !important;
+  width: 0 !important;
+  min-width: 0 !important;
+  max-width: 0 !important;
+  height: 0 !important;
+  padding: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.settings-value {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 64px;
+  width: min(58%, 190px);
+  min-width: 118px;
+  padding: 0 28px 0 12px;
+  border: 0;
+  color: var(--ink);
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 850;
+  text-align: right;
+  cursor: pointer;
+}
+
+.settings-value:focus-visible {
+  outline: 1px solid color-mix(in srgb, var(--accent) 62%, transparent);
+  outline-offset: -8px;
+}
+
+.settings-options {
+  grid-column: 1 / -1;
+  justify-self: stretch;
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  max-height: 0;
+  padding: 0 6px;
+  overflow: auto;
+  border: 0 solid var(--line);
+  border-radius: 18px;
+  background: var(--settings-surface);
+  box-shadow: none;
+  opacity: 0;
+  pointer-events: none;
+  transform: none;
+  transition: max-height 170ms ease, opacity 140ms ease, padding 170ms ease;
+}
+
+.settings-field.choice-open .settings-options {
+  max-height: min(260px, calc(100vh - 260px));
+  margin: 64px 0 8px;
+  padding: 6px;
+  border-width: 1px;
+  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.settings-option {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 12px;
+  color: var(--muted);
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 780;
+  text-align: right;
+  cursor: pointer;
+}
+
+.settings-option:hover,
+.settings-option:focus-visible {
+  color: var(--ink);
+  background: var(--settings-hover);
+  outline: 0;
+}
+
+.settings-option[aria-selected="true"] {
+  color: var(--ink);
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+}
+
+.settings-popover:has(.settings-field.choice-open) {
+  width: min(300px, calc(100vw - 20px)) !important;
+  padding: 10px;
+}
+
+.settings-popover:has(.settings-field.choice-open) .settings-field {
+  display: none;
+}
+
+.settings-popover:has(.settings-field.choice-open) .settings-field.choice-open {
+  display: block;
+  min-height: 0;
+  border-top: 0;
+  background: transparent;
+}
+
+.settings-field.choice-open::before,
+.settings-field.choice-open::after,
+.settings-field.choice-open > span,
+.settings-field.choice-open .settings-value {
+  display: none;
+}
+
+.settings-field.choice-open .settings-options {
+  width: 100%;
+  max-height: min(260px, calc(100vh - 220px));
+  margin: 0;
+  padding: 4px;
+  border: 0;
+  box-shadow: none;
+}
+
+@media (max-width: 760px) {
+  .settings-popover {
+    width: min(330px, calc(100vw - 20px)) !important;
+  }
+
+  .settings-field select {
+    width: min(66%, 210px) !important;
+  }
+
+  .settings-value {
+    width: min(66%, 210px);
+  }
+
+  .settings-options {
+    width: 100%;
+  }
+}
+
+/* 20260701 settings drill-down: scalable main list plus focused choice panel. */
+.settings-choice-panel[hidden] {
+  display: none !important;
+}
+
+.settings-popover.choice-mode {
+  width: min(300px, calc(100vw - 20px)) !important;
+  padding: 10px;
+}
+
+.settings-popover.choice-mode .settings-field {
+  display: none !important;
+}
+
+.settings-choice-panel {
+  display: grid;
+  gap: 8px;
+}
+
+.settings-choice-head {
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  align-items: center;
+  min-height: 40px;
+}
+
+.settings-back {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 50%;
+  color: var(--ink);
+  background: transparent;
+  font: inherit;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.settings-back:hover,
+.settings-back:focus-visible {
+  background: var(--settings-hover);
+  outline: 0;
+}
+
+.settings-choice-title {
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 850;
+}
+
+.settings-choice-list {
+  display: grid;
+  gap: 2px;
+  max-height: min(292px, calc(100vh - 236px));
+  overflow: auto;
+}
+
+.settings-choice-list .settings-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 38px;
+  text-align: left;
+}
+
+.settings-choice-list .settings-option[aria-selected="true"]::after {
+  content: "✓";
+  color: var(--accent);
+  font-weight: 900;
 }

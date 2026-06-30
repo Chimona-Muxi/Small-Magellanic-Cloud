@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Small Magellanic Cloud</title>
   <meta name="description" content="Small Magellanic Cloud personal site." />
-  <link rel="stylesheet" href="/styles.css?v=20260627d" />
+  <link rel="stylesheet" href="/styles.css?v=20260701b" />
 </head>
 <body>
   <div class="site-shell">
@@ -21,14 +21,14 @@
         <div class="settings-menu" data-settings-menu-root>
           <button class="settings-trigger" type="button" data-settings-toggle data-i18n="settings.label" aria-expanded="false" aria-label="设置">设置</button>
           <div class="settings-popover" data-settings-menu>
-            <label class="settings-field">
+            <div class="settings-field">
               <span data-i18n="settings.language">语言：</span>
               <select data-language-select aria-label="Language"></select>
-            </label>
-            <label class="settings-field">
+            </div>
+            <div class="settings-field">
               <span data-i18n="settings.appearance">外观：</span>
               <select data-theme-select aria-label="Appearance"></select>
-            </label>
+            </div>
           </div>
         </div>
       </nav>
@@ -45,32 +45,19 @@
 
       <section class="content-band" id="modules">
         <div class="section-head" data-reveal>
-          <p class="eyebrow" data-i18n="home.modules.eyebrow">模块</p>
           <h2 data-i18n="home.modules.title">我的公开创作作品</h2>
           <p data-i18n="home.modules.copy">网站存放了我认为有一定价值的项目，包括游戏、学习工具、资源库等等。</p>
         </div>
         <div class="module-grid">
           <a class="module-card" href="/game/" data-reveal>
-            <div class="module-meta">
-              <span class="tag" data-i18n="tag.live">已上线</span>
-              <span class="tag" data-i18n="tag.games">游戏</span>
-            </div>
             <h3 data-i18n="module.game.title">游戏</h3>
             <p data-i18n="module.game.copy">棋类与互动游戏的集合，目前先收纳棋类模块。</p>
           </a>
           <article class="module-card" data-reveal>
-            <div class="module-meta">
-              <span class="tag" data-i18n="tag.next">待扩展</span>
-              <span class="tag" data-i18n="tag.tools">工具</span>
-            </div>
             <h3 data-i18n="module.study.title">学习工具</h3>
             <p data-i18n="module.study.copy">后续学习工具、笔记系统和小型实验可以从这里扩展。</p>
           </article>
           <article class="module-card" data-reveal>
-            <div class="module-meta">
-              <span class="tag" data-i18n="tag.archive">归档</span>
-              <span class="tag" data-i18n="tag.research">研究</span>
-            </div>
             <h3 data-i18n="module.lab.title">实验室</h3>
             <p data-i18n="module.lab.copy">用于保存阶段性作品、算法实验和可复用组件。</p>
           </article>
@@ -83,6 +70,6 @@
       <span data-i18n="footer.built">一个持续生长的个人网站。</span>
     </footer>
   </div>
-  <script type="module" src="/site.mjs?v=20260627d"></script>
+  <script type="module" src="/site.mjs?v=20260701b"></script>
 </body>
 </html>

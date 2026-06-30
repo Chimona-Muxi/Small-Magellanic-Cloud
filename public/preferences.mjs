@@ -68,15 +68,6 @@ const copy = {
     ko: "장모린의 개인 웹사이트입니다. 일상과 학습을 위해 만들었습니다. 환영합니다.",
     ru: "Личный сайт Чжан Молиня для повседневной жизни и учебы. Добро пожаловать."
   },
-  "home.modules.eyebrow": {
-    "zh-CN": "模块",
-    "zh-TW": "模組",
-    en: "modules",
-    fr: "modules",
-    ja: "モジュール",
-    ko: "모듈",
-    ru: "модули"
-  },
   "home.modules.title": {
     "zh-CN": "我的公开创作作品",
     "zh-TW": "我的公開創作作品",
@@ -149,15 +140,6 @@ const copy = {
     ko: "단계별 작업물, 알고리즘 실험, 재사용 컴포넌트를 모으는 곳입니다.",
     ru: "Место для черновиков, алгоритмов и переиспользуемых компонентов."
   },
-  "game.title": {
-    "zh-CN": "游戏模块",
-    "zh-TW": "遊戲模組",
-    en: "Game Module",
-    fr: "Module Game",
-    ja: "ゲームモジュール",
-    ko: "게임 모듈",
-    ru: "Игровой модуль"
-  },
   "game.copy": {
     "zh-CN": "互动游戏会按类型收纳。当前启用的是棋类，后续可以继续加入策略、谜题、物理模拟或其他实验。",
     "zh-TW": "互動遊戲會按類型收納。當前啟用的是棋類，後續可以繼續加入策略、謎題、物理模擬或其他實驗。",
@@ -194,24 +176,6 @@ const copy = {
     ko: "루창치, 서양 체커, 터키 체커를 하나의 board 모듈에 모았습니다.",
     ru: "Wall Road Chess, шашки и турецкие шашки собраны в одном модуле."
   },
-  "board.luqiangqi.tag1": {
-    "zh-CN": "围堵",
-    "zh-TW": "圍堵",
-    en: "Blockade",
-    fr: "Blocage",
-    ja: "封鎖",
-    ko: "봉쇄",
-    ru: "Блокада"
-  },
-  "board.luqiangqi.tag2": {
-    "zh-CN": "路径博弈",
-    "zh-TW": "路徑博弈",
-    en: "Path duel",
-    fr: "Chemins",
-    ja: "経路戦",
-    ko: "경로전",
-    ru: "Маршруты"
-  },
   "board.luqiangqi.title": {
     "zh-CN": "墙路棋",
     "zh-TW": "牆路棋",
@@ -229,24 +193,6 @@ const copy = {
     ja: "経路、壁、空間圧力を読む戦略ゲームです。",
     ko: "길, 벽, 공간 압박을 읽는 전략 게임입니다.",
     ru: "Позиционная дуэль маршрутов, стен и давления."
-  },
-  "board.xiyangtiaoqi.tag1": {
-    "zh-CN": "强制吃子",
-    "zh-TW": "強制吃子",
-    en: "Forced capture",
-    fr: "Prise forcee",
-    ja: "必須捕獲",
-    ko: "강제 포획",
-    ru: "Обязательный бой"
-  },
-  "board.xiyangtiaoqi.tag2": {
-    "zh-CN": "连跳升王",
-    "zh-TW": "連跳升王",
-    en: "King race",
-    fr: "Dames",
-    ja: "連跳成王",
-    ko: "연속 점프",
-    ru: "Дамки"
   },
   "board.xiyangtiaoqi.title": {
     "zh-CN": "西洋跳棋",
@@ -266,24 +212,6 @@ const copy = {
     ko: "강제 포획과 연속 점프로 매 수가 교환 계산이 됩니다.",
     ru: "Обязательный бой и серии делают каждый ход расчетом обменов."
   },
-  "board.tuerqitiaoqi.tag1": {
-    "zh-CN": "正交跳吃",
-    "zh-TW": "正交跳吃",
-    en: "Orthogonal",
-    fr: "Orthogonal",
-    ja: "直交捕獲",
-    ko: "직교 점프",
-    ru: "Ортогонально"
-  },
-  "board.tuerqitiaoqi.tag2": {
-    "zh-CN": "长王路线",
-    "zh-TW": "長王路線",
-    en: "Long kings",
-    fr: "Dames longues",
-    ja: "長い王",
-    ko: "긴 왕",
-    ru: "Длинные дамки"
-  },
   "board.tuerqitiaoqi.title": {
     "zh-CN": "土耳其跳棋",
     "zh-TW": "土耳其跳棋",
@@ -301,78 +229,6 @@ const copy = {
     ja: "縦横移動と長い王で、戦術の幅が大きく広がります。",
     ko: "가로세로 이동과 긴 왕이 넓은 전술 공간을 만듭니다.",
     ru: "Ходы по вертикали и горизонтали дают более широкую тактику."
-  },
-  "open": {
-    "zh-CN": "打开",
-    "zh-TW": "打開",
-    en: "Open",
-    fr: "Ouvrir",
-    ja: "開く",
-    ko: "열기",
-    ru: "Открыть"
-  },
-  "tag.live": {
-    "zh-CN": "已上线",
-    "zh-TW": "已上線",
-    en: "Live",
-    fr: "En ligne",
-    ja: "公開中",
-    ko: "공개",
-    ru: "Доступно"
-  },
-  "tag.games": {
-    "zh-CN": "游戏",
-    "zh-TW": "遊戲",
-    en: "Games",
-    fr: "Jeux",
-    ja: "ゲーム",
-    ko: "게임",
-    ru: "Игры"
-  },
-  "tag.next": {
-    "zh-CN": "待扩展",
-    "zh-TW": "待擴展",
-    en: "Next",
-    fr: "A venir",
-    ja: "次へ",
-    ko: "다음",
-    ru: "Далее"
-  },
-  "tag.tools": {
-    "zh-CN": "工具",
-    "zh-TW": "工具",
-    en: "Tools",
-    fr: "Outils",
-    ja: "ツール",
-    ko: "도구",
-    ru: "Инструменты"
-  },
-  "tag.archive": {
-    "zh-CN": "归档",
-    "zh-TW": "歸檔",
-    en: "Archive",
-    fr: "Archive",
-    ja: "アーカイブ",
-    ko: "아카이브",
-    ru: "Архив"
-  },
-  "tag.research": {
-    "zh-CN": "研究",
-    "zh-TW": "研究",
-    en: "Research",
-    fr: "Recherche",
-    ja: "研究",
-    ko: "연구",
-    ru: "Исследования"
-  },
-  "tag.threeGames": {
-    "zh-CN": "3 款游戏",
-    "zh-TW": "3 款遊戲",
-    en: "3 games",
-    fr: "3 jeux",
-    ja: "3 本のゲーム",
-    ko: "게임 3개",
-    ru: "3 игры"
   },
   "footer.built": {
     "zh-CN": "一个持续生长的个人网站。",
@@ -472,6 +328,15 @@ const copy = {
     ja: "外観：",
     ko: "화면:",
     ru: "Вид:"
+  },
+  "settings.back": {
+    "zh-CN": "返回",
+    "zh-TW": "返回",
+    en: "Back",
+    fr: "Retour",
+    ja: "戻る",
+    ko: "뒤로",
+    ru: "Назад"
   },
   "common.aiStrength": {
     "zh-CN": "AI 强度",
@@ -1274,6 +1139,7 @@ function applyLanguage(lang = currentLanguage()) {
     select.value = meta.value;
     const field = select.closest(".settings-field");
     if (field) field.dataset.value = meta.label;
+    syncSettingsChoice(select);
   }
   fillThemeSelects();
   for (const button of document.querySelectorAll("[data-settings-toggle]")) {
@@ -1293,6 +1159,7 @@ function applyTheme(theme = currentTheme()) {
     select.value = theme;
     const field = select.closest(".settings-field");
     if (field) field.dataset.value = theme === "dark" ? t("theme.dark") : t("theme.light");
+    syncSettingsChoice(select);
   }
 }
 
@@ -1313,11 +1180,145 @@ function fillThemeSelects() {
     select.value = value === "dark" ? "dark" : "light";
     const field = select.closest(".settings-field");
     if (field) field.dataset.value = select.value === "dark" ? t("theme.dark") : t("theme.light");
+    syncSettingsChoice(select);
   }
+}
+
+function settingsChoices(select) {
+  if (select.matches("[data-language-select]")) return languages.map(({ value, label }) => ({ value, label }));
+  return [
+    { value: "light", label: t("theme.light") },
+    { value: "dark", label: t("theme.dark") }
+  ];
+}
+
+function closeSettingsChoices(scope = document) {
+  for (const button of scope.querySelectorAll("[data-settings-value]")) button.setAttribute("aria-expanded", "false");
+  const popovers = scope.matches?.(".settings-popover.choice-mode")
+    ? [scope, ...scope.querySelectorAll(".settings-popover.choice-mode")]
+    : [...scope.querySelectorAll(".settings-popover.choice-mode")];
+  for (const popover of popovers) popover.classList.remove("choice-mode");
+  for (const panel of scope.querySelectorAll("[data-settings-choice-panel]")) {
+    panel.hidden = true;
+    panel.replaceChildren();
+  }
+}
+
+function syncSettingsChoice(select) {
+  const field = select.closest(".settings-field");
+  if (!field) return;
+  const button = field.querySelector("[data-settings-value]");
+  if (!button) return;
+
+  const choices = settingsChoices(select);
+  const current = choices.find((item) => item.value === select.value) || choices[0];
+  const fieldLabel = field.querySelector("span")?.textContent?.replace(/[:：]\s*$/, "") || "";
+  button.textContent = current?.label || "";
+  button.setAttribute("aria-label", fieldLabel ? `${fieldLabel}：${button.textContent}` : button.textContent);
+}
+
+function ensureSettingsChoicePanel(popover) {
+  let panel = popover.querySelector("[data-settings-choice-panel]");
+  if (panel) return panel;
+  panel = document.createElement("div");
+  panel.className = "settings-choice-panel";
+  panel.dataset.settingsChoicePanel = "";
+  panel.hidden = true;
+  popover.append(panel);
+  return panel;
+}
+
+function openSettingsChoice(field, select) {
+  const popover = field.closest(".settings-popover");
+  if (!popover) return;
+
+  closeSettingsChoices(popover);
+  const panel = ensureSettingsChoicePanel(popover);
+  const fieldLabel = field.querySelector("span")?.textContent?.replace(/[:：]\s*$/, "") || "";
+  const choices = settingsChoices(select);
+
+  const header = document.createElement("div");
+  header.className = "settings-choice-head";
+
+  const back = document.createElement("button");
+  back.type = "button";
+  back.className = "settings-back";
+  back.setAttribute("aria-label", t("settings.back", "返回"));
+  back.textContent = "‹";
+  back.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    closeSettingsChoices(popover);
+  });
+
+  const title = document.createElement("strong");
+  title.className = "settings-choice-title";
+  title.textContent = fieldLabel;
+  header.append(back, title);
+
+  const list = document.createElement("div");
+  list.className = "settings-choice-list";
+  list.setAttribute("role", "listbox");
+  list.append(...choices.map((item) => {
+    const option = document.createElement("button");
+    option.type = "button";
+    option.className = "settings-option";
+    option.dataset.settingsOption = item.value;
+    option.setAttribute("role", "option");
+    option.setAttribute("aria-selected", item.value === select.value ? "true" : "false");
+    option.textContent = item.label;
+    option.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      select.value = item.value;
+      select.dispatchEvent(new Event("change", { bubbles: true }));
+      closeSettingsChoices(popover);
+    });
+    return option;
+  }));
+
+  panel.replaceChildren(header, list);
+  panel.hidden = false;
+  popover.classList.add("choice-mode");
+  const button = field.querySelector("[data-settings-value]");
+  if (button) button.setAttribute("aria-expanded", "true");
+}
+
+function enhanceSettingsSelect(select) {
+  if (select.dataset.settingsEnhanced) {
+    syncSettingsChoice(select);
+    return;
+  }
+
+  const field = select.closest(".settings-field");
+  if (!field) return;
+  select.dataset.settingsEnhanced = "true";
+  select.tabIndex = -1;
+  select.setAttribute("aria-hidden", "true");
+
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "settings-value";
+  button.dataset.settingsValue = "";
+  button.setAttribute("aria-haspopup", "listbox");
+  button.setAttribute("aria-expanded", "false");
+
+  field.append(button);
+  button.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    openSettingsChoice(field, select);
+  });
+  syncSettingsChoice(select);
+}
+
+function enhanceSettingsSelects() {
+  for (const select of document.querySelectorAll("[data-language-select], [data-theme-select]")) enhanceSettingsSelect(select);
 }
 
 function setSettingsMenuOpen(menu, open) {
   menu.classList.toggle("open", open);
+  if (!open) closeSettingsChoices(menu);
   const button = menu.querySelector("[data-settings-toggle]");
   if (button) button.setAttribute("aria-expanded", open ? "true" : "false");
 }
@@ -1335,15 +1336,20 @@ function initSettingsMenus() {
       for (const other of menus) setSettingsMenuOpen(other, false);
       setSettingsMenuOpen(menu, willOpen);
     });
-    menu.addEventListener("click", (event) => event.stopPropagation());
+    menu.addEventListener("click", (event) => {
+      event.stopPropagation();
+      if (!event.target.closest("[data-settings-value], [data-settings-choice-panel]")) closeSettingsChoices(menu);
+    });
   }
 
   document.addEventListener("click", () => {
+    closeSettingsChoices();
     for (const menu of menus) setSettingsMenuOpen(menu, false);
   });
 
   document.addEventListener("keydown", (event) => {
     if (event.key !== "Escape") return;
+    closeSettingsChoices();
     for (const menu of menus) setSettingsMenuOpen(menu, false);
   });
 }
@@ -1370,6 +1376,7 @@ export function toggleTheme() {
 export function initPreferences() {
   fillLanguageSelects();
   fillThemeSelects();
+  enhanceSettingsSelects();
   applyLanguage();
   applyTheme();
   initSettingsMenus();

@@ -224,13 +224,24 @@ function sendSse(req, res, room, clientId) {
     Connection: "keep-alive",
     "X-Accel-Buffering": "no"
   });
+  res.flushHeaders?.();
 
   const client = { clientId, res };
   room.clients.add(client);
+  const heartbeat = setInterval(() => {
+    try {
+      res.write(": keep-alive\n\n");
+    } catch {
+      clearInterval(heartbeat);
+      room.clients.delete(client);
+    }
+  }, 25000);
+
   res.write(`data: ${JSON.stringify(publicRoom(room, clientId))}\n\n`);
   broadcast(room);
 
   req.on("close", () => {
+    clearInterval(heartbeat);
     room.clients.delete(client);
     const active = [...room.clients].some((item) => item.clientId === clientId);
     if (!active && seatIndex >= 0) {
