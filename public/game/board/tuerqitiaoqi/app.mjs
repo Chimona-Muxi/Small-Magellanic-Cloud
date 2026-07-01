@@ -306,23 +306,35 @@ function renderBoard() {
 }
 
 function renderPlayers() {
-  els.playerCards.innerHTML = game.players.map((player) => {
+  els.playerCards.replaceChildren();
+  for (const player of game.players) {
     const active = game.current === player.id && game.winner === null;
     const seat = onlineRoom?.seats?.[player.id];
     const turnLabel = mode === "online"
       ? seat?.occupied ? (seat.connected ? tr("status.online", "在线") : tr("status.seated", "已入座")) : tr("status.waiting", "等待")
       : mode === "ai" ? (player.id === 0 ? tr("status.player", "玩家") : tr("player.ai", "AI")) : (player.id === 0 ? tr("status.first", "先手") : tr("status.second", "后手"));
-    return `
-      <div class="player-card ${active ? "active" : ""}">
-        <span class="player-dot" style="background:${player.color}"></span>
-        <div>
-          <strong>${displayPlayerName(player)}</strong>
-          <small>${localizedPieceLabel(player.id)} · ${turnLabel}</small>
-        </div>
-        <span>${active ? tr("status.active", "行动") : ""}</span>
-      </div>
-    `;
-  }).join("");
+
+    const card = document.createElement("div");
+    card.className = "player-card";
+    if (active) card.classList.add("active");
+
+    const dot = document.createElement("span");
+    dot.className = "player-dot";
+    dot.style.background = player.color;
+
+    const info = document.createElement("div");
+    const name = document.createElement("strong");
+    name.textContent = displayPlayerName(player);
+    const meta = document.createElement("small");
+    meta.textContent = `${localizedPieceLabel(player.id)} · ${turnLabel}`;
+    info.append(name, meta);
+
+    const action = document.createElement("span");
+    action.textContent = active ? tr("status.active", "行动") : "";
+
+    card.append(dot, info, action);
+    els.playerCards.append(card);
+  }
 }
 
 function renderTopBar() {
@@ -346,18 +358,28 @@ function renderTopBar() {
 }
 
 function renderMetrics() {
-  els.metrics.innerHTML = scoreSummary(game).map((item) => `
-    <div class="metric">
-      <span>${item.name}</span>
-      <strong>${item.pieces} / ${item.kings}</strong>
-    </div>
-  `).join("");
+  els.metrics.replaceChildren();
+  for (const item of scoreSummary(game)) {
+    const metric = document.createElement("div");
+    metric.className = "metric";
+    const name = document.createElement("span");
+    name.textContent = item.name;
+    const score = document.createElement("strong");
+    score.textContent = `${item.pieces} / ${item.kings}`;
+    metric.append(name, score);
+    els.metrics.append(metric);
+  }
 }
 
 function renderLog() {
-  els.logList.innerHTML = (game.log || []).length
-    ? game.log.slice(0, 16).map((item) => `<div class="log-item">${item}</div>`).join("")
-    : `<div class="log-item">${tr("status.noLog", "暂无记录")}</div>`;
+  els.logList.replaceChildren();
+  const entries = (game.log || []).length ? game.log.slice(0, 16) : [tr("status.noLog", "暂无记录")];
+  for (const text of entries) {
+    const item = document.createElement("div");
+    item.className = "log-item";
+    item.textContent = text;
+    els.logList.append(item);
+  }
 }
 
 function recordLines() {
