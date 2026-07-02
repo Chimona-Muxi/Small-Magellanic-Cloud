@@ -1,5 +1,6 @@
 import { createServer } from "node:http";
-import { readFile, stat } from "node:fs/promises";
+import { spawn } from "node:child_process";
+import { access, readFile, stat } from "node:fs/promises";
 import { dirname, extname, join, normalize } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
@@ -17,6 +18,9 @@ import {
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const publicDir = join(__dirname, "public");
+const padicDir = join(__dirname, "tools", "padic", "p_adic_pro");
+const padicBinary = join(padicDir, process.platform === "win32" ? "padic_converter.exe" : "padic_converter");
+const padicRuntimeHome = join(__dirname, "tools", "padic", "runtime-home");
 const port = Number(process.env.PORT || 5226);
 const host = process.env.HOST || (process.env.PORT ? "0.0.0.0" : "127.0.0.1");
 const roomTtlMs = 1000 * 60 * 60 * 6;
@@ -35,7 +39,8 @@ const mime = {
   ".ico": "image/x-icon",
   ".sh": "application/octet-stream",
   ".command": "application/octet-stream",
-  ".bat": "application/octet-stream"
+  ".bat": "application/octet-stream",
+  ".zip": "application/zip"
 };
 
 const gameConfigs = {
@@ -81,6 +86,7 @@ const gameConfigs = {
 };
 
 const roomStores = new Map(Object.keys(gameConfigs).map((key) => [key, new Map()]));
+let padicBuildPromise = null;
 
 function cleanPath(pathname) {
   const decoded = decodeURIComponent(pathname);
@@ -130,6 +136,106 @@ function readBody(req) {
     });
     req.on("error", () => resolve({}));
   });
+}
+
+function runProcess(command, args, options = {}) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(command, args, {
+      cwd: options.cwd,
+      env: options.env || process.env,
+      stdio: ["pipe", "pipe", "pipe"]
+    });
+    let stdout = "";
+    let stderr = "";
+    const timer = setTimeout(() => {
+      child.kill("SIGKILL");
+      reject(new Error(`${command} timed out`));
+    }, options.timeoutMs || 8000);
+
+    child.stdout.on("data", (chunk) => {
+      stdout += chunk;
+      if (stdout.length > 64 * 1024) child.kill("SIGKILL");
+    });
+    child.stderr.on("data", (chunk) => {
+      stderr += chunk;
+    });
+    child.on("error", (error) => {
+      clearTimeout(timer);
+      reject(error);
+    });
+    child.on("close", (code) => {
+      clearTimeout(timer);
+      if (code === 0) resolve({ stdout, stderr });
+      else reject(new Error(stderr.trim() || `${command} exited with code ${code}`));
+    });
+
+    if (options.input) child.stdin.end(options.input);
+    else child.stdin.end();
+  });
+}
+
+async function ensurePadicBinary() {
+  try {
+    await access(padicBinary);
+    return;
+  } catch {
+    // Build below.
+  }
+
+  if (!padicBuildPromise) {
+    padicBuildPromise = runProcess("make", ["clean", "all"], {
+      cwd: padicDir,
+      timeoutMs: 20000
+    }).finally(() => {
+      padicBuildPromise = null;
+    });
+  }
+  await padicBuildPromise;
+}
+
+function cleanPadicOutput(text) {
+  return String(text || "")
+    .replace(/\r\n/g, "\n")
+    .replace(/\np-adic> (退出|再见！|Goodbye!)\s*$/u, "")
+    .trimEnd();
+}
+
+async function handlePadicApi(req, res, url) {
+  if (url.pathname !== "/api/padic/evaluate") return false;
+  if (req.method === "OPTIONS") {
+    json(res, 204, {});
+    return true;
+  }
+  if (req.method !== "POST") {
+    json(res, 405, { error: "Method not allowed" });
+    return true;
+  }
+
+  try {
+    const body = await readBody(req);
+    const command = String(body.command || "").replace(/[\r\n]+/g, " ").trim();
+    if (!command) {
+      json(res, 400, { error: "请输入指令" });
+      return true;
+    }
+    if (command.length > 400) {
+      json(res, 400, { error: "指令过长" });
+      return true;
+    }
+
+    await ensurePadicBinary();
+    const result = await runProcess(padicBinary, [], {
+      cwd: padicDir,
+      env: { ...process.env, HOME: padicRuntimeHome },
+      input: `${command}\nquit\n`,
+      timeoutMs: 8000
+    });
+    json(res, 200, { output: cleanPadicOutput(result.stdout) });
+    return true;
+  } catch (error) {
+    json(res, 500, { error: error.message || "p-adic 计算失败" });
+    return true;
+  }
 }
 
 function syncPlayerNames(room) {
@@ -381,6 +487,7 @@ const server = createServer(async (req, res) => {
   try {
     const url = new URL(req.url || "/", `http://${req.headers.host || `${host}:${port}`}`);
 
+    if (await handlePadicApi(req, res, url)) return;
     if (await handleApi(req, res, url)) return;
 
     if (url.pathname !== "/" && !extname(url.pathname) && !url.pathname.endsWith("/")) {

@@ -885,7 +885,7 @@ body:has(.site-nav.trail .settings-menu.open) .board-grid {
 
 .padic-form {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 110px auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 12px;
   align-items: end;
 }
