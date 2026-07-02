@@ -32,6 +32,15 @@ const copy = {
     ko: "게임",
     ru: "Игры"
   },
+  "nav.study": {
+    "zh-CN": "学习工具",
+    "zh-TW": "學習工具",
+    en: "Study Tools",
+    fr: "Outils d'etude",
+    ja: "学習ツール",
+    ko: "학습 도구",
+    ru: "Учебные инструменты"
+  },
   "nav.board": {
     "zh-CN": "棋类",
     "zh-TW": "棋類",
@@ -114,13 +123,94 @@ const copy = {
     ru: "Учебные инструменты"
   },
   "module.study.copy": {
-    "zh-CN": "后续学习工具、笔记系统和小型实验可以从这里扩展。",
-    "zh-TW": "後續學習工具、筆記系統和小型實驗可以從這裡擴展。",
-    en: "Future study tools, notes and small experiments can expand from here.",
-    fr: "Les futurs outils d'etude, notes et petites experiences partiront d'ici.",
-    ja: "今後の学習ツール、ノート、小さな実験はここから広げます。",
-    ko: "앞으로 학습 도구, 노트, 작은 실험을 여기에서 확장합니다.",
-    ru: "Будущие учебные инструменты, заметки и эксперименты вырастут отсюда."
+    "zh-CN": "p-adic 转换、终端工具和后续学习实验会收纳在这里。",
+    "zh-TW": "p-adic 轉換、終端工具和後續學習實驗會收納在這裡。",
+    en: "p-adic conversion, terminal tools and future study experiments live here.",
+    fr: "Conversion p-adic, outils terminal et futurs essais d'etude vivent ici.",
+    ja: "p-adic 変換、端末ツール、今後の学習実験をここに置きます。",
+    ko: "p-adic 변환, 터미널 도구, 앞으로의 학습 실험을 여기에 둡니다.",
+    ru: "Здесь будут p-adic преобразования, терминальные инструменты и учебные опыты."
+  },
+  "study.copy": {
+    "zh-CN": "把可直接使用的小工具放在这里：能下载，也能在浏览器里先试一试。",
+    "zh-TW": "把可直接使用的小工具放在這裡：能下載，也能在瀏覽器裡先試一試。",
+    en: "Small usable tools live here: downloadable, and often tryable in the browser.",
+    fr: "De petits outils utilisables: a telecharger ou a essayer dans le navigateur.",
+    ja: "すぐ使える小さなツールを置きます。ダウンロードもブラウザ試用もできます。",
+    ko: "바로 쓸 수 있는 작은 도구를 둡니다. 다운로드하거나 브라우저에서 먼저 써볼 수 있습니다.",
+    ru: "Небольшие готовые инструменты: скачать или попробовать прямо в браузере."
+  },
+  "study.padic.title": {
+    "zh-CN": "p-adic Converter",
+    "zh-TW": "p-adic Converter",
+    en: "p-adic Converter",
+    fr: "p-adic Converter",
+    ja: "p-adic Converter",
+    ko: "p-adic Converter",
+    ru: "p-adic Converter"
+  },
+  "study.padic.copy": {
+    "zh-CN": "下载终端版安装器，或直接使用网页版 p-adic 有理数转换。",
+    "zh-TW": "下載終端版安裝器，或直接使用網頁版 p-adic 有理數轉換。",
+    en: "Download the terminal installer, or use the web p-adic rational converter.",
+    fr: "Telechargez l'installateur terminal ou utilisez le convertisseur web.",
+    ja: "端末版インストーラを入手するか、Web 版 p-adic 有理数変換を使えます。",
+    ko: "터미널 설치기를 받거나 웹 p-adic 유리수 변환기를 바로 사용합니다.",
+    ru: "Скачайте терминальный установщик или используйте веб-конвертер."
+  },
+  "padic.copy": {
+    "zh-CN": "选择终端安装器，或打开无需安装的网页版转换器。终端版安装器使用 p-adic 仓库的 main2.0 分支。",
+    "zh-TW": "選擇終端安裝器，或打開無需安裝的網頁版轉換器。終端版安裝器使用 p-adic 倉庫的 main2.0 分支。",
+    en: "Choose a terminal installer or open the no-install web converter. Installers use the p-adic main2.0 branch.",
+    fr: "Choisissez l'installateur terminal ou le convertisseur web sans installation. Les installateurs utilisent main2.0.",
+    ja: "端末インストーラか、インストール不要の Web 変換器を選べます。インストーラは main2.0 を使います。",
+    ko: "터미널 설치기 또는 설치 없는 웹 변환기를 선택합니다. 설치기는 main2.0 브랜치를 사용합니다.",
+    ru: "Выберите установщик или веб-конвертер без установки. Установщики используют ветку main2.0."
+  },
+  "padic.download.title": {
+    "zh-CN": "下载安装器",
+    "zh-TW": "下載安裝器",
+    en: "Download Installers",
+    fr: "Telechargements",
+    ja: "インストーラ",
+    ko: "설치기 다운로드",
+    ru: "Установщики"
+  },
+  "padic.download.copy": {
+    "zh-CN": "选择 Linux、macOS 或 Windows，下载后打开对应文件完成安装。",
+    "zh-TW": "選擇 Linux、macOS 或 Windows，下載後打開對應檔案完成安裝。",
+    en: "Choose Linux, macOS or Windows, then open the downloaded file to install.",
+    fr: "Choisissez Linux, macOS ou Windows, puis ouvrez le fichier telecharge.",
+    ja: "Linux、macOS、Windows を選び、ダウンロードしたファイルを開いてインストールします。",
+    ko: "Linux, macOS, Windows 중 선택하고 내려받은 파일을 열어 설치합니다.",
+    ru: "Выберите Linux, macOS или Windows и откройте скачанный файл."
+  },
+  "padic.download.pageCopy": {
+    "zh-CN": "选择你的系统。安装器会下载 main2.0 分支源码，并调用项目内置安装脚本。",
+    "zh-TW": "選擇你的系統。安裝器會下載 main2.0 分支源碼，並呼叫專案內建安裝腳本。",
+    en: "Choose your system. The installer downloads main2.0 source and runs the project installer.",
+    fr: "Choisissez votre systeme. L'installateur telecharge main2.0 et lance le script du projet.",
+    ja: "システムを選んでください。インストーラは main2.0 のソースを取得して内蔵スクリプトを実行します。",
+    ko: "시스템을 선택하세요. 설치기가 main2.0 소스를 받고 프로젝트 설치 스크립트를 실행합니다.",
+    ru: "Выберите систему. Установщик скачает main2.0 и запустит скрипт проекта."
+  },
+  "padic.web.title": {
+    "zh-CN": "网页版转换",
+    "zh-TW": "網頁版轉換",
+    en: "Web Converter",
+    fr: "Convertisseur web",
+    ja: "Web 変換",
+    ko: "웹 변환",
+    ru: "Веб-конвертер"
+  },
+  "padic.web.copy": {
+    "zh-CN": "输入表达式和素数 p，在浏览器里生成 p-adic 展开，并可输入 help 查看完整指令。",
+    "zh-TW": "輸入表達式和質數 p，在瀏覽器裡生成 p-adic 展開，並可輸入 help 查看完整指令。",
+    en: "Enter an expression and prime p to generate a p-adic expansion in the browser. Type help for commands.",
+    fr: "Entrez une expression et un nombre premier p. Tapez help pour les commandes.",
+    ja: "式と素数 p を入力してブラウザで p-adic 展開を作ります。help で説明を表示します。",
+    ko: "표현식과 소수 p를 입력해 브라우저에서 p-adic 전개를 만듭니다. help로 명령을 봅니다.",
+    ru: "Введите выражение и простое p, чтобы получить p-adic разложение. help покажет команды."
   },
   "module.lab.title": {
     "zh-CN": "实验室",

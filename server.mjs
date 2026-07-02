@@ -32,7 +32,10 @@ const mime = {
   ".jpg": "image/jpeg",
   ".jpeg": "image/jpeg",
   ".webp": "image/webp",
-  ".ico": "image/x-icon"
+  ".ico": "image/x-icon",
+  ".sh": "application/octet-stream",
+  ".command": "application/octet-stream",
+  ".bat": "application/octet-stream"
 };
 
 const gameConfigs = {

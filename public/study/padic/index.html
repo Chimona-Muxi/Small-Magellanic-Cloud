@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>p-adic Converter · Small Magellanic Cloud</title>
+  <link rel="stylesheet" href="/styles.css?v=20260702a" />
+</head>
+<body>
+  <div class="site-shell">
+    <header class="site-header">
+      <a class="brand" href="/">
+        <span class="brand-text"><strong>Small Magellanic Cloud</strong></span>
+      </a>
+      <nav class="site-nav trail" aria-label="当前位置">
+        <a href="/" data-i18n="nav.home">主页</a>
+        <span>/</span>
+        <a href="/study/" data-i18n="nav.study">学习工具</a>
+        <div class="settings-menu" data-settings-menu-root>
+          <button class="settings-trigger" type="button" data-settings-toggle data-i18n="settings.label" aria-expanded="false" aria-label="设置">设置</button>
+          <div class="settings-popover" data-settings-menu>
+            <div class="settings-field">
+              <span data-i18n="settings.language">语言：</span>
+              <select data-language-select aria-label="Language"></select>
+            </div>
+            <div class="settings-field">
+              <span data-i18n="settings.appearance">外观：</span>
+              <select data-theme-select aria-label="Appearance"></select>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="content-band compact">
+      <div class="page-title" data-reveal>
+        <p class="eyebrow">study tool</p>
+        <h1 data-i18n="study.padic.title">p-adic Converter</h1>
+        <p data-i18n="padic.copy">选择终端安装器，或打开无需安装的网页版转换器。终端版安装器使用 p-adic 仓库的 main2.0 分支。</p>
+      </div>
+
+      <div class="module-grid">
+        <a class="module-card" href="/study/padic/downloads/" data-reveal>
+          <h3 data-i18n="padic.download.title">下载安装器</h3>
+          <p data-i18n="padic.download.copy">选择 Linux、macOS 或 Windows，下载后打开对应文件完成安装。</p>
+        </a>
+        <a class="module-card" href="/study/padic/web/" data-reveal>
+          <h3 data-i18n="padic.web.title">网页版转换</h3>
+          <p data-i18n="padic.web.copy">输入表达式和素数 p，在浏览器里生成 p-adic 展开，并可输入 help 查看完整指令。</p>
+        </a>
+      </div>
+    </main>
+  </div>
+  <script type="module" src="/site.mjs?v=20260702a"></script>
+</body>
+</html>

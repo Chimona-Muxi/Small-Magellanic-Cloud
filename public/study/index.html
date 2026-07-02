@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>学习工具 · Small Magellanic Cloud</title>
+  <link rel="stylesheet" href="/styles.css?v=20260702a" />
+</head>
+<body>
+  <div class="site-shell">
+    <header class="site-header">
+      <a class="brand" href="/">
+        <span class="brand-text"><strong>Small Magellanic Cloud</strong></span>
+      </a>
+      <nav class="site-nav trail" aria-label="当前位置">
+        <a href="/" data-i18n="nav.home">主页</a>
+        <div class="settings-menu" data-settings-menu-root>
+          <button class="settings-trigger" type="button" data-settings-toggle data-i18n="settings.label" aria-expanded="false" aria-label="设置">设置</button>
+          <div class="settings-popover" data-settings-menu>
+            <div class="settings-field">
+              <span data-i18n="settings.language">语言：</span>
+              <select data-language-select aria-label="Language"></select>
+            </div>
+            <div class="settings-field">
+              <span data-i18n="settings.appearance">外观：</span>
+              <select data-theme-select aria-label="Appearance"></select>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="content-band compact">
+      <div class="page-title" data-reveal>
+        <h1 data-i18n="nav.study">学习工具</h1>
+        <p data-i18n="study.copy">把可直接使用的小工具放在这里：能下载，也能在浏览器里先试一试。</p>
+      </div>
+      <div class="module-grid">
+        <a class="module-card" href="/study/padic/" data-reveal>
+          <h3 data-i18n="study.padic.title">p-adic Converter</h3>
+          <p data-i18n="study.padic.copy">下载终端版安装器，或直接使用网页版 p-adic 有理数转换。</p>
+        </a>
+      </div>
+    </main>
+  </div>
+  <script type="module" src="/site.mjs?v=20260702a"></script>
+</body>
+</html>
