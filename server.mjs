@@ -193,9 +193,10 @@ async function ensurePadicBinary() {
   await padicBuildPromise;
 }
 
-function cleanPadicOutput(text) {
+function cleanPadicOutput(text, command = "") {
   return String(text || "")
     .replace(/\r\n/g, "\n")
+    .replace(/^p-adic> /, `p-adic> ${command}\n`)
     .replace(/\np-adic> (退出|再见！|Goodbye!)\s*$/u, "")
     .trimEnd();
 }
@@ -230,7 +231,7 @@ async function handlePadicApi(req, res, url) {
       input: `${command}\nquit\n`,
       timeoutMs: 8000
     });
-    json(res, 200, { output: cleanPadicOutput(result.stdout) });
+    json(res, 200, { output: cleanPadicOutput(result.stdout, command) });
     return true;
   } catch (error) {
     json(res, 500, { error: error.message || "p-adic 计算失败" });
