@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>下载 p-adic Converter · Small Magellanic Cloud</title>
+  <link rel="stylesheet" href="/styles.css?v=20260702b" />
+</head>
+<body>
+  <div class="site-shell">
+    <header class="site-header">
+      <a class="brand" href="/">
+        <span class="brand-text"><strong>Small Magellanic Cloud</strong></span>
+      </a>
+      <nav class="site-nav trail" aria-label="当前位置">
+        <a href="/" data-i18n="nav.home">主页</a>
+        <span>/</span>
+        <a href="/study/" data-i18n="nav.study">学习工具</a>
+        <span>/</span>
+        <a href="/study/padic/" data-i18n="study.padic.title">p-adic Converter</a>
+        <div class="settings-menu" data-settings-menu-root>
+          <button class="settings-trigger" type="button" data-settings-toggle data-i18n="settings.label" aria-expanded="false" aria-label="设置">设置</button>
+          <div class="settings-popover" data-settings-menu>
+            <div class="settings-field">
+              <span data-i18n="settings.language">语言：</span>
+              <select data-language-select aria-label="Language"></select>
+            </div>
+            <div class="settings-field">
+              <span data-i18n="settings.appearance">外观：</span>
+              <select data-theme-select aria-label="Appearance"></select>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="content-band compact">
+      <div class="page-title" data-reveal>
+        <h1 data-i18n="padic.download.title">下载安装器</h1>
+        <p data-i18n="padic.download.pageCopy">选择你的系统。安装器会先清理旧版本，再下载 main2.0 分支源码并调用项目内置安装脚本。</p>
+      </div>
+
+      <section class="download-note" data-reveal>
+        <h2>安装 / 重装说明</h2>
+        <p>这些文件是未签名的个人项目安装器。浏览器会弹出下载或保存提示；macOS 可能会先拦截直接双击打开，这是系统安全策略，不能由网页绕过。</p>
+        <div class="install-steps">
+          <article>
+            <strong>macOS</strong>
+            <p>如果双击提示无法验证，请在访达中右键文件并选择“打开”，或在终端运行 <code>bash ~/Downloads/install-macos.command</code>。脚本运行后会通过 <code>sudo</code> 请求密码授权。</p>
+          </article>
+          <article>
+            <strong>自动清理旧版本</strong>
+            <p>安装器会先删除旧的 <code>smc-padic</code>、<code>padic_converter</code> 和 <code>.padic_config</code>，再安装 main2.0 最新版。</p>
+          </article>
+        </div>
+      </section>
+
+      <div class="download-grid">
+        <a class="download-card" href="/study/padic/downloads/install-linux.sh" download data-reveal>
+          <span>Linux</span>
+          <strong>install-linux.sh</strong>
+          <p>下载后打开或在终端运行，先清理旧版本，再安装 smc-padic。</p>
+        </a>
+        <a class="download-card" href="/study/padic/downloads/install-macos.command" download data-reveal>
+          <span>macOS</span>
+          <strong>install-macos.command</strong>
+          <p>下载后打开，按系统提示允许执行；脚本会请求密码授权。</p>
+        </a>
+        <a class="download-card" href="/study/padic/downloads/install-windows.bat" download data-reveal>
+          <span>Windows</span>
+          <strong>install-windows.bat</strong>
+          <p>下载后双击运行，先清理旧安装目录，再执行 Windows 安装流程。</p>
+        </a>
+      </div>
+    </main>
+  </div>
+  <script type="module" src="/site.mjs?v=20260702b"></script>
+</body>
+</html>
