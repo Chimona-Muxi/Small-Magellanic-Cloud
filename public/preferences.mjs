@@ -186,13 +186,13 @@ const copy = {
     ru: "Выберите Linux, macOS или Windows и откройте скачанный файл."
   },
   "padic.download.pageCopy": {
-    "zh-CN": "选择你的系统。安装器会下载 main2.0 分支源码，并调用项目内置安装脚本。",
-    "zh-TW": "選擇你的系統。安裝器會下載 main2.0 分支源碼，並呼叫專案內建安裝腳本。",
-    en: "Choose your system. The installer downloads main2.0 source and runs the project installer.",
-    fr: "Choisissez votre systeme. L'installateur telecharge main2.0 et lance le script du projet.",
-    ja: "システムを選んでください。インストーラは main2.0 のソースを取得して内蔵スクリプトを実行します。",
-    ko: "시스템을 선택하세요. 설치기가 main2.0 소스를 받고 프로젝트 설치 스크립트를 실행합니다.",
-    ru: "Выберите систему. Установщик скачает main2.0 и запустит скрипт проекта."
+    "zh-CN": "选择你的系统。安装器会先清理旧版本，再安装 main2.0 版本。",
+    "zh-TW": "選擇你的系統。安裝器會先清理舊版本，再安裝 main2.0 版本。",
+    en: "Choose your system. The installer removes old files first, then installs main2.0.",
+    fr: "Choisissez votre systeme. L'installateur retire l'ancienne version puis installe main2.0.",
+    ja: "システムを選んでください。古いファイルを削除してから main2.0 をインストールします。",
+    ko: "시스템을 선택하세요. 설치기가 이전 파일을 먼저 정리한 뒤 main2.0을 설치합니다.",
+    ru: "Выберите систему. Установщик удалит старые файлы и установит main2.0."
   },
   "padic.web.title": {
     "zh-CN": "网页版转换",
