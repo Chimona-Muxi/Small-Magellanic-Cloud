@@ -177,13 +177,13 @@ const copy = {
     ru: "Учебные инструменты"
   },
   "module.study.copy": {
-    "zh-CN": "p进数转换、终端工具和后续学习实验会收纳在这里。",
-    "zh-TW": "p進數轉換、終端工具和後續學習實驗會收納在這裡。",
-    en: "p-adic conversion, terminal tools and future study experiments live here.",
-    fr: "Conversion p-adique, outils terminal et futurs essais d'etude vivent ici.",
-    ja: "p進数変換、端末ツール、今後の学習実験をここに置きます。",
-    ko: "p진수 변환, 터미널 도구, 앞으로의 학습 실험을 여기에 둡니다.",
-    ru: "Здесь будут преобразования p-адических чисел, терминальные инструменты и учебные опыты."
+    "zh-CN": "p进数转换、高等代数、数学分析和后续学习实验会收纳在这里。",
+    "zh-TW": "p進數轉換、高等代數、數學分析和後續學習實驗會收納在這裡。",
+    en: "p-adic conversion, higher algebra, mathematical analysis and future study experiments live here.",
+    fr: "Conversion p-adique, algebre superieure, analyse mathematique et futurs essais d'etude vivent ici.",
+    ja: "p進数変換、高等代数、数学解析、今後の学習実験をここに置きます。",
+    ko: "p진수 변환, 고등대수, 해석학, 앞으로의 학습 실험을 여기에 둡니다.",
+    ru: "Здесь будут p-адические числа, высшая алгебра, матанализ и будущие учебные опыты."
   },
   "study.copy": {
     "zh-CN": "把可直接使用的小工具放在这里：能下载，也能在浏览器里先试一试。",
@@ -211,6 +211,240 @@ const copy = {
     ja: "端末版インストーラを入手するか、Web 版 p進数有理数変換を使えます。",
     ko: "터미널 설치기를 받거나 웹 p진수 유리수 변환기를 바로 사용합니다.",
     ru: "Скачайте терминальный установщик или используйте веб-конвертер p-адических рациональных чисел."
+  },
+  "page.title.algebra": {
+    "zh-CN": "高等代数学习辅助器 · Small Magellanic Cloud",
+    "zh-TW": "高等代數學習輔助器 · Small Magellanic Cloud",
+    en: "Higher Algebra Assistant · Small Magellanic Cloud",
+    fr: "Assistant d'algebre superieure · Small Magellanic Cloud",
+    ja: "高等代数学習補助 · Small Magellanic Cloud",
+    ko: "고등대수 학습 보조기 · Small Magellanic Cloud",
+    ru: "Помощник по высшей алгебре · Small Magellanic Cloud"
+  },
+  "page.title.analysis": {
+    "zh-CN": "数学分析学习辅助器 · Small Magellanic Cloud",
+    "zh-TW": "數學分析學習輔助器 · Small Magellanic Cloud",
+    en: "Mathematical Analysis Assistant · Small Magellanic Cloud",
+    fr: "Assistant d'analyse mathematique · Small Magellanic Cloud",
+    ja: "数学解析学習補助 · Small Magellanic Cloud",
+    ko: "해석학 학습 보조기 · Small Magellanic Cloud",
+    ru: "Помощник по математическому анализу · Small Magellanic Cloud"
+  },
+  "study.algebra.title": {
+    "zh-CN": "高等代数学习辅助器",
+    "zh-TW": "高等代數學習輔助器",
+    en: "Higher Algebra Assistant",
+    fr: "Assistant d'algebre superieure",
+    ja: "高等代数学習補助",
+    ko: "고등대수 학습 보조기",
+    ru: "Помощник по высшей алгебре"
+  },
+  "study.algebra.copy": {
+    "zh-CN": "直接调用原 Python/SymPy 项目，处理矩阵、行列式、秩、逆矩阵、特征多项式、多项式与二次型。",
+    "zh-TW": "直接呼叫原 Python/SymPy 專案，處理矩陣、行列式、秩、逆矩陣、特徵多項式、多項式與二次型。",
+    en: "Runs the original Python/SymPy project for matrices, determinants, rank, inverses, characteristic polynomials, polynomials and quadratic forms.",
+    fr: "Execute le projet Python/SymPy d'origine pour matrices, determinants, rang, inverses, polynomes caracteristiques et formes quadratiques.",
+    ja: "元の Python/SymPy プロジェクトを呼び出し、行列、行列式、階数、逆行列、特性多項式、多項式、二次形式を扱います。",
+    ko: "원래 Python/SymPy 프로젝트를 호출해 행렬, 행렬식, 랭크, 역행렬, 특성다항식, 다항식, 이차형식을 처리합니다.",
+    ru: "Запускает исходный проект Python/SymPy для матриц, определителей, ранга, обратных матриц, характеристических многочленов и квадратичных форм."
+  },
+  "study.analysis.title": {
+    "zh-CN": "数学分析学习辅助器",
+    "zh-TW": "數學分析學習輔助器",
+    en: "Mathematical Analysis Assistant",
+    fr: "Assistant d'analyse mathematique",
+    ja: "数学解析学習補助",
+    ko: "해석학 학습 보조기",
+    ru: "Помощник по математическому анализу"
+  },
+  "study.analysis.copy": {
+    "zh-CN": "直接调用原 GeoGebra CAS 风格 Python 项目，处理极限、导数、积分、级数、方程、ODE、傅里叶与特殊函数。",
+    "zh-TW": "直接呼叫原 GeoGebra CAS 風格 Python 專案，處理極限、導數、積分、級數、方程、ODE、傅立葉與特殊函數。",
+    en: "Runs the original GeoGebra-style Python CAS project for limits, derivatives, integrals, series, equations, ODEs, Fourier tools and special functions.",
+    fr: "Execute le CAS Python d'origine, style GeoGebra, pour limites, derivees, integrales, series, equations, EDO, Fourier et fonctions speciales.",
+    ja: "GeoGebra CAS 風の元 Python プロジェクトを呼び出し、極限、微分、積分、級数、方程式、ODE、Fourier、特殊関数を扱います。",
+    ko: "GeoGebra CAS 스타일의 원래 Python 프로젝트를 호출해 극한, 미분, 적분, 급수, 방정식, ODE, 푸리에, 특수함수를 처리합니다.",
+    ru: "Запускает исходный Python CAS в стиле GeoGebra для пределов, производных, интегралов, рядов, уравнений, ОДУ, Фурье и специальных функций."
+  },
+  "study.core.eyebrow": {
+    "zh-CN": "原项目核心",
+    "zh-TW": "原專案核心",
+    en: "original core",
+    fr: "coeur original",
+    ja: "元プロジェクト",
+    ko: "원본 코어",
+    ru: "исходное ядро"
+  },
+  "tool.input": {
+    "zh-CN": "输入文件内容",
+    "zh-TW": "輸入檔案內容",
+    en: "Input file",
+    fr: "Fichier d'entree",
+    ja: "入力ファイル",
+    ko: "입력 파일",
+    ru: "Входной файл"
+  },
+  "tool.output": {
+    "zh-CN": "运行输出",
+    "zh-TW": "執行輸出",
+    en: "Output",
+    fr: "Sortie",
+    ja: "出力",
+    ko: "실행 출력",
+    ru: "Вывод"
+  },
+  "tool.run": {
+    "zh-CN": "运行",
+    "zh-TW": "執行",
+    en: "Run",
+    fr: "Executer",
+    ja: "実行",
+    ko: "실행",
+    ru: "Запустить"
+  },
+  "tool.examples": {
+    "zh-CN": "示例",
+    "zh-TW": "範例",
+    en: "Examples",
+    fr: "Exemples",
+    ja: "例",
+    ko: "예시",
+    ru: "Примеры"
+  },
+  "tool.running": {
+    "zh-CN": "正在调用原项目...",
+    "zh-TW": "正在呼叫原專案...",
+    en: "Running the original project...",
+    fr: "Execution du projet d'origine...",
+    ja: "元プロジェクトを実行中...",
+    ko: "원본 프로젝트 실행 중...",
+    ru: "Запуск исходного проекта..."
+  },
+  "tool.empty": {
+    "zh-CN": "请输入要执行的内容",
+    "zh-TW": "請輸入要執行的內容",
+    en: "Enter content to run",
+    fr: "Entrez le contenu a executer",
+    ja: "実行する内容を入力してください",
+    ko: "실행할 내용을 입력하세요",
+    ru: "Введите содержимое для запуска"
+  },
+  "tool.failed": {
+    "zh-CN": "学习工具执行失败",
+    "zh-TW": "學習工具執行失敗",
+    en: "Study tool failed",
+    fr: "Echec de l'outil",
+    ja: "学習ツールの実行に失敗しました",
+    ko: "학습 도구 실행 실패",
+    ru: "Учебный инструмент не выполнен"
+  },
+  "tool.core.title": {
+    "zh-CN": "核心来源",
+    "zh-TW": "核心來源",
+    en: "Core Source",
+    fr: "Source du coeur",
+    ja: "コアの由来",
+    ko: "코어 출처",
+    ru: "Источник ядра"
+  },
+  "tool.core.copy": {
+    "zh-CN": "网页只负责提交输入和展示输出；计算逻辑来自 tools/study 下的原 Python 项目。",
+    "zh-TW": "網頁只負責提交輸入和展示輸出；計算邏輯來自 tools/study 下的原 Python 專案。",
+    en: "The page only submits input and displays output; computation comes from the original Python project under tools/study.",
+    fr: "La page soumet l'entree et affiche la sortie; le calcul vient du projet Python original dans tools/study.",
+    ja: "ページは入力送信と出力表示だけを担当し、計算は tools/study の元 Python プロジェクトで行います。",
+    ko: "페이지는 입력 전송과 출력 표시만 담당하며 계산은 tools/study의 원래 Python 프로젝트가 수행합니다.",
+    ru: "Страница только отправляет ввод и показывает вывод; вычисления идут из исходного Python-проекта в tools/study."
+  },
+  "tool.web.title": {
+    "zh-CN": "网页运行",
+    "zh-TW": "網頁執行",
+    en: "Web Run",
+    fr: "Execution web",
+    ja: "Web 実行",
+    ko: "웹 실행",
+    ru: "Веб-запуск"
+  },
+  "tool.web.copy": {
+    "zh-CN": "输入多行脚本后运行，服务器会生成临时文件并调用原解析器。",
+    "zh-TW": "輸入多行腳本後執行，伺服器會生成暫存檔並呼叫原解析器。",
+    en: "Enter a multi-line script and run it; the server creates a temporary file and calls the original parser.",
+    fr: "Saisissez un script multi-ligne; le serveur cree un fichier temporaire et appelle l'analyseur original.",
+    ja: "複数行スクリプトを入力して実行すると、サーバーが一時ファイルを作り元パーサーを呼び出します。",
+    ko: "여러 줄 스크립트를 입력해 실행하면 서버가 임시 파일을 만들고 원래 파서를 호출합니다.",
+    ru: "Введите многострочный скрипт; сервер создаст временный файл и вызовет исходный парсер."
+  },
+  "tool.local.title": {
+    "zh-CN": "本地命令",
+    "zh-TW": "本機命令",
+    en: "Local CLI",
+    fr: "CLI local",
+    ja: "ローカル CLI",
+    ko: "로컬 CLI",
+    ru: "Локальная CLI"
+  },
+  "tool.local.copy": {
+    "zh-CN": "完整项目、示例与说明保存在 tools/study，可直接用 Python 运行和继续扩展。",
+    "zh-TW": "完整專案、範例與說明保存在 tools/study，可直接用 Python 執行和繼續擴展。",
+    en: "The full project, examples and manuals live in tools/study and can still be run or extended with Python.",
+    fr: "Le projet complet, les exemples et les manuels sont dans tools/study et restent executables avec Python.",
+    ja: "完全なプロジェクト、例、説明は tools/study にあり、Python で実行・拡張できます。",
+    ko: "전체 프로젝트, 예시, 설명서는 tools/study에 있으며 Python으로 실행하고 확장할 수 있습니다.",
+    ru: "Полный проект, примеры и руководства находятся в tools/study и запускаются или расширяются через Python."
+  },
+  "algebra.example.matrix": {
+    "zh-CN": "矩阵基础",
+    "zh-TW": "矩陣基礎",
+    en: "Matrix Basics",
+    fr: "Matrices",
+    ja: "行列基礎",
+    ko: "행렬 기본",
+    ru: "Матрицы"
+  },
+  "algebra.example.quadratic": {
+    "zh-CN": "二次型",
+    "zh-TW": "二次型",
+    en: "Quadratic Form",
+    fr: "Forme quadratique",
+    ja: "二次形式",
+    ko: "이차형식",
+    ru: "Квадратичная форма"
+  },
+  "algebra.example.poly": {
+    "zh-CN": "多项式",
+    "zh-TW": "多項式",
+    en: "Polynomials",
+    fr: "Polynomes",
+    ja: "多項式",
+    ko: "다항식",
+    ru: "Многочлены"
+  },
+  "analysis.example.cas": {
+    "zh-CN": "CAS 基础",
+    "zh-TW": "CAS 基礎",
+    en: "CAS Basics",
+    fr: "Bases CAS",
+    ja: "CAS 基礎",
+    ko: "CAS 기본",
+    ru: "Основы CAS"
+  },
+  "analysis.example.series": {
+    "zh-CN": "级数与傅里叶",
+    "zh-TW": "級數與傅立葉",
+    en: "Series & Fourier",
+    fr: "Series et Fourier",
+    ja: "級数と Fourier",
+    ko: "급수와 푸리에",
+    ru: "Ряды и Фурье"
+  },
+  "analysis.example.ode": {
+    "zh-CN": "方程与 ODE",
+    "zh-TW": "方程與 ODE",
+    en: "Equations & ODE",
+    fr: "Equations et EDO",
+    ja: "方程式と ODE",
+    ko: "방정식과 ODE",
+    ru: "Уравнения и ОДУ"
   },
   "padic.copy": {
     "zh-CN": "选择终端安装器，或打开无需安装的网页版转换器。终端版安装器使用 p进数工具仓库的 main2.0 分支。",

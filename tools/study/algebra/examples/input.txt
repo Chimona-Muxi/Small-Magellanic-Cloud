@@ -1,0 +1,31 @@
+# 高等代数复杂运算示例
+
+# 1. 定义符号矩阵（支持分式、根式、多项式）
+x = symbols('x')
+A = [[1, 2], [3, 4]]
+B = [[Rational(1,2), sqrt(2)], [x+1, I]]
+
+# 2. 基本运算
+detA = det(A)
+rankA = rank(A)
+traceA = trace(A)
+invA = inv(A)
+
+# 3. 特征值/特征向量
+evals = eigvals(A)
+evecs = eigvects(A)
+
+# 4. 若当标准型
+J = jordan(A)
+
+# 5. 史密斯标准型
+S = smith(A)
+
+# 6. 特征矩阵 (lambda 矩阵)
+lam = symbols('lam')
+char_mat = A - lam * Matrix([[1,0],[0,1]])
+
+# 7. 有理标准型 / 等价标准型 等可通过 charpoly + smith 组合实现（示例）
+cp = charpoly(A)
+
+print "完成复杂运算示例"

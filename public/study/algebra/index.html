@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title data-i18n="page.title.algebra">高等代数学习辅助器 · Small Magellanic Cloud</title>
+  <link rel="stylesheet" href="/styles.css?v=20260704b" />
+</head>
+<body>
+  <div class="site-shell">
+    <header class="site-header">
+      <a class="brand" href="/">
+        <span class="brand-text"><strong>Small Magellanic Cloud</strong></span>
+      </a>
+      <nav class="site-nav trail" aria-label="当前位置" data-i18n-aria-label="nav.breadcrumb">
+        <a href="/" data-i18n="nav.home">主页</a>
+        <span>/</span>
+        <a href="/study/" data-i18n="nav.study">学习工具</a>
+        <div class="settings-menu" data-settings-menu-root>
+          <button class="settings-trigger" type="button" data-settings-toggle data-i18n="settings.label" data-i18n-aria-label="settings.label" aria-expanded="false" aria-label="设置">设置</button>
+          <div class="settings-popover" data-settings-menu>
+            <div class="settings-field">
+              <span data-i18n="settings.language">语言：</span>
+              <select data-language-select aria-label="选择语言"></select>
+            </div>
+            <div class="settings-field">
+              <span data-i18n="settings.appearance">外观：</span>
+              <select data-theme-select aria-label="选择外观"></select>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="content-band compact">
+      <div class="page-title" data-reveal>
+        <p class="eyebrow" data-i18n="study.core.eyebrow">原项目核心</p>
+        <h1 data-i18n="study.algebra.title">高等代数学习辅助器</h1>
+        <p data-i18n="study.algebra.copy">直接调用原 Python/SymPy 项目，处理矩阵、行列式、秩、逆矩阵、特征多项式、多项式与二次型。</p>
+      </div>
+
+      <section class="study-workbench" data-python-tool data-tool="algebra" data-endpoint="/api/study/algebra/evaluate" data-reveal>
+        <form class="study-form" data-tool-form>
+          <label class="study-editor-label">
+            <span data-i18n="tool.input">输入文件内容</span>
+            <textarea class="study-editor" data-tool-input spellcheck="false" autocomplete="off"></textarea>
+          </label>
+          <div class="study-actions">
+            <div class="quick-examples" aria-label="示例" data-i18n-aria-label="tool.examples">
+              <button type="button" data-example="matrix" data-i18n="algebra.example.matrix">矩阵基础</button>
+              <button type="button" data-example="quadratic" data-i18n="algebra.example.quadratic">二次型</button>
+              <button type="button" data-example="poly" data-i18n="algebra.example.poly">多项式</button>
+            </div>
+            <button class="button primary tool-submit" type="submit" data-tool-submit data-i18n="tool.run">运行</button>
+          </div>
+        </form>
+
+        <section class="study-output-panel" aria-live="polite">
+          <h2 data-i18n="tool.output">运行输出</h2>
+          <pre class="padic-output terminal-output study-output" data-tool-output></pre>
+        </section>
+      </section>
+
+      <section class="study-doc-grid" data-reveal>
+        <article class="study-info">
+          <h3 data-i18n="tool.core.title">核心来源</h3>
+          <p data-i18n="tool.core.copy">网页只负责提交输入和展示输出；计算逻辑来自 tools/study 下的原 Python 项目。</p>
+        </article>
+        <article class="study-info">
+          <h3 data-i18n="tool.web.title">网页运行</h3>
+          <p data-i18n="tool.web.copy">输入多行脚本后运行，服务器会生成临时文件并调用原解析器。</p>
+        </article>
+        <article class="study-info">
+          <h3 data-i18n="tool.local.title">本地命令</h3>
+          <p data-i18n="tool.local.copy">完整项目、示例与说明保存在 tools/study，可直接用 Python 运行和继续扩展。</p>
+        </article>
+      </section>
+    </main>
+  </div>
+  <script type="module" src="/site.mjs?v=20260704b"></script>
+  <script type="module" src="/study/python-tool.mjs?v=20260704b"></script>
+</body>
+</html>

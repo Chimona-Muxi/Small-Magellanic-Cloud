@@ -2,6 +2,38 @@
 
 这个文件记录用户能感知到的变化，以及会影响后续维护判断的结构调整。内部小修不单独写成噪声，除非它改变了维护边界、交互语义或验证方式。
 
+## 2026-07-04
+
+### 学习辅助器
+
+- 新增 `/study/algebra/` 高等代数学习辅助器页面，网页输入会直接调用 `tools/study/algebra/src/parser.py` 原 Python/SymPy 核心。
+- 新增 `/study/analysis/` 数学分析学习辅助器页面，网页输入会直接调用 `tools/study/analysis/src/cas_parser.py` 原 GeoGebra CAS 风格核心。
+- 学习工具总入口新增高等代数、数学分析两张卡片，明确它们是原项目核心的网页发布壳。
+
+### Python 核心接入
+
+- 将 `/2026/6/6/高等代数学习辅助器` 与 `/2026/6/6/数学分析学习辅助器` 的项目结构整理进 `tools/study/algebra/` 和 `tools/study/analysis/`。
+- 新增 `POST /api/study/algebra/evaluate` 与 `POST /api/study/analysis/evaluate`，由 Node 服务写入临时输入文件后调用原 Python 脚本。
+- 新增 `tools/study/requirements.txt`，并将 Render 构建命令改为安装 SymPy、NumPy、Matplotlib。
+
+### 核心脚本修复
+
+- 修复高等代数解析器 `charpoly(A)` 未传变量时生成非法表达式的问题。
+- 高等代数矩阵字面量转换改为括号平衡扫描，避免嵌套 `Matrix([[...]])` 时截断。
+- 数学分析 CAS 解析器补充简单变量赋值、小写 SymPy 命令兼容、`theta` 符号与网页无界面绘图环境。
+
+### 说明书
+
+- 新增 `docs/study-tools-manual.md`，说明两个学习辅助器的核心目录、网页运行流程、API、CLI 命令、部署依赖和维护边界。
+- `README.md` 更新学习工具站点地图、代码边界、本地运行依赖和“不要前端镜像数学核心”的维护规则。
+
+### 页面一致性与终端显示
+
+- 学习工具的虚拟终端改为真实终端式排版：等宽、不自动折行、横向滚动，避免 SymPy 分式、指数、级数等字符画输出被压缩错位。
+- Python 学习工具网页运行时会把输出框的实际列宽传给后端，并通过 `COLUMNS` 注入原 Python 核心进程。
+- p进数网页版、高等代数、数学分析三个浏览器工作台统一工作台结构、主执行按钮、示例按钮和输出区域样式。
+- `STYLE_GUIDE.md` 新增同根同级页面一致性与学习工具工作台规范，明确相似按钮语义、示例按钮行为和虚拟终端规则。
+
 ## 2026-07-03
 
 ### 设置面板

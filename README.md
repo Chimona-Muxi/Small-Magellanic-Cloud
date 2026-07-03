@@ -18,6 +18,8 @@ Small Magellanic Cloud 是张墨霖的个人网站：一个把日常、学习工
 | `/study/padic/` | p进数转换器 | 已启用 |
 | `/study/padic/downloads/` | p进数转换器安装器下载 | 已启用 |
 | `/study/padic/web/` | 浏览器版 p进数转换器 | 已启用 |
+| `/study/algebra/` | 高等代数学习辅助器 | 已启用 |
+| `/study/analysis/` | 数学分析学习辅助器 | 已启用 |
 
 ## 代码边界
 
@@ -28,12 +30,16 @@ Small Magellanic Cloud 是张墨霖的个人网站：一个把日常、学习工
 | `public/styles.css` | 首页、模块页、学习工具页的主视觉系统 |
 | `public/game/board/*` | 三个棋类游戏的发布版前端与引擎 |
 | `tools/padic/` | p进数转换器的终端版源码与安装资源 |
-| `server.mjs` | 静态文件服务、棋类联机房间、p进数转换 API |
+| `tools/study/algebra/` | 高等代数学习辅助器原 Python/SymPy 项目核心 |
+| `tools/study/analysis/` | 数学分析学习辅助器原 Python/SymPy 项目核心 |
+| `docs/study-tools-manual.md` | 两个学习辅助器的网页发布、CLI、API 与部署说明 |
+| `server.mjs` | 静态文件服务、棋类联机房间、p进数转换 API、学习辅助器 Python 桥接 API |
 
 ## 本地运行
 
 ```bash
 npm install
+python3 -m pip install -r tools/study/requirements.txt
 npm start
 ```
 
@@ -56,9 +62,15 @@ Render 配置保持轻量：
 | 项 | 值 |
 | --- | --- |
 | Language | Node |
-| Build Command | `npm install` |
+| Build Command | `npm install && python3 -m pip install --user -r tools/study/requirements.txt` |
 | Start Command | `node server.mjs` |
 | Root Directory | 留空 |
+
+学习辅助器依赖 Python/SymPy；Render 配置文件会在构建阶段执行：
+
+```bash
+npm install && python3 -m pip install --user -r tools/study/requirements.txt
+```
 
 ## 维护规则
 
@@ -66,6 +78,7 @@ Render 配置保持轻量：
 - 语言文案优先进入 `public/preferences.mjs`，不要在页面里散落硬编码文案。
 - 设置入口、主题切换、语言切换属于全站基础设施，修改后至少验证首页、学习工具页和一个棋类页。
 - 棋类游戏是发布版副本；除非任务明确要求，不把它们重构成新的项目结构。
+- 高等代数与数学分析学习辅助器以 `tools/study/*` 下的原 Python 项目为核心；网页只做发布壳、输入提交、输出展示和说明，不另写一套数学镜像。
 - 发布记录写入 `CHANGELOG.md`，按用户可感知变化组织，不堆内部流水。
 
 ## 当前重点

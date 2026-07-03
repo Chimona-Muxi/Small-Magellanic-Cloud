@@ -1,6 +1,7 @@
 import { createServer } from "node:http";
 import { spawn } from "node:child_process";
-import { access, readFile, stat } from "node:fs/promises";
+import { access, mkdir, mkdtemp, readFile, rm, stat, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import { dirname, extname, join, normalize } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
@@ -21,6 +22,9 @@ const publicDir = join(__dirname, "public");
 const padicDir = join(__dirname, "tools", "padic", "p_adic_pro");
 const padicBinary = join(padicDir, process.platform === "win32" ? "padic_converter.exe" : "padic_converter");
 const padicRuntimeHome = join(__dirname, "tools", "padic", "runtime-home");
+const studyDir = join(__dirname, "tools", "study");
+const pythonCommand = process.env.PYTHON || (process.platform === "win32" ? "python" : "python3");
+const matplotlibConfigDir = join(tmpdir(), "smc-matplotlib");
 const port = Number(process.env.PORT || 5226);
 const host = process.env.HOST || (process.env.PORT ? "0.0.0.0" : "127.0.0.1");
 const roomTtlMs = 1000 * 60 * 60 * 6;
@@ -82,6 +86,33 @@ const gameConfigs = {
       });
     },
     apply: applyTurkishAction
+  }
+};
+
+const studyTools = {
+  algebra: {
+    script: join(studyDir, "algebra", "src", "parser.py"),
+    cwd: join(studyDir, "algebra"),
+    extension: ".txt",
+    timeoutMs: 15000,
+    args(filePath, body) {
+      return ["--lang", body.lang === "en" ? "en" : "zh", filePath];
+    },
+    env: {}
+  },
+  analysis: {
+    script: join(studyDir, "analysis", "src", "cas_parser.py"),
+    cwd: join(studyDir, "analysis"),
+    extension: ".ma",
+    timeoutMs: 30000,
+    args(filePath) {
+      return [filePath];
+    },
+    env: {
+      MPLBACKEND: "Agg",
+      MPLCONFIGDIR: matplotlibConfigDir,
+      SMC_WEB_RUN: "1"
+    }
   }
 };
 
@@ -235,6 +266,56 @@ async function handlePadicApi(req, res, url) {
     return true;
   } catch (error) {
     json(res, 500, { error: error.message || "p-adic 计算失败" });
+    return true;
+  }
+}
+
+async function runStudyTool(toolKey, body) {
+  const tool = studyTools[toolKey];
+  if (!tool) throw new Error("学习工具不存在");
+
+  const source = String(body.source || body.command || "").replace(/\r\n/g, "\n").trim();
+  const columns = Math.max(48, Math.min(132, Number(body.columns) || 88));
+  if (!source) throw new Error("请输入要执行的内容");
+  if (source.length > 40000) throw new Error("输入内容过长");
+
+  if (tool.env.MPLCONFIGDIR) await mkdir(tool.env.MPLCONFIGDIR, { recursive: true });
+
+  const tempRoot = await mkdtemp(join(tmpdir(), "smc-study-"));
+  const inputFile = join(tempRoot, `input${tool.extension}`);
+  try {
+    await writeFile(inputFile, `${source}\n`, "utf8");
+    const result = await runProcess(pythonCommand, [tool.script, ...tool.args(inputFile, body)], {
+      cwd: tool.cwd,
+      env: { ...process.env, ...tool.env, COLUMNS: String(columns) },
+      timeoutMs: tool.timeoutMs
+    });
+    return (result.stdout || result.stderr || "").trimEnd();
+  } finally {
+    await rm(tempRoot, { recursive: true, force: true });
+  }
+}
+
+async function handleStudyApi(req, res, url) {
+  const match = url.pathname.match(/^\/api\/study\/([^/]+)\/evaluate\/?$/);
+  if (!match) return false;
+
+  if (req.method === "OPTIONS") {
+    json(res, 204, {});
+    return true;
+  }
+  if (req.method !== "POST") {
+    json(res, 405, { error: "Method not allowed" });
+    return true;
+  }
+
+  try {
+    const body = await readBody(req);
+    const output = await runStudyTool(match[1], body);
+    json(res, 200, { output });
+    return true;
+  } catch (error) {
+    json(res, 500, { error: error.message || "学习工具执行失败" });
     return true;
   }
 }
@@ -489,6 +570,7 @@ const server = createServer(async (req, res) => {
     const url = new URL(req.url || "/", `http://${req.headers.host || `${host}:${port}`}`);
 
     if (await handlePadicApi(req, res, url)) return;
+    if (await handleStudyApi(req, res, url)) return;
     if (await handleApi(req, res, url)) return;
 
     if (url.pathname !== "/" && !extname(url.pathname) && !url.pathname.endsWith("/")) {

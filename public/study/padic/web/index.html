@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title data-i18n="page.title.padicWeb">网页版 p进数转换 · Small Magellanic Cloud</title>
-  <link rel="stylesheet" href="/styles.css?v=20260703a" />
+  <link rel="stylesheet" href="/styles.css?v=20260704b" />
 </head>
 <body>
   <div class="site-shell">
@@ -40,13 +40,13 @@
         <p data-i18n="padic.web.pageCopy">输入类似 1/3 5、3+4*2 5 或 pow(2,10) 7 的指令。输入 help 可查看完整说明。</p>
       </div>
 
-      <section class="padic-console" data-reveal>
+      <section class="study-workbench study-workbench-single" data-reveal>
         <form class="padic-form" data-padic-form>
           <label>
             <span data-i18n="padic.web.command">指令</span>
             <input data-padic-input data-i18n-aria-label="padic.web.command" aria-label="指令" autocomplete="off" spellcheck="false" value="1/3 5" />
           </label>
-          <button class="button primary" type="submit" data-i18n="padic.web.convert">转换</button>
+          <button class="button primary tool-submit" type="submit" data-i18n="padic.web.convert">转换</button>
         </form>
 
         <div class="quick-examples" aria-label="示例" data-i18n-aria-label="padic.web.examples">
@@ -57,11 +57,14 @@
           <button type="button" data-example="help">help</button>
         </div>
 
-        <pre class="padic-output" data-padic-output aria-live="polite"></pre>
+        <section class="study-output-panel" aria-live="polite">
+          <h2 data-i18n="tool.output">运行输出</h2>
+          <pre class="padic-output terminal-output" data-padic-output></pre>
+        </section>
       </section>
     </main>
   </div>
-  <script type="module" src="/site.mjs?v=20260703a"></script>
-  <script type="module" src="/study/padic/web/padic-web.mjs?v=20260703a"></script>
+  <script type="module" src="/site.mjs?v=20260704b"></script>
+  <script type="module" src="/study/padic/web/padic-web.mjs?v=20260704b"></script>
 </body>
 </html>
