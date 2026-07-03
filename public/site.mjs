@@ -1,4 +1,4 @@
-import "./preferences.mjs?v=20260701b";
+import "./preferences.mjs?v=20260703a";
 
 const revealItems = [...document.querySelectorAll("[data-reveal]")];
 

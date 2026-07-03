@@ -50,6 +50,24 @@ const copy = {
     ko: "보드게임",
     ru: "Настольные игры"
   },
+  "nav.primary": {
+    "zh-CN": "主导航",
+    "zh-TW": "主導覽",
+    en: "Primary navigation",
+    fr: "Navigation principale",
+    ja: "メインナビゲーション",
+    ko: "주요 탐색",
+    ru: "Основная навигация"
+  },
+  "nav.breadcrumb": {
+    "zh-CN": "当前位置",
+    "zh-TW": "目前位置",
+    en: "Current location",
+    fr: "Position actuelle",
+    ja: "現在地",
+    ko: "현재 위치",
+    ru: "Текущее положение"
+  },
   "site.subtitle": {
     "zh-CN": "个人网站",
     "zh-TW": "個人網站",
@@ -58,6 +76,42 @@ const copy = {
     ja: "個人サイト",
     ko: "개인 사이트",
     ru: "личный сайт"
+  },
+  "page.title.study": {
+    "zh-CN": "学习工具 · Small Magellanic Cloud",
+    "zh-TW": "學習工具 · Small Magellanic Cloud",
+    en: "Study Tools · Small Magellanic Cloud",
+    fr: "Outils d'etude · Small Magellanic Cloud",
+    ja: "学習ツール · Small Magellanic Cloud",
+    ko: "학습 도구 · Small Magellanic Cloud",
+    ru: "Учебные инструменты · Small Magellanic Cloud"
+  },
+  "page.title.padic": {
+    "zh-CN": "p进数转换器 · Small Magellanic Cloud",
+    "zh-TW": "p進數轉換器 · Small Magellanic Cloud",
+    en: "p-adic Converter · Small Magellanic Cloud",
+    fr: "Convertisseur p-adique · Small Magellanic Cloud",
+    ja: "p進数変換器 · Small Magellanic Cloud",
+    ko: "p진수 변환기 · Small Magellanic Cloud",
+    ru: "Конвертер p-адических чисел · Small Magellanic Cloud"
+  },
+  "page.title.padicDownload": {
+    "zh-CN": "下载 p进数转换器 · Small Magellanic Cloud",
+    "zh-TW": "下載 p進數轉換器 · Small Magellanic Cloud",
+    en: "Download p-adic Converter · Small Magellanic Cloud",
+    fr: "Telecharger le convertisseur p-adique · Small Magellanic Cloud",
+    ja: "p進数変換器をダウンロード · Small Magellanic Cloud",
+    ko: "p진수 변환기 다운로드 · Small Magellanic Cloud",
+    ru: "Скачать конвертер p-адических чисел · Small Magellanic Cloud"
+  },
+  "page.title.padicWeb": {
+    "zh-CN": "网页版 p进数转换 · Small Magellanic Cloud",
+    "zh-TW": "網頁版 p進數轉換 · Small Magellanic Cloud",
+    en: "Web p-adic Converter · Small Magellanic Cloud",
+    fr: "Convertisseur p-adique web · Small Magellanic Cloud",
+    ja: "Web p進数変換 · Small Magellanic Cloud",
+    ko: "웹 p진수 변환 · Small Magellanic Cloud",
+    ru: "Веб-конвертер p-адических чисел · Small Magellanic Cloud"
   },
   "home.eyebrow": {
     "zh-CN": "私人网站",
@@ -123,13 +177,13 @@ const copy = {
     ru: "Учебные инструменты"
   },
   "module.study.copy": {
-    "zh-CN": "p-adic 转换、终端工具和后续学习实验会收纳在这里。",
-    "zh-TW": "p-adic 轉換、終端工具和後續學習實驗會收納在這裡。",
+    "zh-CN": "p进数转换、终端工具和后续学习实验会收纳在这里。",
+    "zh-TW": "p進數轉換、終端工具和後續學習實驗會收納在這裡。",
     en: "p-adic conversion, terminal tools and future study experiments live here.",
-    fr: "Conversion p-adic, outils terminal et futurs essais d'etude vivent ici.",
-    ja: "p-adic 変換、端末ツール、今後の学習実験をここに置きます。",
-    ko: "p-adic 변환, 터미널 도구, 앞으로의 학습 실험을 여기에 둡니다.",
-    ru: "Здесь будут p-adic преобразования, терминальные инструменты и учебные опыты."
+    fr: "Conversion p-adique, outils terminal et futurs essais d'etude vivent ici.",
+    ja: "p進数変換、端末ツール、今後の学習実験をここに置きます。",
+    ko: "p진수 변환, 터미널 도구, 앞으로의 학습 실험을 여기에 둡니다.",
+    ru: "Здесь будут преобразования p-адических чисел, терминальные инструменты и учебные опыты."
   },
   "study.copy": {
     "zh-CN": "把可直接使用的小工具放在这里：能下载，也能在浏览器里先试一试。",
@@ -141,31 +195,40 @@ const copy = {
     ru: "Небольшие готовые инструменты: скачать или попробовать прямо в браузере."
   },
   "study.padic.title": {
-    "zh-CN": "p-adic Converter",
-    "zh-TW": "p-adic Converter",
+    "zh-CN": "p进数转换器",
+    "zh-TW": "p進數轉換器",
     en: "p-adic Converter",
-    fr: "p-adic Converter",
-    ja: "p-adic Converter",
-    ko: "p-adic Converter",
-    ru: "p-adic Converter"
+    fr: "Convertisseur p-adique",
+    ja: "p進数変換器",
+    ko: "p진수 변환기",
+    ru: "Конвертер p-адических чисел"
   },
   "study.padic.copy": {
-    "zh-CN": "下载终端版安装器，或直接使用网页版 p-adic 有理数转换。",
-    "zh-TW": "下載終端版安裝器，或直接使用網頁版 p-adic 有理數轉換。",
+    "zh-CN": "下载终端版安装器，或直接使用网页版 p进数有理数转换。",
+    "zh-TW": "下載終端版安裝器，或直接使用網頁版 p進數有理數轉換。",
     en: "Download the terminal installer, or use the web p-adic rational converter.",
-    fr: "Telechargez l'installateur terminal ou utilisez le convertisseur web.",
-    ja: "端末版インストーラを入手するか、Web 版 p-adic 有理数変換を使えます。",
-    ko: "터미널 설치기를 받거나 웹 p-adic 유리수 변환기를 바로 사용합니다.",
-    ru: "Скачайте терминальный установщик или используйте веб-конвертер."
+    fr: "Telechargez l'installateur terminal ou utilisez le convertisseur rationnel p-adique web.",
+    ja: "端末版インストーラを入手するか、Web 版 p進数有理数変換を使えます。",
+    ko: "터미널 설치기를 받거나 웹 p진수 유리수 변환기를 바로 사용합니다.",
+    ru: "Скачайте терминальный установщик или используйте веб-конвертер p-адических рациональных чисел."
   },
   "padic.copy": {
-    "zh-CN": "选择终端安装器，或打开无需安装的网页版转换器。终端版安装器使用 p-adic 仓库的 main2.0 分支。",
-    "zh-TW": "選擇終端安裝器，或打開無需安裝的網頁版轉換器。終端版安裝器使用 p-adic 倉庫的 main2.0 分支。",
+    "zh-CN": "选择终端安装器，或打开无需安装的网页版转换器。终端版安装器使用 p进数工具仓库的 main2.0 分支。",
+    "zh-TW": "選擇終端安裝器，或打開無需安裝的網頁版轉換器。終端版安裝器使用 p進數工具倉庫的 main2.0 分支。",
     en: "Choose a terminal installer or open the no-install web converter. Installers use the p-adic main2.0 branch.",
-    fr: "Choisissez l'installateur terminal ou le convertisseur web sans installation. Les installateurs utilisent main2.0.",
-    ja: "端末インストーラか、インストール不要の Web 変換器を選べます。インストーラは main2.0 を使います。",
-    ko: "터미널 설치기 또는 설치 없는 웹 변환기를 선택합니다. 설치기는 main2.0 브랜치를 사용합니다.",
-    ru: "Выберите установщик или веб-конвертер без установки. Установщики используют ветку main2.0."
+    fr: "Choisissez l'installateur terminal ou le convertisseur web sans installation. Les installateurs utilisent la branche main2.0 du depot p-adique.",
+    ja: "端末インストーラか、インストール不要の Web 変換器を選べます。インストーラは p進数ツールリポジトリの main2.0 を使います。",
+    ko: "터미널 설치기 또는 설치 없는 웹 변환기를 선택합니다. 설치기는 p진수 도구 저장소의 main2.0 브랜치를 사용합니다.",
+    ru: "Выберите установщик или веб-конвертер без установки. Установщики используют ветку main2.0 репозитория инструмента p-адических чисел."
+  },
+  "padic.eyebrow": {
+    "zh-CN": "学习工具",
+    "zh-TW": "學習工具",
+    en: "study tool",
+    fr: "outil d'etude",
+    ja: "学習ツール",
+    ko: "학습 도구",
+    ru: "учебный инструмент"
   },
   "padic.download.title": {
     "zh-CN": "下载安装器",
@@ -194,6 +257,33 @@ const copy = {
     ko: "시스템을 선택하세요. 설치기가 이전 파일을 먼저 정리한 뒤 main2.0을 설치합니다.",
     ru: "Выберите систему. Установщик удалит старые файлы и установит main2.0."
   },
+  "padic.download.linux.copy": {
+    "zh-CN": "下载后打开或在终端运行，先清理旧版本，再安装 smc-padic。",
+    "zh-TW": "下載後開啟或在終端執行，先清理舊版本，再安裝 smc-padic。",
+    en: "Open it after download or run it in Terminal. It removes old files before installing smc-padic.",
+    fr: "Ouvrez-le apres le telechargement ou lancez-le dans le terminal. Il nettoie l'ancienne version avant smc-padic.",
+    ja: "ダウンロード後に開くか端末で実行します。古いファイルを消してから smc-padic を入れます。",
+    ko: "다운로드 후 열거나 터미널에서 실행합니다. 이전 파일을 지운 뒤 smc-padic을 설치합니다.",
+    ru: "Откройте после загрузки или запустите в терминале. Старые файлы будут удалены перед установкой smc-padic."
+  },
+  "padic.download.macos.copy": {
+    "zh-CN": "下载后打开，脚本会请求密码授权并自动完成安装。",
+    "zh-TW": "下載後開啟，腳本會要求密碼授權並自動完成安裝。",
+    en: "Open it after download. The script asks for password authorization and completes installation.",
+    fr: "Ouvrez-le apres le telechargement. Le script demandera le mot de passe puis installera l'outil.",
+    ja: "ダウンロード後に開きます。スクリプトがパスワード承認を求め、自動でインストールします。",
+    ko: "다운로드 후 엽니다. 스크립트가 암호 권한을 요청하고 설치를 마칩니다.",
+    ru: "Откройте после загрузки. Скрипт запросит пароль и завершит установку."
+  },
+  "padic.download.windows.copy": {
+    "zh-CN": "下载后双击运行，先清理旧安装目录，再执行 Windows 安装流程。",
+    "zh-TW": "下載後雙擊執行，先清理舊安裝目錄，再執行 Windows 安裝流程。",
+    en: "Double-click after download. It clears the old install folder before running the Windows setup.",
+    fr: "Double-cliquez apres le telechargement. Il nettoie l'ancien dossier avant l'installation Windows.",
+    ja: "ダウンロード後にダブルクリックします。古いインストール先を消してから Windows 用の手順を実行します。",
+    ko: "다운로드 후 두 번 클릭합니다. 이전 설치 폴더를 정리한 뒤 Windows 설치를 실행합니다.",
+    ru: "Дважды щелкните после загрузки. Старый каталог будет очищен перед установкой Windows."
+  },
   "padic.web.title": {
     "zh-CN": "网页版转换",
     "zh-TW": "網頁版轉換",
@@ -204,13 +294,85 @@ const copy = {
     ru: "Веб-конвертер"
   },
   "padic.web.copy": {
-    "zh-CN": "输入表达式和素数 p，在浏览器里生成 p-adic 展开，并可输入 help 查看完整指令。",
-    "zh-TW": "輸入表達式和質數 p，在瀏覽器裡生成 p-adic 展開，並可輸入 help 查看完整指令。",
+    "zh-CN": "输入表达式和素数 p，在浏览器里生成 p进数展开，并可输入 help 查看完整指令。",
+    "zh-TW": "輸入表達式和質數 p，在瀏覽器裡生成 p進數展開，並可輸入 help 查看完整指令。",
     en: "Enter an expression and prime p to generate a p-adic expansion in the browser. Type help for commands.",
-    fr: "Entrez une expression et un nombre premier p. Tapez help pour les commandes.",
-    ja: "式と素数 p を入力してブラウザで p-adic 展開を作ります。help で説明を表示します。",
-    ko: "표현식과 소수 p를 입력해 브라우저에서 p-adic 전개를 만듭니다. help로 명령을 봅니다.",
-    ru: "Введите выражение и простое p, чтобы получить p-adic разложение. help покажет команды."
+    fr: "Entrez une expression et un nombre premier p pour generer un developpement p-adique. Tapez help pour les commandes.",
+    ja: "式と素数 p を入力してブラウザで p進数展開を作ります。help で説明を表示します。",
+    ko: "표현식과 소수 p를 입력해 브라우저에서 p진수 전개를 만듭니다. help로 명령을 봅니다.",
+    ru: "Введите выражение и простое p, чтобы получить p-адическое разложение. help покажет команды."
+  },
+  "padic.web.pageCopy": {
+    "zh-CN": "输入类似 1/3 5、3+4*2 5 或 pow(2,10) 7 的指令。输入 help 可查看完整说明。",
+    "zh-TW": "輸入類似 1/3 5、3+4*2 5 或 pow(2,10) 7 的指令。輸入 help 可查看完整說明。",
+    en: "Enter commands like 1/3 5, 3+4*2 5 or pow(2,10) 7. Type help for the full guide.",
+    fr: "Entrez des commandes comme 1/3 5, 3+4*2 5 ou pow(2,10) 7. Tapez help pour le guide complet.",
+    ja: "1/3 5、3+4*2 5、pow(2,10) 7 のように入力します。help で説明を表示します。",
+    ko: "1/3 5, 3+4*2 5, pow(2,10) 7 같은 명령을 입력합니다. help로 전체 안내를 봅니다.",
+    ru: "Введите команды вроде 1/3 5, 3+4*2 5 или pow(2,10) 7. help покажет полную справку."
+  },
+  "padic.web.command": {
+    "zh-CN": "指令",
+    "zh-TW": "指令",
+    en: "Command",
+    fr: "Commande",
+    ja: "コマンド",
+    ko: "명령",
+    ru: "Команда"
+  },
+  "padic.web.convert": {
+    "zh-CN": "转换",
+    "zh-TW": "轉換",
+    en: "Convert",
+    fr: "Convertir",
+    ja: "変換",
+    ko: "변환",
+    ru: "Преобразовать"
+  },
+  "padic.web.examples": {
+    "zh-CN": "示例",
+    "zh-TW": "範例",
+    en: "Examples",
+    fr: "Exemples",
+    ja: "例",
+    ko: "예시",
+    ru: "Примеры"
+  },
+  "padic.web.noCommand": {
+    "zh-CN": "请输入指令",
+    "zh-TW": "請輸入指令",
+    en: "Enter a command",
+    fr: "Entrez une commande",
+    ja: "コマンドを入力してください",
+    ko: "명령을 입력하세요",
+    ru: "Введите команду"
+  },
+  "padic.web.working": {
+    "zh-CN": "计算中...",
+    "zh-TW": "計算中...",
+    en: "Calculating...",
+    fr: "Calcul...",
+    ja: "計算中...",
+    ko: "계산 중...",
+    ru: "Вычисление..."
+  },
+  "padic.web.error": {
+    "zh-CN": "p进数计算失败",
+    "zh-TW": "p進數計算失敗",
+    en: "p-adic calculation failed",
+    fr: "Le calcul p-adique a echoue",
+    ja: "p進数計算に失敗しました",
+    ko: "p진수 계산에 실패했습니다",
+    ru: "Не удалось выполнить p-адическое вычисление"
+  },
+  "padic.web.tooLong": {
+    "zh-CN": "指令过长",
+    "zh-TW": "指令過長",
+    en: "Command is too long",
+    fr: "Commande trop longue",
+    ja: "コマンドが長すぎます",
+    ko: "명령이 너무 깁니다",
+    ru: "Команда слишком длинная"
   },
   "module.lab.title": {
     "zh-CN": "实验室",
@@ -418,6 +580,24 @@ const copy = {
     ja: "外観：",
     ko: "화면:",
     ru: "Вид:"
+  },
+  "settings.languageSelect": {
+    "zh-CN": "选择语言",
+    "zh-TW": "選擇語言",
+    en: "Choose language",
+    fr: "Choisir la langue",
+    ja: "言語を選択",
+    ko: "언어 선택",
+    ru: "Выбрать язык"
+  },
+  "settings.appearanceSelect": {
+    "zh-CN": "选择外观",
+    "zh-TW": "選擇外觀",
+    en: "Choose appearance",
+    fr: "Choisir l'apparence",
+    ja: "外観を選択",
+    ko: "화면 선택",
+    ru: "Выбрать вид"
   },
   "settings.back": {
     "zh-CN": "返回",
@@ -1225,8 +1405,15 @@ function applyLanguage(lang = currentLanguage()) {
   for (const node of document.querySelectorAll("[data-i18n-placeholder]")) {
     node.setAttribute("placeholder", t(node.dataset.i18nPlaceholder, node.getAttribute("placeholder") || ""));
   }
+  for (const node of document.querySelectorAll("[data-i18n-aria-label]")) {
+    node.setAttribute("aria-label", t(node.dataset.i18nAriaLabel, node.getAttribute("aria-label") || ""));
+  }
+  for (const node of document.querySelectorAll("[data-i18n-title]")) {
+    node.setAttribute("title", t(node.dataset.i18nTitle, node.getAttribute("title") || ""));
+  }
   for (const select of document.querySelectorAll("[data-language-select]")) {
     select.value = meta.value;
+    select.setAttribute("aria-label", t("settings.languageSelect"));
     const field = select.closest(".settings-field");
     if (field) field.dataset.value = meta.label;
     syncSettingsChoice(select);
@@ -1247,6 +1434,7 @@ function applyTheme(theme = currentTheme()) {
   }
   for (const select of document.querySelectorAll("[data-theme-select]")) {
     select.value = theme;
+    select.setAttribute("aria-label", t("settings.appearanceSelect"));
     const field = select.closest(".settings-field");
     if (field) field.dataset.value = theme === "dark" ? t("theme.dark") : t("theme.light");
     syncSettingsChoice(select);

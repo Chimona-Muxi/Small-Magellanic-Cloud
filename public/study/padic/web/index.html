@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>网页版 p-adic 转换 · Small Magellanic Cloud</title>
-  <link rel="stylesheet" href="/styles.css?v=20260702c" />
+  <title data-i18n="page.title.padicWeb">网页版 p进数转换 · Small Magellanic Cloud</title>
+  <link rel="stylesheet" href="/styles.css?v=20260703a" />
 </head>
 <body>
   <div class="site-shell">
@@ -12,22 +12,22 @@
       <a class="brand" href="/">
         <span class="brand-text"><strong>Small Magellanic Cloud</strong></span>
       </a>
-      <nav class="site-nav trail" aria-label="当前位置">
+      <nav class="site-nav trail" aria-label="当前位置" data-i18n-aria-label="nav.breadcrumb">
         <a href="/" data-i18n="nav.home">主页</a>
         <span>/</span>
         <a href="/study/" data-i18n="nav.study">学习工具</a>
         <span>/</span>
-        <a href="/study/padic/" data-i18n="study.padic.title">p-adic Converter</a>
+        <a href="/study/padic/" data-i18n="study.padic.title">p进数转换器</a>
         <div class="settings-menu" data-settings-menu-root>
-          <button class="settings-trigger" type="button" data-settings-toggle data-i18n="settings.label" aria-expanded="false" aria-label="设置">设置</button>
+          <button class="settings-trigger" type="button" data-settings-toggle data-i18n="settings.label" data-i18n-aria-label="settings.label" aria-expanded="false" aria-label="设置">设置</button>
           <div class="settings-popover" data-settings-menu>
             <div class="settings-field">
               <span data-i18n="settings.language">语言：</span>
-              <select data-language-select aria-label="Language"></select>
+              <select data-language-select aria-label="选择语言"></select>
             </div>
             <div class="settings-field">
               <span data-i18n="settings.appearance">外观：</span>
-              <select data-theme-select aria-label="Appearance"></select>
+              <select data-theme-select aria-label="选择外观"></select>
             </div>
           </div>
         </div>
@@ -37,19 +37,19 @@
     <main class="content-band compact">
       <div class="page-title" data-reveal>
         <h1 data-i18n="padic.web.title">网页版转换</h1>
-        <p>输入类似 <code>1/3 5</code>、<code>3+4*2 5</code> 或 <code>pow(2,10) 7</code> 的指令。输入 <code>help</code> 可查看完整说明。</p>
+        <p data-i18n="padic.web.pageCopy">输入类似 1/3 5、3+4*2 5 或 pow(2,10) 7 的指令。输入 help 可查看完整说明。</p>
       </div>
 
       <section class="padic-console" data-reveal>
         <form class="padic-form" data-padic-form>
           <label>
-            <span>指令</span>
-            <input data-padic-input autocomplete="off" spellcheck="false" value="1/3 5" />
+            <span data-i18n="padic.web.command">指令</span>
+            <input data-padic-input data-i18n-aria-label="padic.web.command" aria-label="指令" autocomplete="off" spellcheck="false" value="1/3 5" />
           </label>
-          <button class="button primary" type="submit">转换</button>
+          <button class="button primary" type="submit" data-i18n="padic.web.convert">转换</button>
         </form>
 
-        <div class="quick-examples" aria-label="示例">
+        <div class="quick-examples" aria-label="示例" data-i18n-aria-label="padic.web.examples">
           <button type="button" data-example="5 7">5 7</button>
           <button type="button" data-example="1/3 5">1/3 5</button>
           <button type="button" data-example="(1/3+1)*2 5">(1/3+1)*2 5</button>
@@ -61,7 +61,7 @@
       </section>
     </main>
   </div>
-  <script type="module" src="/site.mjs?v=20260702c"></script>
-  <script type="module" src="/study/padic/web/padic-web.mjs?v=20260702c"></script>
+  <script type="module" src="/site.mjs?v=20260703a"></script>
+  <script type="module" src="/study/padic/web/padic-web.mjs?v=20260703a"></script>
 </body>
 </html>

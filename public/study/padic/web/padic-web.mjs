@@ -2,6 +2,17 @@ const form = document.querySelector("[data-padic-form]");
 const input = document.querySelector("[data-padic-input]");
 const output = document.querySelector("[data-padic-output]");
 
+function t(key, fallback = "") {
+  return window.SMC_PREFS?.t?.(key, fallback) || fallback || key;
+}
+
+function localizedError(message) {
+  if (message === "请输入指令") return t("padic.web.noCommand", message);
+  if (message === "指令过长") return t("padic.web.tooLong", message);
+  if (message === "p-adic 计算失败") return t("padic.web.error", message);
+  return message || t("padic.web.error", "p-adic calculation failed");
+}
+
 async function evaluatePadic(command) {
   const response = await fetch("/api/padic/evaluate", {
     method: "POST",
@@ -16,15 +27,15 @@ async function evaluatePadic(command) {
 async function submit(command) {
   const text = command.trim();
   if (!text) {
-    output.textContent = "p-adic> 请输入指令";
+    output.textContent = `p-adic> ${t("padic.web.noCommand", "请输入指令")}`;
     return;
   }
 
-  output.textContent = "p-adic> 计算中...";
+  output.textContent = `p-adic> ${t("padic.web.working", "计算中...")}`;
   try {
     output.textContent = await evaluatePadic(text);
   } catch (error) {
-    output.textContent = `p-adic> ${error.message}`;
+    output.textContent = `p-adic> ${localizedError(error.message)}`;
   }
 }
 

@@ -1540,3 +1540,31 @@ html[data-theme="dark"] {
   color: var(--accent);
   font-weight: 900;
 }
+
+/* Crisp settings row icons: direct SVG backgrounds avoid emoji color texture and mask fringing. */
+.settings-field:first-child::before,
+.settings-field:nth-child(2)::before {
+  content: "" !important;
+  background-color: transparent !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-size: 24px 24px !important;
+  mask-image: none !important;
+  -webkit-mask-image: none !important;
+}
+
+.settings-field:first-child::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='8.25' fill='none' stroke='%23f6f4ed' stroke-width='1.9'/%3E%3Cpath d='M3.75 12h16.5M12 3.75c2.2 2.15 3.25 4.9 3.25 8.25S14.2 18.1 12 20.25M12 3.75C9.8 5.9 8.75 8.65 8.75 12S9.8 18.1 12 20.25' fill='none' stroke='%23f6f4ed' stroke-width='1.9' stroke-linecap='round'/%3E%3C/svg%3E") !important;
+}
+
+.settings-field:nth-child(2)::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='3.9' fill='none' stroke='%23f6f4ed' stroke-width='1.9'/%3E%3Cpath d='M12 2.75v2.4M12 18.85v2.4M5.46 5.46l1.7 1.7M16.84 16.84l1.7 1.7M2.75 12h2.4M18.85 12h2.4M5.46 18.54l1.7-1.7M16.84 7.16l1.7-1.7' fill='none' stroke='%23f6f4ed' stroke-width='1.9' stroke-linecap='round'/%3E%3C/svg%3E") !important;
+}
+
+html[data-theme="light"] .settings-field:first-child::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='8.25' fill='none' stroke='%2314201d' stroke-width='1.9'/%3E%3Cpath d='M3.75 12h16.5M12 3.75c2.2 2.15 3.25 4.9 3.25 8.25S14.2 18.1 12 20.25M12 3.75C9.8 5.9 8.75 8.65 8.75 12S9.8 18.1 12 20.25' fill='none' stroke='%2314201d' stroke-width='1.9' stroke-linecap='round'/%3E%3C/svg%3E") !important;
+}
+
+html[data-theme="light"] .settings-field:nth-child(2)::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='3.9' fill='none' stroke='%2314201d' stroke-width='1.9'/%3E%3Cpath d='M12 2.75v2.4M12 18.85v2.4M5.46 5.46l1.7 1.7M16.84 16.84l1.7 1.7M2.75 12h2.4M18.85 12h2.4M5.46 18.54l1.7-1.7M16.84 7.16l1.7-1.7' fill='none' stroke='%2314201d' stroke-width='1.9' stroke-linecap='round'/%3E%3C/svg%3E") !important;
+}

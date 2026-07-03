@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>p-adic Converter · Small Magellanic Cloud</title>
-  <link rel="stylesheet" href="/styles.css?v=20260702a" />
+  <title data-i18n="page.title.padic">p进数转换器 · Small Magellanic Cloud</title>
+  <link rel="stylesheet" href="/styles.css?v=20260703a" />
 </head>
 <body>
   <div class="site-shell">
@@ -12,20 +12,20 @@
       <a class="brand" href="/">
         <span class="brand-text"><strong>Small Magellanic Cloud</strong></span>
       </a>
-      <nav class="site-nav trail" aria-label="当前位置">
+      <nav class="site-nav trail" aria-label="当前位置" data-i18n-aria-label="nav.breadcrumb">
         <a href="/" data-i18n="nav.home">主页</a>
         <span>/</span>
         <a href="/study/" data-i18n="nav.study">学习工具</a>
         <div class="settings-menu" data-settings-menu-root>
-          <button class="settings-trigger" type="button" data-settings-toggle data-i18n="settings.label" aria-expanded="false" aria-label="设置">设置</button>
+          <button class="settings-trigger" type="button" data-settings-toggle data-i18n="settings.label" data-i18n-aria-label="settings.label" aria-expanded="false" aria-label="设置">设置</button>
           <div class="settings-popover" data-settings-menu>
             <div class="settings-field">
               <span data-i18n="settings.language">语言：</span>
-              <select data-language-select aria-label="Language"></select>
+              <select data-language-select aria-label="选择语言"></select>
             </div>
             <div class="settings-field">
               <span data-i18n="settings.appearance">外观：</span>
-              <select data-theme-select aria-label="Appearance"></select>
+              <select data-theme-select aria-label="选择外观"></select>
             </div>
           </div>
         </div>
@@ -34,9 +34,9 @@
 
     <main class="content-band compact">
       <div class="page-title" data-reveal>
-        <p class="eyebrow">study tool</p>
-        <h1 data-i18n="study.padic.title">p-adic Converter</h1>
-        <p data-i18n="padic.copy">选择终端安装器，或打开无需安装的网页版转换器。终端版安装器使用 p-adic 仓库的 main2.0 分支。</p>
+        <p class="eyebrow" data-i18n="padic.eyebrow">study tool</p>
+        <h1 data-i18n="study.padic.title">p进数转换器</h1>
+        <p data-i18n="padic.copy">选择终端安装器，或打开无需安装的网页版转换器。终端版安装器使用 p进数工具仓库的 main2.0 分支。</p>
       </div>
 
       <div class="module-grid">
@@ -46,11 +46,11 @@
         </a>
         <a class="module-card" href="/study/padic/web/" data-reveal>
           <h3 data-i18n="padic.web.title">网页版转换</h3>
-          <p data-i18n="padic.web.copy">输入表达式和素数 p，在浏览器里生成 p-adic 展开，并可输入 help 查看完整指令。</p>
+          <p data-i18n="padic.web.copy">输入表达式和素数 p，在浏览器里生成 p进数展开，并可输入 help 查看完整指令。</p>
         </a>
       </div>
     </main>
   </div>
-  <script type="module" src="/site.mjs?v=20260702a"></script>
+  <script type="module" src="/site.mjs?v=20260703a"></script>
 </body>
 </html>
