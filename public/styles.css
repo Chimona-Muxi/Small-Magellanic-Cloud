@@ -1084,6 +1084,40 @@ html[data-theme="light"] .padic-output {
   line-height: 1.7;
 }
 
+.study-guide-entry {
+  margin-top: 14px;
+}
+
+.study-guide-entry a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 12px;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.05);
+  text-decoration: none;
+}
+
+.study-guide-entry a::after {
+  content: ">";
+  margin-left: 10px;
+  color: var(--muted);
+}
+
+.study-guide-entry a:hover {
+  border-color: var(--line-strong);
+}
+
+.manual-page {
+  min-height: calc(100vh - 96px);
+}
+
+.manual-page .study-manual {
+  margin-top: 0;
+}
+
 .study-manual {
   display: block;
   max-width: 760px;
@@ -1105,6 +1139,7 @@ html[data-theme="light"] .padic-output {
   display: none;
 }
 
+.study-guide-view h1,
 .study-guide-view h2 {
   margin: 0;
   color: var(--ink);

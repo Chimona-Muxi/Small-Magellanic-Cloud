@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title data-i18n="page.title.analysisManual">数学分析说明书 · Small Magellanic Cloud</title>
+  <link rel="stylesheet" href="/styles.css?v=20260704f" />
+</head>
+<body>
+  <div class="site-shell">
+    <header class="site-header">
+      <a class="brand" href="/">
+        <span class="brand-text"><strong>Small Magellanic Cloud</strong></span>
+      </a>
+      <nav class="site-nav trail" aria-label="当前位置" data-i18n-aria-label="nav.breadcrumb">
+        <a href="/" data-i18n="nav.home">主页</a>
+        <span>/</span>
+        <a href="/study/" data-i18n="nav.study">学习工具</a>
+        <span>/</span>
+        <a href="/study/analysis/" data-i18n="study.analysis.title">数学分析学习辅助器</a>
+        <div class="settings-menu" data-settings-menu-root>
+          <button class="settings-trigger" type="button" data-settings-toggle data-i18n="settings.label" data-i18n-aria-label="settings.label" aria-expanded="false" aria-label="设置">设置</button>
+          <div class="settings-popover" data-settings-menu>
+            <div class="settings-field">
+              <span data-i18n="settings.language">语言：</span>
+              <select data-language-select aria-label="选择语言"></select>
+            </div>
+            <div class="settings-field">
+              <span data-i18n="settings.appearance">外观：</span>
+              <select data-theme-select aria-label="选择外观"></select>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="content-band compact manual-page">
+      <section class="study-manual" aria-labelledby="analysis-manual-title" data-study-guide data-reveal>
+        <div class="study-guide-view" id="analysis-guide" data-guide-view="root">
+          <p class="eyebrow" data-i18n="guide.eyebrow">使用指南</p>
+          <h1 id="analysis-manual-title" data-i18n="guide.analysis.title">数学分析说明书</h1>
+          <nav class="study-guide-links" aria-label="数学分析使用说明目录" data-i18n-aria-label="guide.analysis.nav">
+            <a href="#analysis-start" data-guide-target="analysis-start" data-i18n="guide.start">快速上手</a>
+            <a href="#analysis-cas" data-guide-target="analysis-cas" data-i18n="guide.analysis.cas">基础 CAS</a>
+            <a href="#analysis-equation" data-guide-target="analysis-equation" data-i18n="guide.analysis.equation">方程与 ODE</a>
+            <a href="#analysis-fourier" data-guide-target="analysis-fourier" data-i18n="guide.analysis.fourier">傅里叶与特殊函数</a>
+          </nav>
+        </div>
+
+        <div class="study-guide-view" id="analysis-start" data-guide-view="analysis-start" hidden>
+          <a class="study-guide-back" href="#analysis-guide" data-guide-target="root" data-i18n="guide.back.root">返回说明书</a>
+          <h1 data-i18n="guide.start">快速上手</h1>
+          <nav class="study-guide-links" aria-label="快速上手" data-i18n-aria-label="guide.start">
+            <a href="#analysis-start-example" data-guide-target="analysis-start-example" data-i18n="guide.runExample">运行示例</a>
+            <a href="#analysis-start-wait" data-guide-target="analysis-start-wait" data-i18n="guide.onlineWait">线上等待</a>
+          </nav>
+        </div>
+
+        <div class="study-guide-view" id="analysis-start-example" data-guide-view="analysis-start-example" hidden>
+          <a class="study-guide-back" href="#analysis-start" data-guide-target="analysis-start" data-i18n="guide.back.start">返回快速上手</a>
+          <h1 data-i18n="guide.runExample">运行示例</h1>
+          <p data-i18n="guide.analysis.runExample.copy">点击“CAS 基础”“级数与傅里叶”或“方程与 ODE”，系统会填入示例并立即运行。先看命令格式，再替换表达式。</p>
+        </div>
+
+        <div class="study-guide-view" id="analysis-start-wait" data-guide-view="analysis-start-wait" hidden>
+          <a class="study-guide-back" href="#analysis-start" data-guide-target="analysis-start" data-i18n="guide.back.start">返回快速上手</a>
+          <h1 data-i18n="guide.onlineWait">线上等待</h1>
+          <p data-i18n="guide.analysis.onlineWait.copy">线上首次运行会比本地慢，通常是 Python/SymPy 冷启动。输出区显示运行提示时，等待返回即可。</p>
+        </div>
+
+        <div class="study-guide-view" id="analysis-cas" data-guide-view="analysis-cas" hidden>
+          <a class="study-guide-back" href="#analysis-guide" data-guide-target="root" data-i18n="guide.back.root">返回说明书</a>
+          <h1 data-i18n="guide.analysis.cas">基础 CAS</h1>
+          <nav class="study-guide-links" aria-label="基础 CAS" data-i18n-aria-label="guide.analysis.cas">
+            <a href="#analysis-limit" data-guide-target="analysis-limit" data-i18n="guide.analysis.limit">极限与导数</a>
+            <a href="#analysis-integral" data-guide-target="analysis-integral" data-i18n="guide.analysis.integral">积分与级数</a>
+          </nav>
+        </div>
+
+        <div class="study-guide-view" id="analysis-limit" data-guide-view="analysis-limit" hidden>
+          <a class="study-guide-back" href="#analysis-cas" data-guide-target="analysis-cas" data-i18n="guide.back.cas">返回基础 CAS</a>
+          <h1 data-i18n="guide.analysis.limit">极限与导数</h1>
+          <p><span data-i18n="guide.analysis.limit.copy">极限使用</span> <code>Limit(expr, x, a)</code> <span data-i18n="guide.analysis.derivative.copy">导数使用</span> <code>Derivative(expr, x)</code></p>
+        </div>
+
+        <div class="study-guide-view" id="analysis-integral" data-guide-view="analysis-integral" hidden>
+          <a class="study-guide-back" href="#analysis-cas" data-guide-target="analysis-cas" data-i18n="guide.back.cas">返回基础 CAS</a>
+          <h1 data-i18n="guide.analysis.integral">积分与级数</h1>
+          <p><span data-i18n="guide.analysis.integral.copy">积分使用</span> <code>Integral(expr, x)</code> <span data-i18n="guide.analysis.series.copy">级数展开用</span> <code>Series(expr, x, a, n)</code></p>
+        </div>
+
+        <div class="study-guide-view" id="analysis-equation" data-guide-view="analysis-equation" hidden>
+          <a class="study-guide-back" href="#analysis-guide" data-guide-target="root" data-i18n="guide.back.root">返回说明书</a>
+          <h1 data-i18n="guide.analysis.equation">方程与 ODE</h1>
+          <p><span data-i18n="guide.analysis.equation.copy">代数方程可写</span> <code>Solve(Eq(x**2 - 3*x + 2, 0), x)</code> <span data-i18n="guide.analysis.ode.copy">常微分方程可写</span> <code>SolveODE(Eq(f(x).diff(x), f(x)), f(x))</code></p>
+        </div>
+
+        <div class="study-guide-view" id="analysis-fourier" data-guide-view="analysis-fourier" hidden>
+          <a class="study-guide-back" href="#analysis-guide" data-guide-target="root" data-i18n="guide.back.root">返回说明书</a>
+          <h1 data-i18n="guide.analysis.fourier">傅里叶与特殊函数</h1>
+          <p><span data-i18n="guide.analysis.fourier.copy">傅里叶级数使用</span> <code>FourierSeries(expr, x, a, b, n)</code> <span data-i18n="guide.analysis.special.copy">特殊函数可使用 Gamma、Beta、erf。</span></p>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script type="module" src="/site.mjs?v=20260704f"></script>
+  <script type="module" src="/study/python-tool.mjs?v=20260704f"></script>
+</body>
+</html>

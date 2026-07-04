@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title data-i18n="page.title.algebraManual">高等代数说明书 · Small Magellanic Cloud</title>
+  <link rel="stylesheet" href="/styles.css?v=20260704f" />
+</head>
+<body>
+  <div class="site-shell">
+    <header class="site-header">
+      <a class="brand" href="/">
+        <span class="brand-text"><strong>Small Magellanic Cloud</strong></span>
+      </a>
+      <nav class="site-nav trail" aria-label="当前位置" data-i18n-aria-label="nav.breadcrumb">
+        <a href="/" data-i18n="nav.home">主页</a>
+        <span>/</span>
+        <a href="/study/" data-i18n="nav.study">学习工具</a>
+        <span>/</span>
+        <a href="/study/algebra/" data-i18n="study.algebra.title">高等代数学习辅助器</a>
+        <div class="settings-menu" data-settings-menu-root>
+          <button class="settings-trigger" type="button" data-settings-toggle data-i18n="settings.label" data-i18n-aria-label="settings.label" aria-expanded="false" aria-label="设置">设置</button>
+          <div class="settings-popover" data-settings-menu>
+            <div class="settings-field">
+              <span data-i18n="settings.language">语言：</span>
+              <select data-language-select aria-label="选择语言"></select>
+            </div>
+            <div class="settings-field">
+              <span data-i18n="settings.appearance">外观：</span>
+              <select data-theme-select aria-label="选择外观"></select>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="content-band compact manual-page">
+      <section class="study-manual" aria-labelledby="algebra-manual-title" data-study-guide data-reveal>
+        <div class="study-guide-view" id="algebra-guide" data-guide-view="root">
+          <p class="eyebrow" data-i18n="guide.eyebrow">使用指南</p>
+          <h1 id="algebra-manual-title" data-i18n="guide.algebra.title">高等代数说明书</h1>
+          <nav class="study-guide-links" aria-label="高等代数使用说明目录" data-i18n-aria-label="guide.algebra.nav">
+            <a href="#algebra-start" data-guide-target="algebra-start" data-i18n="guide.start">快速上手</a>
+            <a href="#algebra-matrix" data-guide-target="algebra-matrix" data-i18n="guide.algebra.matrix">矩阵计算</a>
+            <a href="#algebra-poly" data-guide-target="algebra-poly" data-i18n="guide.algebra.poly">多项式</a>
+            <a href="#algebra-quadratic" data-guide-target="algebra-quadratic" data-i18n="guide.algebra.quadratic">二次型</a>
+          </nav>
+        </div>
+
+        <div class="study-guide-view" id="algebra-start" data-guide-view="algebra-start" hidden>
+          <a class="study-guide-back" href="#algebra-guide" data-guide-target="root" data-i18n="guide.back.root">返回说明书</a>
+          <h1 data-i18n="guide.start">快速上手</h1>
+          <nav class="study-guide-links" aria-label="快速上手" data-i18n-aria-label="guide.start">
+            <a href="#algebra-start-example" data-guide-target="algebra-start-example" data-i18n="guide.runExample">运行示例</a>
+            <a href="#algebra-start-edit" data-guide-target="algebra-start-edit" data-i18n="guide.editOwn">改成自己的题</a>
+          </nav>
+        </div>
+
+        <div class="study-guide-view" id="algebra-start-example" data-guide-view="algebra-start-example" hidden>
+          <a class="study-guide-back" href="#algebra-start" data-guide-target="algebra-start" data-i18n="guide.back.start">返回快速上手</a>
+          <h1 data-i18n="guide.runExample">运行示例</h1>
+          <p data-i18n="guide.algebra.runExample.copy">点击“矩阵基础”“二次型”或“多项式”，系统会填入示例并立即运行。先看输出格式，再替换数字、矩阵或多项式。</p>
+        </div>
+
+        <div class="study-guide-view" id="algebra-start-edit" data-guide-view="algebra-start-edit" hidden>
+          <a class="study-guide-back" href="#algebra-start" data-guide-target="algebra-start" data-i18n="guide.back.start">返回快速上手</a>
+          <h1 data-i18n="guide.editOwn">改成自己的题</h1>
+          <p><span data-i18n="guide.algebra.editOwn.copy">每行写一个赋值或输出命令。需要符号变量时先写</span> <code>x = symbols('x')</code></p>
+        </div>
+
+        <div class="study-guide-view" id="algebra-matrix" data-guide-view="algebra-matrix" hidden>
+          <a class="study-guide-back" href="#algebra-guide" data-guide-target="root" data-i18n="guide.back.root">返回说明书</a>
+          <h1 data-i18n="guide.algebra.matrix">矩阵计算</h1>
+          <nav class="study-guide-links" aria-label="矩阵计算" data-i18n-aria-label="guide.algebra.matrix">
+            <a href="#algebra-matrix-format" data-guide-target="algebra-matrix-format" data-i18n="guide.inputFormat">输入格式</a>
+            <a href="#algebra-matrix-functions" data-guide-target="algebra-matrix-functions" data-i18n="guide.commonFunctions">常用函数</a>
+          </nav>
+        </div>
+
+        <div class="study-guide-view" id="algebra-matrix-format" data-guide-view="algebra-matrix-format" hidden>
+          <a class="study-guide-back" href="#algebra-matrix" data-guide-target="algebra-matrix" data-i18n="guide.back.matrix">返回矩阵计算</a>
+          <h1 data-i18n="guide.inputFormat">输入格式</h1>
+          <p><span data-i18n="guide.algebra.matrixFormat.copy">矩阵用分号分隔行，例如</span> <code>A = [[1;2];[3;4]]</code></p>
+        </div>
+
+        <div class="study-guide-view" id="algebra-matrix-functions" data-guide-view="algebra-matrix-functions" hidden>
+          <a class="study-guide-back" href="#algebra-matrix" data-guide-target="algebra-matrix" data-i18n="guide.back.matrix">返回矩阵计算</a>
+          <h1 data-i18n="guide.commonFunctions">常用函数</h1>
+          <p><code>det(A)</code> <span data-i18n="guide.algebra.det">行列式</span> · <code>rank(A)</code> <span data-i18n="guide.algebra.rank">秩</span> · <code>inv(A)</code> <span data-i18n="guide.algebra.inv">逆矩阵</span> · <code>charpoly(A)</code> <span data-i18n="guide.algebra.charpoly">特征多项式</span></p>
+        </div>
+
+        <div class="study-guide-view" id="algebra-poly" data-guide-view="algebra-poly" hidden>
+          <a class="study-guide-back" href="#algebra-guide" data-guide-target="root" data-i18n="guide.back.root">返回说明书</a>
+          <h1 data-i18n="guide.algebra.poly">多项式</h1>
+          <p><span data-i18n="guide.algebra.poly.copy">多项式可以直接写成</span> <code>x^2 + 3*x + 2</code> <span data-i18n="guide.algebra.poly.functions">常用函数包括最大公因式、求根和乘法检查。</span></p>
+        </div>
+
+        <div class="study-guide-view" id="algebra-quadratic" data-guide-view="algebra-quadratic" hidden>
+          <a class="study-guide-back" href="#algebra-guide" data-guide-target="root" data-i18n="guide.back.root">返回说明书</a>
+          <h1 data-i18n="guide.algebra.quadratic">二次型</h1>
+          <p><span data-i18n="guide.algebra.quadratic.copy">先定义对称矩阵和列向量，再用</span> <code>quadratic_form(Q, v)</code> <span data-i18n="guide.algebra.quadratic.more">展开二次型，并配合矩阵性质判断函数检查结果。</span></p>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script type="module" src="/site.mjs?v=20260704f"></script>
+  <script type="module" src="/study/python-tool.mjs?v=20260704f"></script>
+</body>
+</html>

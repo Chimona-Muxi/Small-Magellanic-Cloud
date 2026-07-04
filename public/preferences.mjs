@@ -230,6 +230,24 @@ const copy = {
     ko: "해석학 학습 보조기 · Small Magellanic Cloud",
     ru: "Помощник по математическому анализу · Small Magellanic Cloud"
   },
+  "page.title.algebraManual": {
+    "zh-CN": "高等代数说明书 · Small Magellanic Cloud",
+    "zh-TW": "高等代數說明書 · Small Magellanic Cloud",
+    en: "Higher Algebra Manual · Small Magellanic Cloud",
+    fr: "Manuel d'algebre superieure · Small Magellanic Cloud",
+    ja: "高等代数説明書 · Small Magellanic Cloud",
+    ko: "고등대수 설명서 · Small Magellanic Cloud",
+    ru: "Руководство по высшей алгебре · Small Magellanic Cloud"
+  },
+  "page.title.analysisManual": {
+    "zh-CN": "数学分析说明书 · Small Magellanic Cloud",
+    "zh-TW": "數學分析說明書 · Small Magellanic Cloud",
+    en: "Analysis Manual · Small Magellanic Cloud",
+    fr: "Manuel d'analyse · Small Magellanic Cloud",
+    ja: "数学解析説明書 · Small Magellanic Cloud",
+    ko: "해석학 설명서 · Small Magellanic Cloud",
+    ru: "Руководство по матанализу · Small Magellanic Cloud"
+  },
   "study.algebra.title": {
     "zh-CN": "高等代数学习辅助器",
     "zh-TW": "高等代數學習輔助器",
@@ -344,6 +362,15 @@ const copy = {
     en: "Guide",
     fr: "Guide",
     ja: "ガイド",
+    ko: "사용 안내",
+    ru: "Руководство"
+  },
+  "guide.open": {
+    "zh-CN": "使用指南",
+    "zh-TW": "使用指南",
+    en: "User guide",
+    fr: "Guide d'utilisation",
+    ja: "使い方ガイド",
     ko: "사용 안내",
     ru: "Руководство"
   },
