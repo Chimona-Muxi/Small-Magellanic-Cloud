@@ -37,6 +37,10 @@
 - 语言改动至少验证一个非中文语言，包含标题、按钮、状态和可访问标签。
 - 修改后汇报：改了哪些文件、为什么改、如何验证、剩余风险。
 
+## 提交与推送契约
+
+- 完成项目后通过 GitHub Desktop 提交到仓库：[Chimona-Muxi/Small-Magellanic-Cloud.git](https://github.com/Chimona-Muxi/Small-Magellanic-Cloud.git)。
+
 ## 输出契约
 
 - 用中文说明。
