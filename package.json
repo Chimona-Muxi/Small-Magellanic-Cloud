@@ -8,6 +8,7 @@
   },
   "scripts": {
     "install:study": "node scripts/install-study-deps.mjs",
+    "install:study:plot": "node scripts/install-study-deps.mjs --plot",
     "postinstall": "node scripts/install-study-deps.mjs",
     "start": "node server.mjs"
   }

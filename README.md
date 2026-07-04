@@ -73,6 +73,12 @@ npm run install:study
 
 依赖会安装到 `tools/study/python-packages/`，服务端运行 Python 核心时会自动注入 `PYTHONPATH`。如果部署平台跳过了 `postinstall`，第一次运行学习工具时服务端也会尝试补装一次。
 
+默认依赖只安装基础 CAS 需要的 SymPy，避免 Render 冷启动时被 Matplotlib 等绘图包拖到超时。需要本地绘图能力时再执行：
+
+```bash
+npm run install:study:plot
+```
+
 ## 维护规则
 
 - UI 修改先看 `STYLE_GUIDE.md`，保持安静、清楚、深远、克制、有秩序。
@@ -80,6 +86,7 @@ npm run install:study
 - 设置入口、主题切换、语言切换属于全站基础设施，修改后至少验证首页、学习工具页和一个棋类页。
 - 棋类游戏是发布版副本；除非任务明确要求，不把它们重构成新的项目结构。
 - 高等代数与数学分析学习辅助器以 `tools/study/*` 下的原 Python 项目为核心；网页只做发布壳、输入提交、输出展示和说明，不另写一套数学镜像。
+- 学习工具线上默认依赖保持轻量；除非页面需要展示图像，不把 NumPy/Matplotlib 放回默认部署依赖。
 - 发布记录写入 `CHANGELOG.md`，按用户可感知变化组织，不堆内部流水。
 
 ## 当前重点

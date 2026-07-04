@@ -5,7 +5,10 @@ import { fileURLToPath } from "node:url";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const target = join(root, "tools", "study", "python-packages");
-const requirements = join(root, "tools", "study", "requirements.txt");
+const requirements = [
+  join(root, "tools", "study", "requirements.txt"),
+  ...(process.argv.includes("--plot") ? [join(root, "tools", "study", "requirements-plot.txt")] : [])
+];
 const candidates = [process.env.PYTHON, "python3", "python"].filter(Boolean);
 
 mkdirSync(target, { recursive: true });
@@ -25,8 +28,7 @@ for (const python of candidates) {
     "--disable-pip-version-check",
     "--target",
     target,
-    "-r",
-    requirements
+    ...requirements.flatMap((file) => ["-r", file])
   ], {
     encoding: "utf8",
     stdio: "inherit"

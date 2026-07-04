@@ -14,7 +14,7 @@
 
 - 将 `/2026/6/6/高等代数学习辅助器` 与 `/2026/6/6/数学分析学习辅助器` 的项目结构整理进 `tools/study/algebra/` 和 `tools/study/analysis/`。
 - 新增 `POST /api/study/algebra/evaluate` 与 `POST /api/study/analysis/evaluate`，由 Node 服务写入临时输入文件后调用原 Python 脚本。
-- 新增 `tools/study/requirements.txt`，并将 Render 构建命令改为安装 SymPy、NumPy、Matplotlib。
+- 新增 `tools/study/requirements.txt` 作为默认 SymPy 依赖清单，并保留可选绘图依赖清单用于本地扩展。
 
 ### 核心脚本修复
 
@@ -35,6 +35,7 @@
 - `STYLE_GUIDE.md` 新增同根同级页面一致性与学习工具工作台规范，明确相似按钮语义、示例按钮行为和虚拟终端规则。
 - 学习工具 Python 依赖改为项目内安装：`npm install` 自动安装到 `tools/study/python-packages/`，服务端运行时注入 `PYTHONPATH`，并在依赖缺失时尝试一次运行时补装。
 - 虚拟终端和脚本输入的行高改得更接近真实 CLI，避免 SymPy 字符画上下行间距过大。
+- 学习工具线上依赖拆分为默认 SymPy 与可选绘图依赖，避免 Render 上 NumPy/Matplotlib 安装拖到 `python3 timed out`；同时放宽高代/分析运行超时并细化超时错误来源。
 
 ## 2026-07-03
 

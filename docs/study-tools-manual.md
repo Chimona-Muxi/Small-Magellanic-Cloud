@@ -54,6 +54,15 @@ npm run install:study
 依赖内容：
 
 - SymPy：符号计算核心
+
+默认部署只安装基础 CAS 路径需要的 SymPy，避免 Render 冷启动或运行时补装时被大型绘图库拖到超时。需要本地绘图能力时再执行：
+
+```bash
+npm run install:study:plot
+```
+
+额外绘图依赖：
+
 - NumPy：绘图和数值采样辅助
 - Matplotlib：数学分析绘图命令
 
@@ -135,7 +144,7 @@ python3 tools/study/analysis/src/cas_parser.py tools/study/analysis/examples/cas
 python3 tools/study/analysis/src/cas_parser.py tools/study/analysis/examples/theory.ma
 ```
 
-网页环境会使用无界面 Matplotlib 后端，绘图命令可完成计算并返回文本提示；需要看到实际图像时，请在本地 CLI 运行。
+网页环境默认保障符号推导；`Plot*` 绘图命令需要额外安装绘图依赖。需要看到实际图像时，请在本地 CLI 运行并执行 `npm run install:study:plot`。
 
 ## 部署
 
@@ -152,6 +161,8 @@ tools/study/python-packages/
 ```
 
 运行时由 `server.mjs` 调用 `python3`，并自动把这个目录注入 `PYTHONPATH`。如果部署环境跳过了 `postinstall`，服务端第一次运行学习工具时会尝试补装一次。若部署环境禁止运行时安装，可以设置 `SMC_SKIP_RUNTIME_PIP=1`，并确保构建阶段已经执行 `npm run install:study`。
+
+线上默认不要安装 `requirements-plot.txt`。基础学习工具接口的超时预算用于 SymPy 冷启动和符号推导；绘图依赖体积较大，放进默认构建容易导致 Render 免费实例冷启动或运行时安装超时。
 
 如部署环境需要指定 Python 命令，可以设置：
 

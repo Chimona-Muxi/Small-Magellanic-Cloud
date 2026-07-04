@@ -96,7 +96,7 @@ const studyTools = {
     script: join(studyDir, "algebra", "src", "parser.py"),
     cwd: join(studyDir, "algebra"),
     extension: ".txt",
-    timeoutMs: 15000,
+    timeoutMs: 45000,
     args(filePath, body) {
       return ["--lang", body.lang === "en" ? "en" : "zh", filePath];
     },
@@ -106,7 +106,7 @@ const studyTools = {
     script: join(studyDir, "analysis", "src", "cas_parser.py"),
     cwd: join(studyDir, "analysis"),
     extension: ".ma",
-    timeoutMs: 30000,
+    timeoutMs: 75000,
     args(filePath) {
       return [filePath];
     },
@@ -181,9 +181,11 @@ function runProcess(command, args, options = {}) {
     });
     let stdout = "";
     let stderr = "";
+    let didTimeout = false;
     const timer = setTimeout(() => {
+      didTimeout = true;
       child.kill("SIGKILL");
-      reject(new Error(`${command} timed out`));
+      reject(new Error(`${options.label || command} timed out after ${Math.round((options.timeoutMs || 8000) / 1000)}s`));
     }, options.timeoutMs || 8000);
     const maxStdout = options.maxStdout || 64 * 1024;
 
@@ -200,6 +202,7 @@ function runProcess(command, args, options = {}) {
     });
     child.on("close", (code) => {
       clearTimeout(timer);
+      if (didTimeout) return;
       if (code === 0) resolve({ stdout, stderr });
       else reject(new Error(stderr.trim() || `${command} exited with code ${code}`));
     });
@@ -215,15 +218,17 @@ function studyPythonEnv(extra = {}) {
     ...process.env,
     PYTHONPATH: pythonPath,
     PYTHONUNBUFFERED: "1",
+    PYTHONDONTWRITEBYTECODE: "1",
     ...extra
   };
 }
 
 async function ensureStudyPythonDependencies() {
   try {
-    await runProcess(pythonCommand, ["-c", "import sympy, numpy"], {
+    await runProcess(pythonCommand, ["-c", "import sympy"], {
       env: studyPythonEnv(),
-      timeoutMs: 8000
+      label: "study dependency check",
+      timeoutMs: 20000
     });
     return;
   } catch {
@@ -248,8 +253,9 @@ async function ensureStudyPythonDependencies() {
       ], {
         cwd: __dirname,
         env: process.env,
+        label: "study dependency install",
         maxStdout: 512 * 1024,
-        timeoutMs: 120000
+        timeoutMs: 180000
       }))
       .finally(() => {
         studyDepsPromise = null;
@@ -257,9 +263,10 @@ async function ensureStudyPythonDependencies() {
   }
   await studyDepsPromise;
 
-  await runProcess(pythonCommand, ["-c", "import sympy, numpy"], {
+  await runProcess(pythonCommand, ["-c", "import sympy"], {
     env: studyPythonEnv(),
-    timeoutMs: 8000
+    label: "study dependency check",
+    timeoutMs: 20000
   });
 }
 
