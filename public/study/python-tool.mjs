@@ -129,4 +129,33 @@ function initTool(root) {
   }
 }
 
+function initGuide(root) {
+  const views = new Map([...root.querySelectorAll("[data-guide-view]")].map((view) => [view.dataset.guideView, view]));
+  const byId = new Map([...root.querySelectorAll(".study-guide-view[id]")].map((view) => [view.id, view]));
+
+  function show(target = "root", updateHash = true) {
+    const view = views.get(target) || byId.get(target) || views.get("root");
+    if (!view) return;
+    for (const item of views.values()) item.hidden = item !== view;
+    if (updateHash && view.id) history.pushState(null, "", `#${view.id}`);
+  }
+
+  root.addEventListener("click", (event) => {
+    const link = event.target.closest("[data-guide-target]");
+    if (!link) return;
+    event.preventDefault();
+    show(link.dataset.guideTarget || "root");
+  });
+
+  function syncFromHash() {
+    const id = decodeURIComponent(location.hash.replace(/^#/, ""));
+    if (id && byId.has(id)) show(id, false);
+    else show("root", false);
+  }
+
+  window.addEventListener("hashchange", syncFromHash);
+  syncFromHash();
+}
+
 for (const root of document.querySelectorAll("[data-python-tool]")) initTool(root);
+for (const root of document.querySelectorAll("[data-study-guide]")) initGuide(root);

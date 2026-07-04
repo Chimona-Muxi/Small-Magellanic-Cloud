@@ -312,13 +312,13 @@ const copy = {
     ru: "Примеры"
   },
   "tool.running": {
-    "zh-CN": "正在调用原项目...",
-    "zh-TW": "正在呼叫原專案...",
-    en: "Running the original project...",
-    fr: "Execution du projet d'origine...",
-    ja: "元プロジェクトを実行中...",
-    ko: "원본 프로젝트 실행 중...",
-    ru: "Запуск исходного проекта..."
+    "zh-CN": "正在运行，线上首次加载可能需要稍等...",
+    "zh-TW": "正在執行，線上首次載入可能需要稍等...",
+    en: "Running; first online load may take a moment...",
+    fr: "Execution en cours; le premier chargement en ligne peut prendre un moment...",
+    ja: "実行中です。オンライン初回読み込みは少し時間がかかる場合があります...",
+    ko: "실행 중입니다. 온라인 첫 로드는 잠시 걸릴 수 있습니다...",
+    ru: "Выполняется; первый онлайн-запуск может занять немного времени..."
   },
   "tool.empty": {
     "zh-CN": "请输入要执行的内容",
@@ -338,59 +338,401 @@ const copy = {
     ko: "학습 도구 실행 실패",
     ru: "Учебный инструмент не выполнен"
   },
-  "tool.core.title": {
-    "zh-CN": "核心来源",
-    "zh-TW": "核心來源",
-    en: "Core Source",
-    fr: "Source du coeur",
-    ja: "コアの由来",
-    ko: "코어 출처",
-    ru: "Источник ядра"
+  "guide.eyebrow": {
+    "zh-CN": "使用指南",
+    "zh-TW": "使用指南",
+    en: "Guide",
+    fr: "Guide",
+    ja: "ガイド",
+    ko: "사용 안내",
+    ru: "Руководство"
   },
-  "tool.core.copy": {
-    "zh-CN": "网页只负责提交输入和展示输出；计算逻辑来自 tools/study 下的原 Python 项目。",
-    "zh-TW": "網頁只負責提交輸入和展示輸出；計算邏輯來自 tools/study 下的原 Python 專案。",
-    en: "The page only submits input and displays output; computation comes from the original Python project under tools/study.",
-    fr: "La page soumet l'entree et affiche la sortie; le calcul vient du projet Python original dans tools/study.",
-    ja: "ページは入力送信と出力表示だけを担当し、計算は tools/study の元 Python プロジェクトで行います。",
-    ko: "페이지는 입력 전송과 출력 표시만 담당하며 계산은 tools/study의 원래 Python 프로젝트가 수행합니다.",
-    ru: "Страница только отправляет ввод и показывает вывод; вычисления идут из исходного Python-проекта в tools/study."
+  "guide.algebra.title": {
+    "zh-CN": "高等代数说明书",
+    "zh-TW": "高等代數說明書",
+    en: "Higher Algebra Manual",
+    fr: "Manuel d'algebre superieure",
+    ja: "高等代数説明書",
+    ko: "고등대수 설명서",
+    ru: "Руководство по высшей алгебре"
   },
-  "tool.web.title": {
-    "zh-CN": "网页运行",
-    "zh-TW": "網頁執行",
-    en: "Web Run",
-    fr: "Execution web",
-    ja: "Web 実行",
-    ko: "웹 실행",
-    ru: "Веб-запуск"
+  "guide.analysis.title": {
+    "zh-CN": "数学分析说明书",
+    "zh-TW": "數學分析說明書",
+    en: "Analysis Manual",
+    fr: "Manuel d'analyse",
+    ja: "数学解析説明書",
+    ko: "해석학 설명서",
+    ru: "Руководство по матанализу"
   },
-  "tool.web.copy": {
-    "zh-CN": "输入多行脚本后运行，服务器会生成临时文件并调用原解析器。",
-    "zh-TW": "輸入多行腳本後執行，伺服器會生成暫存檔並呼叫原解析器。",
-    en: "Enter a multi-line script and run it; the server creates a temporary file and calls the original parser.",
-    fr: "Saisissez un script multi-ligne; le serveur cree un fichier temporaire et appelle l'analyseur original.",
-    ja: "複数行スクリプトを入力して実行すると、サーバーが一時ファイルを作り元パーサーを呼び出します。",
-    ko: "여러 줄 스크립트를 입력해 실행하면 서버가 임시 파일을 만들고 원래 파서를 호출합니다.",
-    ru: "Введите многострочный скрипт; сервер создаст временный файл и вызовет исходный парсер."
+  "guide.algebra.nav": {
+    "zh-CN": "高等代数使用说明目录",
+    "zh-TW": "高等代數使用說明目錄",
+    en: "Higher algebra guide menu",
+    fr: "Menu du guide d'algebre",
+    ja: "高等代数ガイド目次",
+    ko: "고등대수 안내 목차",
+    ru: "Меню руководства по алгебре"
   },
-  "tool.local.title": {
-    "zh-CN": "本地命令",
-    "zh-TW": "本機命令",
-    en: "Local CLI",
-    fr: "CLI local",
-    ja: "ローカル CLI",
-    ko: "로컬 CLI",
-    ru: "Локальная CLI"
+  "guide.analysis.nav": {
+    "zh-CN": "数学分析使用说明目录",
+    "zh-TW": "數學分析使用說明目錄",
+    en: "Analysis guide menu",
+    fr: "Menu du guide d'analyse",
+    ja: "数学解析ガイド目次",
+    ko: "해석학 안내 목차",
+    ru: "Меню руководства по анализу"
   },
-  "tool.local.copy": {
-    "zh-CN": "完整项目、示例与说明保存在 tools/study，可直接用 Python 运行和继续扩展。",
-    "zh-TW": "完整專案、範例與說明保存在 tools/study，可直接用 Python 執行和繼續擴展。",
-    en: "The full project, examples and manuals live in tools/study and can still be run or extended with Python.",
-    fr: "Le projet complet, les exemples et les manuels sont dans tools/study et restent executables avec Python.",
-    ja: "完全なプロジェクト、例、説明は tools/study にあり、Python で実行・拡張できます。",
-    ko: "전체 프로젝트, 예시, 설명서는 tools/study에 있으며 Python으로 실행하고 확장할 수 있습니다.",
-    ru: "Полный проект, примеры и руководства находятся в tools/study и запускаются или расширяются через Python."
+  "guide.back.root": {
+    "zh-CN": "返回说明书",
+    "zh-TW": "返回說明書",
+    en: "Back to manual",
+    fr: "Retour au manuel",
+    ja: "説明書に戻る",
+    ko: "설명서로 돌아가기",
+    ru: "Назад к руководству"
+  },
+  "guide.back.start": {
+    "zh-CN": "返回快速上手",
+    "zh-TW": "返回快速上手",
+    en: "Back to quick start",
+    fr: "Retour au demarrage",
+    ja: "クイック開始に戻る",
+    ko: "빠른 시작으로 돌아가기",
+    ru: "Назад к быстрому старту"
+  },
+  "guide.back.matrix": {
+    "zh-CN": "返回矩阵计算",
+    "zh-TW": "返回矩陣計算",
+    en: "Back to matrices",
+    fr: "Retour aux matrices",
+    ja: "行列計算に戻る",
+    ko: "행렬 계산으로 돌아가기",
+    ru: "Назад к матрицам"
+  },
+  "guide.back.cas": {
+    "zh-CN": "返回基础 CAS",
+    "zh-TW": "返回基礎 CAS",
+    en: "Back to CAS basics",
+    fr: "Retour aux bases CAS",
+    ja: "CAS 基礎に戻る",
+    ko: "CAS 기본으로 돌아가기",
+    ru: "Назад к основам CAS"
+  },
+  "guide.start": {
+    "zh-CN": "快速上手",
+    "zh-TW": "快速上手",
+    en: "Quick Start",
+    fr: "Demarrage rapide",
+    ja: "クイック開始",
+    ko: "빠른 시작",
+    ru: "Быстрый старт"
+  },
+  "guide.runExample": {
+    "zh-CN": "运行示例",
+    "zh-TW": "執行範例",
+    en: "Run an Example",
+    fr: "Executer un exemple",
+    ja: "例を実行",
+    ko: "예시 실행",
+    ru: "Запустить пример"
+  },
+  "guide.editOwn": {
+    "zh-CN": "改成自己的题",
+    "zh-TW": "改成自己的題目",
+    en: "Use Your Own Problem",
+    fr: "Utiliser son exercice",
+    ja: "自分の問題に変える",
+    ko: "내 문제로 바꾸기",
+    ru: "Своя задача"
+  },
+  "guide.onlineWait": {
+    "zh-CN": "线上等待",
+    "zh-TW": "線上等待",
+    en: "Online Wait",
+    fr: "Attente en ligne",
+    ja: "オンライン待機",
+    ko: "온라인 대기",
+    ru: "Ожидание онлайн"
+  },
+  "guide.inputFormat": {
+    "zh-CN": "输入格式",
+    "zh-TW": "輸入格式",
+    en: "Input Format",
+    fr: "Format d'entree",
+    ja: "入力形式",
+    ko: "입력 형식",
+    ru: "Формат ввода"
+  },
+  "guide.commonFunctions": {
+    "zh-CN": "常用函数",
+    "zh-TW": "常用函數",
+    en: "Common Functions",
+    fr: "Fonctions utiles",
+    ja: "よく使う関数",
+    ko: "자주 쓰는 함수",
+    ru: "Основные функции"
+  },
+  "guide.algebra.matrix": {
+    "zh-CN": "矩阵计算",
+    "zh-TW": "矩陣計算",
+    en: "Matrices",
+    fr: "Matrices",
+    ja: "行列計算",
+    ko: "행렬 계산",
+    ru: "Матрицы"
+  },
+  "guide.algebra.poly": {
+    "zh-CN": "多项式",
+    "zh-TW": "多項式",
+    en: "Polynomials",
+    fr: "Polynomes",
+    ja: "多項式",
+    ko: "다항식",
+    ru: "Многочлены"
+  },
+  "guide.algebra.quadratic": {
+    "zh-CN": "二次型",
+    "zh-TW": "二次型",
+    en: "Quadratic Forms",
+    fr: "Formes quadratiques",
+    ja: "二次形式",
+    ko: "이차형식",
+    ru: "Квадратичные формы"
+  },
+  "guide.algebra.runExample.copy": {
+    "zh-CN": "点击示例按钮后会自动填入并运行。先看输出格式，再替换数字、矩阵或多项式。",
+    "zh-TW": "點擊範例按鈕後會自動填入並執行。先看輸出格式，再替換數字、矩陣或多項式。",
+    en: "Click an example button to fill and run it. Read the output shape first, then replace numbers, matrices, or polynomials.",
+    fr: "Cliquez sur un exemple pour le remplir et l'executer. Observez la sortie, puis remplacez nombres, matrices ou polynomes.",
+    ja: "例ボタンを押すと入力され実行されます。出力形式を見てから数値、行列、多項式を置き換えます。",
+    ko: "예시 버튼을 누르면 입력되고 실행됩니다. 출력 형식을 먼저 보고 숫자, 행렬, 다항식을 바꾸세요.",
+    ru: "Нажмите пример, чтобы заполнить и запустить его. Сначала посмотрите формат вывода, затем замените числа, матрицы или многочлены."
+  },
+  "guide.algebra.editOwn.copy": {
+    "zh-CN": "每行写一个赋值或输出命令。需要符号变量时先写",
+    "zh-TW": "每行寫一個賦值或輸出命令。需要符號變數時先寫",
+    en: "Write one assignment or output command per line. For symbolic variables, start with",
+    fr: "Ecrivez une affectation ou une commande de sortie par ligne. Pour une variable symbolique, commencez par",
+    ja: "1 行に代入または出力コマンドを 1 つ書きます。記号変数が必要なら先に",
+    ko: "한 줄에 대입이나 출력 명령을 하나씩 씁니다. 기호 변수가 필요하면 먼저",
+    ru: "Пишите одно присваивание или команду вывода на строку. Для символьных переменных начните с"
+  },
+  "guide.algebra.matrixFormat.copy": {
+    "zh-CN": "矩阵用分号分隔行，例如",
+    "zh-TW": "矩陣用分號分隔列，例如",
+    en: "Use semicolons to separate matrix rows, for example",
+    fr: "Separez les lignes de matrice par des points-virgules, par exemple",
+    ja: "行列の行はセミコロンで区切ります。例：",
+    ko: "행렬의 행은 세미콜론으로 나눕니다. 예:",
+    ru: "Строки матрицы разделяются точкой с запятой, например"
+  },
+  "guide.algebra.det": {
+    "zh-CN": "行列式",
+    "zh-TW": "行列式",
+    en: "determinant",
+    fr: "determinant",
+    ja: "行列式",
+    ko: "행렬식",
+    ru: "определитель"
+  },
+  "guide.algebra.rank": {
+    "zh-CN": "秩",
+    "zh-TW": "秩",
+    en: "rank",
+    fr: "rang",
+    ja: "階数",
+    ko: "랭크",
+    ru: "ранг"
+  },
+  "guide.algebra.inv": {
+    "zh-CN": "逆矩阵",
+    "zh-TW": "逆矩陣",
+    en: "inverse",
+    fr: "inverse",
+    ja: "逆行列",
+    ko: "역행렬",
+    ru: "обратная матрица"
+  },
+  "guide.algebra.charpoly": {
+    "zh-CN": "特征多项式",
+    "zh-TW": "特徵多項式",
+    en: "characteristic polynomial",
+    fr: "polynome caracteristique",
+    ja: "特性多項式",
+    ko: "특성다항식",
+    ru: "характеристический многочлен"
+  },
+  "guide.algebra.poly.copy": {
+    "zh-CN": "多项式可以直接写成",
+    "zh-TW": "多項式可以直接寫成",
+    en: "Write polynomials directly as",
+    fr: "Ecrivez les polynomes directement comme",
+    ja: "多項式はそのまま次のように書けます",
+    ko: "다항식은 바로 이렇게 쓸 수 있습니다",
+    ru: "Многочлен можно записать так:"
+  },
+  "guide.algebra.poly.functions": {
+    "zh-CN": "常用函数包括最大公因式、求根和乘法检查。",
+    "zh-TW": "常用函數包括最大公因式、求根和乘法檢查。",
+    en: "Common functions cover gcd, roots, and multiplication checks.",
+    fr: "Les fonctions utiles couvrent pgcd, racines et verification du produit.",
+    ja: "よく使う関数は gcd、根、乗法確認です。",
+    ko: "자주 쓰는 함수는 최대공약식, 근, 곱셈 확인입니다.",
+    ru: "Основные функции: НОД, корни и проверка умножения."
+  },
+  "guide.algebra.quadratic.copy": {
+    "zh-CN": "先定义对称矩阵和列向量，再用",
+    "zh-TW": "先定義對稱矩陣和列向量，再用",
+    en: "Define a symmetric matrix and a column vector, then use",
+    fr: "Definissez une matrice symetrique et un vecteur colonne, puis utilisez",
+    ja: "対称行列と列ベクトルを定義してから",
+    ko: "대칭행렬과 열벡터를 정의한 뒤",
+    ru: "Сначала задайте симметричную матрицу и столбец, затем используйте"
+  },
+  "guide.algebra.quadratic.more": {
+    "zh-CN": "展开二次型，并配合矩阵性质判断函数检查结果。",
+    "zh-TW": "展開二次型，並配合矩陣性質判斷函數檢查結果。",
+    en: "to expand the quadratic form and pair it with matrix-property checks.",
+    fr: "pour developper la forme quadratique et verifier les proprietes de matrice.",
+    ja: "で二次形式を展開し、行列性質の判定と組み合わせます。",
+    ko: "로 이차형식을 전개하고 행렬 성질 판정과 함께 확인합니다.",
+    ru: "чтобы раскрыть квадратичную форму и проверить свойства матрицы."
+  },
+  "guide.analysis.cas": {
+    "zh-CN": "基础 CAS",
+    "zh-TW": "基礎 CAS",
+    en: "CAS Basics",
+    fr: "Bases CAS",
+    ja: "CAS 基礎",
+    ko: "CAS 기본",
+    ru: "Основы CAS"
+  },
+  "guide.analysis.equation": {
+    "zh-CN": "方程与 ODE",
+    "zh-TW": "方程與 ODE",
+    en: "Equations and ODEs",
+    fr: "Equations et EDO",
+    ja: "方程式と ODE",
+    ko: "방정식과 ODE",
+    ru: "Уравнения и ОДУ"
+  },
+  "guide.analysis.fourier": {
+    "zh-CN": "傅里叶与特殊函数",
+    "zh-TW": "傅立葉與特殊函數",
+    en: "Fourier and Special Functions",
+    fr: "Fourier et fonctions speciales",
+    ja: "Fourier と特殊関数",
+    ko: "푸리에와 특수함수",
+    ru: "Фурье и спецфункции"
+  },
+  "guide.analysis.limit": {
+    "zh-CN": "极限与导数",
+    "zh-TW": "極限與導數",
+    en: "Limits and Derivatives",
+    fr: "Limites et derivees",
+    ja: "極限と導関数",
+    ko: "극한과 도함수",
+    ru: "Пределы и производные"
+  },
+  "guide.analysis.integral": {
+    "zh-CN": "积分与级数",
+    "zh-TW": "積分與級數",
+    en: "Integrals and Series",
+    fr: "Integrales et series",
+    ja: "積分と級数",
+    ko: "적분과 급수",
+    ru: "Интегралы и ряды"
+  },
+  "guide.analysis.runExample.copy": {
+    "zh-CN": "点击示例按钮后会自动填入并运行。先看命令格式，再替换表达式。",
+    "zh-TW": "點擊範例按鈕後會自動填入並執行。先看命令格式，再替換表達式。",
+    en: "Click an example button to fill and run it. Read the command format first, then replace the expression.",
+    fr: "Cliquez sur un exemple pour le remplir et l'executer. Observez la commande, puis remplacez l'expression.",
+    ja: "例ボタンを押すと入力され実行されます。コマンド形式を見てから式を置き換えます。",
+    ko: "예시 버튼을 누르면 입력되고 실행됩니다. 명령 형식을 먼저 보고 식을 바꾸세요.",
+    ru: "Нажмите пример, чтобы заполнить и запустить его. Сначала посмотрите формат команды, затем замените выражение."
+  },
+  "guide.analysis.onlineWait.copy": {
+    "zh-CN": "线上首次运行会比本地慢，通常是 Python/SymPy 冷启动。输出区显示运行提示时，等待返回即可。",
+    "zh-TW": "線上首次執行會比本機慢，通常是 Python/SymPy 冷啟動。輸出區顯示執行提示時，等待返回即可。",
+    en: "The first online run can be slower than local use because Python/SymPy may cold start. Wait while the output panel shows the running message.",
+    fr: "Le premier lancement en ligne peut etre plus lent a cause du demarrage a froid de Python/SymPy. Attendez le retour dans la sortie.",
+    ja: "オンライン初回実行は Python/SymPy のコールドスタートでローカルより遅い場合があります。出力欄の実行中表示を待ってください。",
+    ko: "온라인 첫 실행은 Python/SymPy 콜드 스타트 때문에 로컬보다 느릴 수 있습니다. 출력 영역의 실행 안내가 끝날 때까지 기다리세요.",
+    ru: "Первый онлайн-запуск может быть медленнее локального из-за холодного старта Python/SymPy. Дождитесь ответа в панели вывода."
+  },
+  "guide.analysis.limit.copy": {
+    "zh-CN": "极限使用",
+    "zh-TW": "極限使用",
+    en: "Use",
+    fr: "Utilisez",
+    ja: "極限は",
+    ko: "극한은",
+    ru: "Для пределов используйте"
+  },
+  "guide.analysis.derivative.copy": {
+    "zh-CN": "导数使用",
+    "zh-TW": "導數使用",
+    en: "and derivatives use",
+    fr: "et les derivees utilisent",
+    ja: "導関数は",
+    ko: "도함수는",
+    ru: "а для производных"
+  },
+  "guide.analysis.integral.copy": {
+    "zh-CN": "积分使用",
+    "zh-TW": "積分使用",
+    en: "Use",
+    fr: "Utilisez",
+    ja: "積分は",
+    ko: "적분은",
+    ru: "Для интегралов используйте"
+  },
+  "guide.analysis.series.copy": {
+    "zh-CN": "级数展开用",
+    "zh-TW": "級數展開用",
+    en: "and series expansions use",
+    fr: "et les developpements en serie utilisent",
+    ja: "級数展開は",
+    ko: "급수 전개는",
+    ru: "а для разложения в ряд"
+  },
+  "guide.analysis.equation.copy": {
+    "zh-CN": "代数方程可写",
+    "zh-TW": "代數方程可寫",
+    en: "Write algebraic equations as",
+    fr: "Ecrivez les equations algebriques comme",
+    ja: "代数方程式は次のように書けます",
+    ko: "대수방정식은 이렇게 쓸 수 있습니다",
+    ru: "Алгебраические уравнения записываются как"
+  },
+  "guide.analysis.ode.copy": {
+    "zh-CN": "常微分方程可写",
+    "zh-TW": "常微分方程可寫",
+    en: "and ODEs as",
+    fr: "et les EDO comme",
+    ja: "常微分方程式は",
+    ko: "ODE는",
+    ru: "а ОДУ как"
+  },
+  "guide.analysis.fourier.copy": {
+    "zh-CN": "傅里叶级数使用",
+    "zh-TW": "傅立葉級數使用",
+    en: "Fourier series use",
+    fr: "Les series de Fourier utilisent",
+    ja: "Fourier 級数は",
+    ko: "푸리에 급수는",
+    ru: "Для рядов Фурье используйте"
+  },
+  "guide.analysis.special.copy": {
+    "zh-CN": "特殊函数可使用 Gamma、Beta、erf。",
+    "zh-TW": "特殊函數可使用 Gamma、Beta、erf。",
+    en: "Special functions include Gamma, Beta, and erf.",
+    fr: "Les fonctions speciales incluent Gamma, Beta et erf.",
+    ja: "特殊関数は Gamma、Beta、erf を使えます。",
+    ko: "특수함수는 Gamma, Beta, erf를 사용할 수 있습니다.",
+    ru: "Доступны спецфункции Gamma, Beta и erf."
   },
   "algebra.example.matrix": {
     "zh-CN": "矩阵基础",

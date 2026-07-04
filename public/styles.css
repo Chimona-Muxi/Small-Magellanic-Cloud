@@ -1084,6 +1084,88 @@ html[data-theme="light"] .padic-output {
   line-height: 1.7;
 }
 
+.study-manual {
+  display: block;
+  max-width: 760px;
+  margin-top: 18px;
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--panel) 76%, transparent);
+  backdrop-filter: blur(16px);
+  min-height: 230px;
+}
+
+.study-guide-view {
+  display: grid;
+  gap: 14px;
+}
+
+.study-guide-view[hidden] {
+  display: none;
+}
+
+.study-guide-view h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 24px;
+  letter-spacing: 0;
+}
+
+.study-guide-view p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.72;
+}
+
+.study-guide-links {
+  display: grid;
+  gap: 10px;
+}
+
+.study-guide-links a,
+.study-guide-back {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 14px;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.06);
+  text-decoration: none;
+}
+
+.study-guide-links a::after {
+  content: ">";
+  color: var(--muted);
+}
+
+.study-guide-back {
+  justify-content: flex-start;
+  width: fit-content;
+  min-height: 34px;
+  color: var(--muted);
+  background: transparent;
+}
+
+.study-guide-links a:hover,
+.study-guide-back:hover {
+  border-color: var(--line-strong);
+  color: var(--ink);
+}
+
+.study-guide-view code {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 1px 5px;
+  color: color-mix(in srgb, var(--ink) 92%, transparent);
+  background: rgba(0, 0, 0, 0.2);
+  font: 13px/1.35 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  overflow-wrap: anywhere;
+}
+
 @media (max-width: 980px) {
   .download-grid {
     grid-template-columns: 1fr 1fr;
@@ -1105,7 +1187,8 @@ html[data-theme="light"] .padic-output {
   }
 
   .padic-console,
-  .study-workbench {
+  .study-workbench,
+  .study-manual {
     padding: 14px;
   }
 
