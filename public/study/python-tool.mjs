@@ -66,21 +66,8 @@ function currentLanguage() {
   return window.SMC_PREFS?.currentLanguage?.() || document.documentElement.dataset.lang || "zh-CN";
 }
 
-function terminalColumns(output) {
-  const fallback = 88;
-  if (!output) return fallback;
-  const style = getComputedStyle(output);
-  const probe = document.createElement("span");
-  probe.textContent = "0000000000";
-  probe.style.position = "absolute";
-  probe.style.visibility = "hidden";
-  probe.style.whiteSpace = "pre";
-  probe.style.font = style.font;
-  document.body.append(probe);
-  const charWidth = probe.getBoundingClientRect().width / 10;
-  probe.remove();
-  if (!Number.isFinite(charWidth) || charWidth <= 0) return fallback;
-  return Math.max(48, Math.min(132, Math.floor((output.clientWidth - 36) / charWidth)));
+function terminalColumns() {
+  return 1000;
 }
 
 function localizedError(message) {

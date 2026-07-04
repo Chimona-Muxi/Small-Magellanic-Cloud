@@ -340,7 +340,7 @@ async function runStudyTool(toolKey, body) {
   if (!tool) throw new Error("学习工具不存在");
 
   const source = String(body.source || body.command || "").replace(/\r\n/g, "\n").trim();
-  const columns = Math.max(48, Math.min(132, Number(body.columns) || 88));
+  const columns = Math.max(48, Math.min(1000, Number(body.columns) || 1000));
   if (!source) throw new Error("请输入要执行的内容");
   if (source.length > 40000) throw new Error("输入内容过长");
 
