@@ -68,7 +68,7 @@ npm run install:study:plot
 
 ## 高等代数语法
 
-高等代数工具支持矩阵定义、矩阵运算、多项式、线性方程组、Gram-Schmidt、二次型和双线性形式。
+高等代数工具已同步到 v0.9，支持矩阵定义、矩阵运算、多项式、线性方程组、线性空间、线性映射、Gram-Schmidt、二次型、Jordan/Smith 标准形和总复习题方法库。
 
 示例：
 
@@ -94,21 +94,34 @@ print(charpoly(A))
 | `jordan(A)` | Jordan 标准型 |
 | `smith(A)` | Smith 标准型 |
 | `charpoly(A)` | 特征多项式 |
+| `rref(A)` | 行最简形 |
+| `cramer_rule(A, b)` | Cramer 法则 |
+| `homogeneous_solution(A)` | 齐次线性方程组基础解系 |
+| `basis_from_vectors(...)` | 从向量组提取基 |
+| `coordinate_in_basis(v, ...)` | 求坐标 |
+| `diagonalizable_report(A)` | 可对角化报告 |
+| `minimal_polynomial(A)` | 最小多项式 |
+| `schmidt_report(...)` | Schmidt 正交化步骤 |
 | `poly_gcd(p, q)` | 多项式最大公因式 |
+| `poly_bezout(p, q)` | Bezout 等式 |
+| `poly_squarefree(p)` | 重根检查 |
 | `poly_roots(p)` | 多项式求根 |
 | `solve_linear(A, b)` | 解 `Ax=b` |
 | `quadratic_form(Q, v)` | 二次型 |
+| `sylvester_criterion(Q)` | Sylvester 判别 |
+| `study("exam_checklist")` | 高代复习清单 |
 
 本地运行：
 
 ```bash
 python3 tools/study/algebra/src/parser.py tools/study/algebra/examples/example.txt
+python3 tools/study/algebra/src/parser.py tools/study/algebra/examples/expanded_topics.txt
 python3 tools/study/algebra/src/parser.py --lang en tools/study/algebra/examples/example.txt
 ```
 
 ## 数学分析语法
 
-数学分析工具保留 GeoGebra CAS 风格命令，同时兼容一部分小写 SymPy 命令和简单变量赋值。
+数学分析工具已同步到 v0.30，保留 GeoGebra CAS 风格命令，同时扩展数列、连续性、微分学、级数判别、函数项级数、多元函数、曲线曲面积分、Fourier/Laplace/正弦余弦变换等专题。
 
 示例：
 
@@ -134,6 +147,18 @@ Series(sin(x), x, 0, 6)
 | `SolveODE(Eq(...), f(x))` | 常微分方程 |
 | `FourierSeries(...)` | 傅里叶级数 |
 | `FourierTransform(...)` | 傅里叶变换 |
+| `FourierCoefficientReport(...)` | 傅里叶系数报告 |
+| `LaplaceTransformReport(...)` | Laplace 变换报告 |
+| `InverseLaplaceTransformReport(...)` | 逆 Laplace 变换报告 |
+| `EpsilonNHint(...)` | 数列 epsilon-N 提示 |
+| `EpsilonDeltaHint(...)` | 函数极限 epsilon-delta 提示 |
+| `SeriesTestReport(...)` | 数项级数判别 |
+| `UniformConvergenceHint(...)` | 一致收敛提示 |
+| `PowerSeriesInterval(...)` | 幂级数收敛区间 |
+| `JacobianReport(...)` | Jacobi 矩阵报告 |
+| `LineIntegralScalar(...)` | 第一类曲线积分 |
+| `GreenTheoremReport(...)` | Green 公式报告 |
+| `Divergence(...)` / `Curl(...)` | 散度与旋度 |
 | `RecurrenceSolve(...)` | 递推求通项 |
 | `Plot(...)` 等 | 本地绘图命令 |
 
@@ -142,6 +167,7 @@ Series(sin(x), x, 0, 6)
 ```bash
 python3 tools/study/analysis/src/cas_parser.py tools/study/analysis/examples/cas_test.ma
 python3 tools/study/analysis/src/cas_parser.py tools/study/analysis/examples/theory.ma
+python3 tools/study/analysis/src/cas_parser.py tools/study/analysis/examples/expanded_topics.ma
 ```
 
 网页环境默认保障符号推导；`Plot*` 绘图命令需要额外安装绘图依赖。需要看到实际图像时，请在本地 CLI 运行并执行 `npm run install:study:plot`。

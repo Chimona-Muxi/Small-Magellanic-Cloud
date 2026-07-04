@@ -1,4 +1,4 @@
-# 高等代数学习辅助器 (v0.2)
+# 高等代数学习辅助器 (v0.9)
 
 支持数值与符号矩阵的高级运算解析器。
 
@@ -9,13 +9,28 @@
   - 高级：eigvals, eigvects, jordan_form, smith_normal_form
   - 特征矩阵 (A - λI)
   - charpoly 等
+- 高等代数专题：
+  - 多项式除法、Bezout、重根、矩阵多项式
+  - 行列式展开、伴随矩阵、Cramer 法则、RREF
+  - 线性方程组分类、基础解系、秩分解
+  - 基、坐标、过渡矩阵、子空间和与交
+  - 线性映射核/像/秩-零度、不变子空间、商空间维数
+  - 对角化、Jordan 标准形、最小多项式、`P^-1AP`
+  - Schmidt 正交化每步报告、单位化、正交投影
+  - 二次型、合同变换、Sylvester 判别、LDL 合同对角化
+  - 高代总复习题方法：Vandermonde、Woodbury、幂零、实反称矩阵、极分解、Cayley 变换、交换子、中心化子、Sylvester 方程
 - 从文本文件输入，自动解析执行
 
 ## 运行
 ```bash
-python3 -m pip install -r ../requirements.txt
+pip install sympy
 python src/parser.py examples/input.txt
+python src/parser.py examples/expanded_topics.txt
 ```
+
+## 学习功能地图
+
+查看 `docs/chapter_feature_map.md`，其中按高等代数章节列出可用命令和对应题型。
 
 ## 在 Small Magellanic Cloud 中发布
 
@@ -25,6 +40,8 @@ python src/parser.py examples/input.txt
 
 ```bash
 python3 tools/study/algebra/src/parser.py tools/study/algebra/examples/example.txt
+python3 tools/study/algebra/src/parser.py tools/study/algebra/examples/expanded_topics.txt
+python3 tools/study/algebra/src/parser.py --lang en tools/study/algebra/examples/example.txt
 ```
 
 网页 API：

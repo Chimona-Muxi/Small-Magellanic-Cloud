@@ -1,0 +1,100 @@
+# 高等代数学习辅助器 - 章节扩展样例
+
+x = symbols('x')
+lam = symbols('lam')
+
+# 1. 多项式：除法、gcd、Bezout、重根
+p = x^4 - 1
+q = x^3 - 1
+print(poly_div(p, q))
+print(poly_gcd(p, q))
+print(poly_bezout(p, q))
+print(poly_squarefree((x-1)^2*(x+2)))
+
+# 2. 矩阵与行列式：RREF、余子式、伴随矩阵、Cramer
+A = [[2;1;0];[1;2;1];[0;1;2]]
+b = [[1];[0];[1]]
+print(rref(A))
+print(laplace_expand(A, 1, "row"))
+print(adjugate_identity(A))
+print(cramer_rule(A, b))
+print(solve_linear(A, b))
+print(homogeneous_solution(A))
+
+# 3. 线性空间：基、坐标、子空间
+v1 = Matrix([[1],[0],[1]])
+v2 = Matrix([[0],[1],[1]])
+v3 = Matrix([[1],[1],[2]])
+v = Matrix([[2],[1],[3]])
+print(is_linearly_independent(v1, v2, v3))
+print(basis_from_vectors(v1, v2, v3))
+print(coordinate_in_basis(v, v1, v2))
+U = Matrix.hstack(v1, v2)
+V = Matrix.hstack(Matrix([[1],[1],[0]]), Matrix([[0],[1],[1]]))
+print(subspace_sum(U, V))
+print(subspace_intersection(U, V))
+print(dimension_formula(U, V))
+
+# 4. 特征值、对角化、最小多项式、Jordan 线索
+T = [[2;1;0];[0;2;0];[0;0;3]]
+print(characteristic_matrix(T))
+print(algebraic_geometric_multiplicity(T))
+print(diagonalizable_report(T))
+print(cayley_hamilton(T))
+print(minimal_polynomial(T))
+print(power_reduce(T, 8))
+print(jordan_block_report(T))
+print(jordan_similarity(T))
+print(diagonalization_similarity([[1;0;0];[0;2;0];[0;0;3]]))
+
+# 5. 欧氏空间与二次型
+e1 = Matrix([[1],[0],[0]])
+e2 = Matrix([[1],[1],[0]])
+e3 = Matrix([[1],[1],[1]])
+print(gram_matrix(e1, e2, e3))
+print(gram_schmidt(e1, e2, e3))
+print(schmidt_report(e1, e2, e3))
+print(orthonormalize(e1, e2, e3))
+print(projection_to_subspace(v, e1, e2))
+Bold = Matrix.hstack(e1, e2, e3)
+Bnew = Matrix.hstack(Matrix([[1],[0],[0]]), Matrix([[0],[1],[0]]), Matrix([[0],[0],[1]]))
+print(transition_from_to(Bold, Bnew))
+print(matrix_in_basis(A, Bold))
+Q = [[2;1;0];[1;2;0];[0;0;3]]
+print(orthogonal_diagonalization(Q))
+vec = Matrix([[x],[y],[z]])
+print(quadratic_form(Q, vec))
+print(principal_minors(Q))
+print(quadratic_classify(Q))
+print(sylvester_criterion(Q))
+print(symmetric_ldl_report(Q))
+print(congruence_by_given_P(Q, Bold))
+print(linear_map_report(A))
+print(invariant_subspace_check(T, Matrix.hstack(Matrix([[1],[0],[0]]), Matrix([[0],[1],[0]]))))
+print(quotient_dimension(3, Matrix.hstack(v1, v2)))
+print(study("exam_checklist"))
+
+# 6. 高代总复习题方法库：Vandermonde、Woodbury、幂零、交换子、中心化子
+print(vandermonde_report([1, 2, 3], 3))
+print(value_matrix_report([1, x, x^2], [0, 1, 2]))
+A2 = [[1;2];[3;4]]
+B2 = [[0;1];[1;0]]
+print(woodbury_identity(A2, B2))
+N = [[0;1;0];[0;0;1];[0;0;0]]
+print(rank_chain_report(N, 4))
+print(nilpotent_report(N))
+Sskew = [[0;2];[-2;0]]
+print(skew_symmetric_report(Sskew))
+print(cayley_transform_skew(Sskew))
+SPD = [[2;0];[0;8]]
+print(symmetric_square_root(SPD))
+print(polar_decomposition_report([[1;1];[0;1]]))
+print(eisenstein_check(x^3+2*x+2, 2))
+print(polynomial_ideal_generator(x^3-1, x^2-1))
+print(finite_difference_antiderivative(x^2))
+print(commutator_report(A2, B2))
+print(centralizer_jordan_block(3, 2))
+print(centralizer_dimension_from_blocks(((2, 1), (3,))))
+print(sylvester_equation_report([[1;0];[0;2]], [[2;0];[0;3]]))
+print(spectral_projectors([[1;0];[0;2]]))
+print(jordan_chain_count(T))

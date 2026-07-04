@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title data-i18n="page.title.analysisManual">数学分析说明书 · Small Magellanic Cloud</title>
-  <link rel="stylesheet" href="/styles.css?v=20260704f" />
+  <link rel="stylesheet" href="/styles.css?v=20260704g" />
 </head>
 <body>
   <div class="site-shell">
@@ -42,8 +42,10 @@
           <nav class="study-guide-links" aria-label="数学分析使用说明目录" data-i18n-aria-label="guide.analysis.nav">
             <a href="#analysis-start" data-guide-target="analysis-start" data-i18n="guide.start">快速上手</a>
             <a href="#analysis-cas" data-guide-target="analysis-cas" data-i18n="guide.analysis.cas">基础 CAS</a>
+            <a href="#analysis-convergence" data-guide-target="analysis-convergence" data-i18n="guide.analysis.convergence">收敛判别</a>
             <a href="#analysis-equation" data-guide-target="analysis-equation" data-i18n="guide.analysis.equation">方程与 ODE</a>
             <a href="#analysis-fourier" data-guide-target="analysis-fourier" data-i18n="guide.analysis.fourier">傅里叶与特殊函数</a>
+            <a href="#analysis-multivar" data-guide-target="analysis-multivar" data-i18n="guide.analysis.multivar">多元函数与场论</a>
           </nav>
         </div>
 
@@ -95,15 +97,30 @@
           <p><span data-i18n="guide.analysis.equation.copy">代数方程可写</span> <code>Solve(Eq(x**2 - 3*x + 2, 0), x)</code> <span data-i18n="guide.analysis.ode.copy">常微分方程可写</span> <code>SolveODE(Eq(f(x).diff(x), f(x)), f(x))</code></p>
         </div>
 
+        <div class="study-guide-view" id="analysis-convergence" data-guide-view="analysis-convergence" hidden>
+          <a class="study-guide-back" href="#analysis-guide" data-guide-target="root" data-i18n="guide.back.root">返回说明书</a>
+          <h1 data-i18n="guide.analysis.convergence">收敛判别</h1>
+          <p><code>EpsilonNHint(...)</code> · <code>EpsilonDeltaHint(...)</code> · <code>SeriesTestReport(...)</code> · <code>PowerSeriesInterval(...)</code></p>
+          <p data-i18n="guide.analysis.convergence.copy">新版核心加入数列极限提示、epsilon-delta 提示、比较/积分/Dirichlet-Abel 判别和幂级数收敛区间。</p>
+        </div>
+
         <div class="study-guide-view" id="analysis-fourier" data-guide-view="analysis-fourier" hidden>
           <a class="study-guide-back" href="#analysis-guide" data-guide-target="root" data-i18n="guide.back.root">返回说明书</a>
           <h1 data-i18n="guide.analysis.fourier">傅里叶与特殊函数</h1>
           <p><span data-i18n="guide.analysis.fourier.copy">傅里叶级数使用</span> <code>FourierSeries(expr, x, a, b, n)</code> <span data-i18n="guide.analysis.special.copy">特殊函数可使用 Gamma、Beta、erf。</span></p>
+          <p><code>FourierCoefficientReport(...)</code> · <code>LaplaceTransformReport(...)</code> · <code>SineTransformReport(...)</code> · <code>CosineTransformReport(...)</code></p>
+        </div>
+
+        <div class="study-guide-view" id="analysis-multivar" data-guide-view="analysis-multivar" hidden>
+          <a class="study-guide-back" href="#analysis-guide" data-guide-target="root" data-i18n="guide.back.root">返回说明书</a>
+          <h1 data-i18n="guide.analysis.multivar">多元函数与场论</h1>
+          <p><code>Gradient(...)</code> · <code>JacobianReport(...)</code> · <code>LineIntegralScalar(...)</code> · <code>Divergence(...)</code> · <code>Curl(...)</code></p>
+          <p data-i18n="guide.analysis.multivar.copy">可做多元极限、连续可微、隐函数、Jacobi 矩阵、曲线积分、Green 公式、Gauss 公式和 Stokes 公式等报告。</p>
         </div>
       </section>
     </main>
   </div>
-  <script type="module" src="/site.mjs?v=20260704f"></script>
-  <script type="module" src="/study/python-tool.mjs?v=20260704f"></script>
+  <script type="module" src="/site.mjs?v=20260704g"></script>
+  <script type="module" src="/study/python-tool.mjs?v=20260704g"></script>
 </body>
 </html>

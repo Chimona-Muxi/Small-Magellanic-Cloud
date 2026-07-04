@@ -7,6 +7,12 @@ print(det(A))
 print(rank(A))
 print(inv(A))
 print(charpoly(A))`,
+    linear: `A = [[2;1;0];[1;2;1];[0;1;2]]
+b = [[1];[0];[1]]
+print(rref(A))
+print(cramer_rule(A, b))
+print(solve_linear(A, b))
+print(homogeneous_solution(A))`,
     quadratic: `x = symbols('x')
 y = symbols('y')
 Q = [[2;1];[1;3]]
@@ -19,19 +25,36 @@ p = x^2 + 3*x + 2
 q = x^2 + 5*x + 6
 print(poly_gcd(p, q))
 print(poly_roots(p))
-print(poly_mul(p, q))`
+print(poly_bezout(p, q))
+print(poly_squarefree((x-1)^2*(x+2)))`,
+    review: `x = symbols('x')
+A = [[2;1;0];[0;2;0];[0;0;3]]
+print(diagonalizable_report(A))
+print(minimal_polynomial(A))
+print(jordan_block_report(A))
+print(study("exam_checklist"))`
   },
   analysis: {
     cas: `Limit(sin(x)/x, x, 0)
 Derivative(sin(x)*exp(x), x)
 Integral(exp(-x), (x, 0, oo))
 Series(sin(x), x, 0, 6)`,
+    convergence: `SequenceLimit((n+1)/(n+2), n)
+EpsilonNHint((n+1)/(n+2), 1, n)
+SeriesTestReport(1/n**2, n)
+PowerSeriesInterval(1/n, n, x, 0)`,
     series: `Sum(1/k**2, (k, 1, oo))
 FourierSeries(sin(x), x, -pi, pi, 3)
-FourierTransform(exp(-x**2), x, k)`,
+FourierCoefficientReport(x, x, -pi, pi, 4)
+LaplaceTransformReport(sin(t), t, lam)`,
     ode: `Solve(Eq(x**2 - 3*x + 2, 0), x)
 SolveODE(Eq(f(x).diff(x), f(x)), f(x))
-CriticalPoints(x**2 + y**2, x, y)`
+CriticalPoints(x**2 + y**2, x, y)`,
+    multivar: `Gradient(x**2+y**2, x, y)
+HessianMatrix(x**2+x*y+y**2, x, y)
+JacobianReport([x**2-y, x+y**2], [x, y])
+Divergence([x**2, y**2, z**2], (x, y, z))
+Curl([y, z, x], (x, y, z))`
   }
 };
 

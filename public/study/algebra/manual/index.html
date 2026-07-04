@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title data-i18n="page.title.algebraManual">高等代数说明书 · Small Magellanic Cloud</title>
-  <link rel="stylesheet" href="/styles.css?v=20260704f" />
+  <link rel="stylesheet" href="/styles.css?v=20260704g" />
 </head>
 <body>
   <div class="site-shell">
@@ -42,8 +42,11 @@
           <nav class="study-guide-links" aria-label="高等代数使用说明目录" data-i18n-aria-label="guide.algebra.nav">
             <a href="#algebra-start" data-guide-target="algebra-start" data-i18n="guide.start">快速上手</a>
             <a href="#algebra-matrix" data-guide-target="algebra-matrix" data-i18n="guide.algebra.matrix">矩阵计算</a>
+            <a href="#algebra-linear" data-guide-target="algebra-linear" data-i18n="guide.algebra.linear">线性方程组</a>
+            <a href="#algebra-space" data-guide-target="algebra-space" data-i18n="guide.algebra.space">线性空间与映射</a>
             <a href="#algebra-poly" data-guide-target="algebra-poly" data-i18n="guide.algebra.poly">多项式</a>
             <a href="#algebra-quadratic" data-guide-target="algebra-quadratic" data-i18n="guide.algebra.quadratic">二次型</a>
+            <a href="#algebra-review" data-guide-target="algebra-review" data-i18n="guide.algebra.review">复习专题</a>
           </nav>
         </div>
 
@@ -89,6 +92,20 @@
           <p><code>det(A)</code> <span data-i18n="guide.algebra.det">行列式</span> · <code>rank(A)</code> <span data-i18n="guide.algebra.rank">秩</span> · <code>inv(A)</code> <span data-i18n="guide.algebra.inv">逆矩阵</span> · <code>charpoly(A)</code> <span data-i18n="guide.algebra.charpoly">特征多项式</span></p>
         </div>
 
+        <div class="study-guide-view" id="algebra-linear" data-guide-view="algebra-linear" hidden>
+          <a class="study-guide-back" href="#algebra-guide" data-guide-target="root" data-i18n="guide.back.root">返回说明书</a>
+          <h1 data-i18n="guide.algebra.linear">线性方程组</h1>
+          <p><code>rref(A)</code> · <code>cramer_rule(A, b)</code> · <code>solve_linear(A, b)</code> · <code>homogeneous_solution(A)</code></p>
+          <p data-i18n="guide.algebra.linear.copy">新版核心会给出行最简形、Cramer 法则、线性方程组求解和齐次方程组基础解系，适合直接核对章节题。</p>
+        </div>
+
+        <div class="study-guide-view" id="algebra-space" data-guide-view="algebra-space" hidden>
+          <a class="study-guide-back" href="#algebra-guide" data-guide-target="root" data-i18n="guide.back.root">返回说明书</a>
+          <h1 data-i18n="guide.algebra.space">线性空间与映射</h1>
+          <p><code>basis_from_vectors(...)</code> · <code>coordinate_in_basis(v, ...)</code> · <code>linear_map_report(A)</code> · <code>diagonalizable_report(A)</code></p>
+          <p data-i18n="guide.algebra.space.copy">可检查向量组、坐标、子空间和与交、线性映射核像、对角化、最小多项式与 Jordan 相关线索。</p>
+        </div>
+
         <div class="study-guide-view" id="algebra-poly" data-guide-view="algebra-poly" hidden>
           <a class="study-guide-back" href="#algebra-guide" data-guide-target="root" data-i18n="guide.back.root">返回说明书</a>
           <h1 data-i18n="guide.algebra.poly">多项式</h1>
@@ -100,10 +117,17 @@
           <h1 data-i18n="guide.algebra.quadratic">二次型</h1>
           <p><span data-i18n="guide.algebra.quadratic.copy">先定义对称矩阵和列向量，再用</span> <code>quadratic_form(Q, v)</code> <span data-i18n="guide.algebra.quadratic.more">展开二次型，并配合矩阵性质判断函数检查结果。</span></p>
         </div>
+
+        <div class="study-guide-view" id="algebra-review" data-guide-view="algebra-review" hidden>
+          <a class="study-guide-back" href="#algebra-guide" data-guide-target="root" data-i18n="guide.back.root">返回说明书</a>
+          <h1 data-i18n="guide.algebra.review">复习专题</h1>
+          <p><code>study("exam_checklist")</code> · <code>vandermonde_report(...)</code> · <code>woodbury_identity(A, B)</code> · <code>commutator_report(A, B)</code></p>
+          <p data-i18n="guide.algebra.review.copy">复习题方法库覆盖 Vandermonde、Woodbury、幂零、实反称矩阵、极分解、Cayley 变换、交换子和 Sylvester 方程等模板。</p>
+        </div>
       </section>
     </main>
   </div>
-  <script type="module" src="/site.mjs?v=20260704f"></script>
-  <script type="module" src="/study/python-tool.mjs?v=20260704f"></script>
+  <script type="module" src="/site.mjs?v=20260704g"></script>
+  <script type="module" src="/study/python-tool.mjs?v=20260704g"></script>
 </body>
 </html>

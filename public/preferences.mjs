@@ -258,13 +258,13 @@ const copy = {
     ru: "Помощник по высшей алгебре"
   },
   "study.algebra.copy": {
-    "zh-CN": "直接调用原 Python/SymPy 项目，处理矩阵、行列式、秩、逆矩阵、特征多项式、多项式与二次型。",
-    "zh-TW": "直接呼叫原 Python/SymPy 專案，處理矩陣、行列式、秩、逆矩陣、特徵多項式、多項式與二次型。",
-    en: "Runs the original Python/SymPy project for matrices, determinants, rank, inverses, characteristic polynomials, polynomials and quadratic forms.",
-    fr: "Execute le projet Python/SymPy d'origine pour matrices, determinants, rang, inverses, polynomes caracteristiques et formes quadratiques.",
-    ja: "元の Python/SymPy プロジェクトを呼び出し、行列、行列式、階数、逆行列、特性多項式、多項式、二次形式を扱います。",
-    ko: "원래 Python/SymPy 프로젝트를 호출해 행렬, 행렬식, 랭크, 역행렬, 특성다항식, 다항식, 이차형식을 처리합니다.",
-    ru: "Запускает исходный проект Python/SymPy для матриц, определителей, ранга, обратных матриц, характеристических многочленов и квадратичных форм."
+    "zh-CN": "直接调用原 Python/SymPy 项目，处理矩阵、线性方程组、线性空间、对角化、Jordan 线索、多项式、二次型与复习专题。",
+    "zh-TW": "直接呼叫原 Python/SymPy 專案，處理矩陣、線性方程組、線性空間、對角化、Jordan 線索、多項式、二次型與複習專題。",
+    en: "Runs the original Python/SymPy project for matrices, linear systems, vector spaces, diagonalization, Jordan hints, polynomials, quadratic forms, and review topics.",
+    fr: "Execute le projet Python/SymPy d'origine pour matrices, systemes lineaires, espaces vectoriels, diagonalisation, pistes de Jordan, polynomes, formes quadratiques et revisions.",
+    ja: "元の Python/SymPy プロジェクトを呼び出し、行列、連立一次方程式、線形空間、対角化、Jordan の手がかり、多項式、二次形式、復習題を扱います。",
+    ko: "원래 Python/SymPy 프로젝트를 호출해 행렬, 선형방정식, 선형공간, 대각화, Jordan 단서, 다항식, 이차형식, 복습 주제를 처리합니다.",
+    ru: "Запускает исходный проект Python/SymPy для матриц, линейных систем, пространств, диагонализации, подсказок Jordan, многочленов, квадратичных форм и повторения."
   },
   "study.analysis.title": {
     "zh-CN": "数学分析学习辅助器",
@@ -276,13 +276,13 @@ const copy = {
     ru: "Помощник по математическому анализу"
   },
   "study.analysis.copy": {
-    "zh-CN": "直接调用原 GeoGebra CAS 风格 Python 项目，处理极限、导数、积分、级数、方程、ODE、傅里叶与特殊函数。",
-    "zh-TW": "直接呼叫原 GeoGebra CAS 風格 Python 專案，處理極限、導數、積分、級數、方程、ODE、傅立葉與特殊函數。",
-    en: "Runs the original GeoGebra-style Python CAS project for limits, derivatives, integrals, series, equations, ODEs, Fourier tools and special functions.",
-    fr: "Execute le CAS Python d'origine, style GeoGebra, pour limites, derivees, integrales, series, equations, EDO, Fourier et fonctions speciales.",
-    ja: "GeoGebra CAS 風の元 Python プロジェクトを呼び出し、極限、微分、積分、級数、方程式、ODE、Fourier、特殊関数を扱います。",
-    ko: "GeoGebra CAS 스타일의 원래 Python 프로젝트를 호출해 극한, 미분, 적분, 급수, 방정식, ODE, 푸리에, 특수함수를 처리합니다.",
-    ru: "Запускает исходный Python CAS в стиле GeoGebra для пределов, производных, интегралов, рядов, уравнений, ОДУ, Фурье и специальных функций."
+    "zh-CN": "直接调用原 GeoGebra CAS 风格 Python 项目，处理极限、导数、积分、级数、方程、ODE、收敛判别、多元函数与 Fourier/Laplace 工具。",
+    "zh-TW": "直接呼叫原 GeoGebra CAS 風格 Python 專案，處理極限、導數、積分、級數、方程、ODE、收斂判別、多元函數與 Fourier/Laplace 工具。",
+    en: "Runs the original GeoGebra-style Python CAS project for limits, derivatives, integrals, series, equations, ODEs, convergence tests, multivariable calculus, and Fourier/Laplace tools.",
+    fr: "Execute le CAS Python d'origine, style GeoGebra, pour limites, derivees, integrales, series, equations, EDO, tests de convergence, calcul multivariable et outils Fourier/Laplace.",
+    ja: "GeoGebra CAS 風の元 Python プロジェクトを呼び出し、極限、微分、積分、級数、方程式、ODE、収束判定、多変数関数、Fourier/Laplace ツールを扱います。",
+    ko: "GeoGebra CAS 스타일의 원래 Python 프로젝트를 호출해 극한, 미분, 적분, 급수, 방정식, ODE, 수렴 판정, 다변수 함수, Fourier/Laplace 도구를 처리합니다.",
+    ru: "Запускает исходный Python CAS в стиле GeoGebra для пределов, производных, интегралов, рядов, уравнений, ОДУ, признаков сходимости, многих переменных и Fourier/Laplace."
   },
   "study.core.eyebrow": {
     "zh-CN": "原项目核心",
@@ -518,6 +518,33 @@ const copy = {
     ko: "다항식",
     ru: "Многочлены"
   },
+  "guide.algebra.linear": {
+    "zh-CN": "线性方程组",
+    "zh-TW": "線性方程組",
+    en: "Linear Systems",
+    fr: "Systemes lineaires",
+    ja: "連立一次方程式",
+    ko: "선형방정식",
+    ru: "Линейные системы"
+  },
+  "guide.algebra.space": {
+    "zh-CN": "线性空间与映射",
+    "zh-TW": "線性空間與映射",
+    en: "Spaces and Maps",
+    fr: "Espaces et applications",
+    ja: "線形空間と写像",
+    ko: "선형공간과 사상",
+    ru: "Пространства и отображения"
+  },
+  "guide.algebra.review": {
+    "zh-CN": "复习专题",
+    "zh-TW": "複習專題",
+    en: "Review Topics",
+    fr: "Themes de revision",
+    ja: "復習トピック",
+    ko: "복습 주제",
+    ru: "Темы повторения"
+  },
   "guide.algebra.quadratic": {
     "zh-CN": "二次型",
     "zh-TW": "二次型",
@@ -626,6 +653,33 @@ const copy = {
     ko: "로 이차형식을 전개하고 행렬 성질 판정과 함께 확인합니다.",
     ru: "чтобы раскрыть квадратичную форму и проверить свойства матрицы."
   },
+  "guide.algebra.linear.copy": {
+    "zh-CN": "新版核心会给出行最简形、Cramer 法则、线性方程组求解和齐次方程组基础解系，适合直接核对章节题。",
+    "zh-TW": "新版核心會給出列最簡形、Cramer 法則、線性方程組求解和齊次方程組基礎解系，適合直接核對章節題。",
+    en: "The newer core reports RREF, Cramer's rule, linear-system solutions, and fundamental solutions for homogeneous systems.",
+    fr: "Le nouveau noyau donne RREF, regle de Cramer, solutions de systemes lineaires et base des systemes homogenes.",
+    ja: "新しいコアは RREF、Cramer の法則、連立一次方程式の解、斉次方程式の基本解系を出します。",
+    ko: "새 코어는 RREF, Cramer 법칙, 선형방정식 해, 동차방정식 기본해계를 제공합니다.",
+    ru: "Новое ядро выводит RREF, правило Крамера, решения линейных систем и фундаментальные решения однородных систем."
+  },
+  "guide.algebra.space.copy": {
+    "zh-CN": "可检查向量组、坐标、子空间和与交、线性映射核像、对角化、最小多项式与 Jordan 相关线索。",
+    "zh-TW": "可檢查向量組、座標、子空間和與交、線性映射核像、對角化、最小多項式與 Jordan 相關線索。",
+    en: "Use it for vector sets, coordinates, sums and intersections of subspaces, kernels and images, diagonalization, minimal polynomials, and Jordan clues.",
+    fr: "A utiliser pour familles de vecteurs, coordonnees, sommes et intersections, noyau et image, diagonalisation, polynome minimal et pistes Jordan.",
+    ja: "ベクトル組、座標、部分空間の和と交わり、核と像、対角化、最小多項式、Jordan 関連の手がかりを確認できます。",
+    ko: "벡터 집합, 좌표, 부분공간의 합과 교, 핵과 상, 대각화, 최소다항식, Jordan 단서를 확인할 수 있습니다.",
+    ru: "Подходит для систем векторов, координат, сумм и пересечений подпространств, ядра и образа, диагонализации, минимального многочлена и Jordan."
+  },
+  "guide.algebra.review.copy": {
+    "zh-CN": "复习题方法库覆盖 Vandermonde、Woodbury、幂零、实反称矩阵、极分解、Cayley 变换、交换子和 Sylvester 方程等模板。",
+    "zh-TW": "複習題方法庫覆蓋 Vandermonde、Woodbury、冪零、實反稱矩陣、極分解、Cayley 變換、交換子和 Sylvester 方程等模板。",
+    en: "The review library covers Vandermonde, Woodbury, nilpotent matrices, real skew-symmetric matrices, polar decomposition, Cayley transforms, commutators, and Sylvester equations.",
+    fr: "La bibliotheque de revision couvre Vandermonde, Woodbury, nilpotence, matrices antisymetriques reelles, decomposition polaire, transformee de Cayley, commutateurs et equations de Sylvester.",
+    ja: "復習ライブラリは Vandermonde、Woodbury、冪零、実反対称行列、極分解、Cayley 変換、交換子、Sylvester 方程式を扱います。",
+    ko: "복습 라이브러리는 Vandermonde, Woodbury, 멱영, 실 반대칭행렬, 극분해, Cayley 변환, 교환자, Sylvester 방정식을 다룹니다.",
+    ru: "Библиотека повторения охватывает Vandermonde, Woodbury, нильпотентные и вещественные кососимметричные матрицы, полярное разложение, преобразование Cayley, коммутаторы и уравнения Sylvester."
+  },
   "guide.analysis.cas": {
     "zh-CN": "基础 CAS",
     "zh-TW": "基礎 CAS",
@@ -670,6 +724,24 @@ const copy = {
     ja: "積分と級数",
     ko: "적분과 급수",
     ru: "Интегралы и ряды"
+  },
+  "guide.analysis.convergence": {
+    "zh-CN": "收敛判别",
+    "zh-TW": "收斂判別",
+    en: "Convergence Tests",
+    fr: "Tests de convergence",
+    ja: "収束判定",
+    ko: "수렴 판정",
+    ru: "Признаки сходимости"
+  },
+  "guide.analysis.multivar": {
+    "zh-CN": "多元函数与场论",
+    "zh-TW": "多元函數與場論",
+    en: "Multivariable and Fields",
+    fr: "Multivariable et champs",
+    ja: "多変数と場",
+    ko: "다변수와 장",
+    ru: "Многие переменные и поля"
   },
   "guide.analysis.runExample.copy": {
     "zh-CN": "点击示例按钮后会自动填入并运行。先看命令格式，再替换表达式。",
@@ -761,6 +833,24 @@ const copy = {
     ko: "특수함수는 Gamma, Beta, erf를 사용할 수 있습니다.",
     ru: "Доступны спецфункции Gamma, Beta и erf."
   },
+  "guide.analysis.convergence.copy": {
+    "zh-CN": "新版核心加入数列极限提示、epsilon-delta 提示、比较/积分/Dirichlet-Abel 判别和幂级数收敛区间。",
+    "zh-TW": "新版核心加入數列極限提示、epsilon-delta 提示、比較/積分/Dirichlet-Abel 判別和冪級數收斂區間。",
+    en: "The newer core adds sequence-limit hints, epsilon-delta hints, comparison, integral and Dirichlet-Abel tests, plus power-series intervals.",
+    fr: "Le nouveau noyau ajoute suites, epsilon-delta, tests de comparaison, integrale et Dirichlet-Abel, ainsi que les intervalles des series entieres.",
+    ja: "新しいコアは数列極限、epsilon-delta、比較・積分・Dirichlet-Abel 判定、冪級数の収束区間を追加します。",
+    ko: "새 코어는 수열 극한, epsilon-delta, 비교/적분/Dirichlet-Abel 판정, 멱급수 수렴구간을 추가합니다.",
+    ru: "Новое ядро добавляет подсказки для последовательностей, epsilon-delta, признаки сравнения, интегральный и Dirichlet-Abel, а также интервалы степенных рядов."
+  },
+  "guide.analysis.multivar.copy": {
+    "zh-CN": "可做多元极限、连续可微、隐函数、Jacobi 矩阵、曲线积分、Green 公式、Gauss 公式和 Stokes 公式等报告。",
+    "zh-TW": "可做多元極限、連續可微、隱函數、Jacobi 矩陣、曲線積分、Green 公式、Gauss 公式和 Stokes 公式等報告。",
+    en: "It can report on multivariable limits, continuity, differentiability, implicit functions, Jacobians, line integrals, Green, Gauss, and Stokes formulas.",
+    fr: "Il produit des rapports sur limites multivariables, continuite, differentiabilite, fonctions implicites, jacobiens, integrales curvilignes, Green, Gauss et Stokes.",
+    ja: "多変数極限、連続性、可微性、陰関数、Jacobi 行列、線積分、Green・Gauss・Stokes の公式をレポートできます。",
+    ko: "다변수 극한, 연속성, 미분가능성, 음함수, Jacobi 행렬, 선적분, Green, Gauss, Stokes 공식을 보고할 수 있습니다.",
+    ru: "Доступны отчеты по пределам многих переменных, непрерывности, дифференцируемости, неявным функциям, якобианам, криволинейным интегралам, формулам Green, Gauss и Stokes."
+  },
   "algebra.example.matrix": {
     "zh-CN": "矩阵基础",
     "zh-TW": "矩陣基礎",
@@ -769,6 +859,15 @@ const copy = {
     ja: "行列基礎",
     ko: "행렬 기본",
     ru: "Матрицы"
+  },
+  "algebra.example.linear": {
+    "zh-CN": "线性方程组",
+    "zh-TW": "線性方程組",
+    en: "Linear Systems",
+    fr: "Systemes",
+    ja: "連立一次",
+    ko: "선형방정식",
+    ru: "Системы"
   },
   "algebra.example.quadratic": {
     "zh-CN": "二次型",
@@ -788,6 +887,15 @@ const copy = {
     ko: "다항식",
     ru: "Многочлены"
   },
+  "algebra.example.review": {
+    "zh-CN": "复习专题",
+    "zh-TW": "複習專題",
+    en: "Review",
+    fr: "Revision",
+    ja: "復習",
+    ko: "복습",
+    ru: "Повторение"
+  },
   "analysis.example.cas": {
     "zh-CN": "CAS 基础",
     "zh-TW": "CAS 基礎",
@@ -796,6 +904,15 @@ const copy = {
     ja: "CAS 基礎",
     ko: "CAS 기본",
     ru: "Основы CAS"
+  },
+  "analysis.example.convergence": {
+    "zh-CN": "收敛判别",
+    "zh-TW": "收斂判別",
+    en: "Convergence",
+    fr: "Convergence",
+    ja: "収束判定",
+    ko: "수렴 판정",
+    ru: "Сходимость"
   },
   "analysis.example.series": {
     "zh-CN": "级数与傅里叶",
@@ -814,6 +931,15 @@ const copy = {
     ja: "方程式と ODE",
     ko: "방정식과 ODE",
     ru: "Уравнения и ОДУ"
+  },
+  "analysis.example.multivar": {
+    "zh-CN": "多元函数",
+    "zh-TW": "多元函數",
+    en: "Multivariable",
+    fr: "Multivariable",
+    ja: "多変数",
+    ko: "다변수",
+    ru: "Многие переменные"
   },
   "padic.copy": {
     "zh-CN": "选择终端安装器，或打开无需安装的网页版转换器。终端版安装器使用 p进数工具仓库的 main2.0 分支。",

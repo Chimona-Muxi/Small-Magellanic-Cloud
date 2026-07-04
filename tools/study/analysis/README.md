@@ -48,7 +48,7 @@ POST /api/study/analysis/evaluate
 python3 -m pip install -r ../requirements.txt
 ```
 
-当前版本：v0.5（完整 GeoGebra CAS 风格 + 数学分析扩展）
+当前版本：v0.30（完整 GeoGebra CAS 风格 + 数学分析扩展）
 
 已支持命令：
 - Limit / Derivative / ImplicitDerivative
@@ -58,12 +58,21 @@ python3 -m pip install -r ../requirements.txt
 - Simplify / Factor / Expand
 - Gamma / Beta
 - FourierSeries（扩展）
+- FourierCoefficientReport / FourierTransformReport / InverseFourierTransformReport
+- LaplaceTransformReport / InverseLaplaceTransformReport / LaplaceDerivativeRule
+- SineTransformReport / CosineTransformReport / LaplaceConvolutionReport
+- EpsilonNHint / EpsilonDeltaHint / SqueezeLimitReport / EquivalentInfinitesimalReport
+- SeriesTestReport / ComparisonSeriesTest / IntegralSeriesTest / DirichletAbelHint
+- UniformConvergenceHint / PowerSeriesInterval / RiemannSumLimit
+- 多元函数专题：PatchValueForContinuity / DifferentiabilityReport / ImplicitPartialReport / JacobianReport
+- 曲线曲面积分与场论：LineIntegralScalar / LineIntegralVector / GreenTheoremReport / Divergence / Curl / GaussTheoremReport / StokesTheoremReport
 - LagrangeMultiplier（扩展）
 - CriticalPoints（扩展）
 
 使用方式：
 ```bash
 python src/cas_parser.py examples/cas_test.ma
+python src/cas_parser.py examples/expanded_topics.ma
 ```
 
-详细说明请查看：`docs/使用手册.md`
+详细说明请查看：`docs/使用手册.md` 和 `docs/chapter_feature_map.md`
