@@ -39,7 +39,6 @@ Small Magellanic Cloud 是张墨霖的个人网站：一个把日常、学习工
 
 ```bash
 npm install
-python3 -m pip install -r tools/study/requirements.txt
 npm start
 ```
 
@@ -62,15 +61,17 @@ Render 配置保持轻量：
 | 项 | 值 |
 | --- | --- |
 | Language | Node |
-| Build Command | `npm install && python3 -m pip install --user -r tools/study/requirements.txt` |
+| Build Command | `npm install` |
 | Start Command | `node server.mjs` |
 | Root Directory | 留空 |
 
-学习辅助器依赖 Python/SymPy；Render 配置文件会在构建阶段执行：
+学习辅助器依赖 Python/SymPy。`npm install` 会通过 `postinstall` 自动执行：
 
 ```bash
-npm install && python3 -m pip install --user -r tools/study/requirements.txt
+npm run install:study
 ```
+
+依赖会安装到 `tools/study/python-packages/`，服务端运行 Python 核心时会自动注入 `PYTHONPATH`。如果部署平台跳过了 `postinstall`，第一次运行学习工具时服务端也会尝试补装一次。
 
 ## 维护规则
 

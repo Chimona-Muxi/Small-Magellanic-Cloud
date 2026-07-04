@@ -48,7 +48,7 @@
 ## 本地依赖
 
 ```bash
-python3 -m pip install -r tools/study/requirements.txt
+npm run install:study
 ```
 
 依赖内容：
@@ -139,13 +139,21 @@ python3 tools/study/analysis/src/cas_parser.py tools/study/analysis/examples/the
 
 ## 部署
 
-`render.yaml` 使用 Node 服务，但构建阶段会安装 Python 依赖：
+`render.yaml` 使用 Node 服务。构建阶段执行 `npm install`，随后 `postinstall` 会安装 Python 依赖：
 
 ```bash
-npm install && python3 -m pip install --user -r tools/study/requirements.txt
+npm install
 ```
 
-运行时由 `server.mjs` 调用 `python3`。如部署环境需要指定 Python 命令，可以设置：
+依赖安装到：
+
+```text
+tools/study/python-packages/
+```
+
+运行时由 `server.mjs` 调用 `python3`，并自动把这个目录注入 `PYTHONPATH`。如果部署环境跳过了 `postinstall`，服务端第一次运行学习工具时会尝试补装一次。若部署环境禁止运行时安装，可以设置 `SMC_SKIP_RUNTIME_PIP=1`，并确保构建阶段已经执行 `npm run install:study`。
+
+如部署环境需要指定 Python 命令，可以设置：
 
 ```bash
 PYTHON=/path/to/python

@@ -2,7 +2,7 @@ import { createServer } from "node:http";
 import { spawn } from "node:child_process";
 import { access, mkdir, mkdtemp, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { dirname, extname, join, normalize } from "node:path";
+import { delimiter, dirname, extname, join, normalize } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   createInitialState as createLuqiangqiState,
@@ -23,6 +23,8 @@ const padicDir = join(__dirname, "tools", "padic", "p_adic_pro");
 const padicBinary = join(padicDir, process.platform === "win32" ? "padic_converter.exe" : "padic_converter");
 const padicRuntimeHome = join(__dirname, "tools", "padic", "runtime-home");
 const studyDir = join(__dirname, "tools", "study");
+const studyPythonPackages = join(studyDir, "python-packages");
+const studyRequirements = join(studyDir, "requirements.txt");
 const pythonCommand = process.env.PYTHON || (process.platform === "win32" ? "python" : "python3");
 const matplotlibConfigDir = join(tmpdir(), "smc-matplotlib");
 const port = Number(process.env.PORT || 5226);
@@ -118,6 +120,7 @@ const studyTools = {
 
 const roomStores = new Map(Object.keys(gameConfigs).map((key) => [key, new Map()]));
 let padicBuildPromise = null;
+let studyDepsPromise = null;
 
 function cleanPath(pathname) {
   const decoded = decodeURIComponent(pathname);
@@ -182,10 +185,11 @@ function runProcess(command, args, options = {}) {
       child.kill("SIGKILL");
       reject(new Error(`${command} timed out`));
     }, options.timeoutMs || 8000);
+    const maxStdout = options.maxStdout || 64 * 1024;
 
     child.stdout.on("data", (chunk) => {
       stdout += chunk;
-      if (stdout.length > 64 * 1024) child.kill("SIGKILL");
+      if (stdout.length > maxStdout) child.kill("SIGKILL");
     });
     child.stderr.on("data", (chunk) => {
       stderr += chunk;
@@ -202,6 +206,60 @@ function runProcess(command, args, options = {}) {
 
     if (options.input) child.stdin.end(options.input);
     else child.stdin.end();
+  });
+}
+
+function studyPythonEnv(extra = {}) {
+  const pythonPath = [studyPythonPackages, process.env.PYTHONPATH].filter(Boolean).join(delimiter);
+  return {
+    ...process.env,
+    PYTHONPATH: pythonPath,
+    PYTHONUNBUFFERED: "1",
+    ...extra
+  };
+}
+
+async function ensureStudyPythonDependencies() {
+  try {
+    await runProcess(pythonCommand, ["-c", "import sympy, numpy"], {
+      env: studyPythonEnv(),
+      timeoutMs: 8000
+    });
+    return;
+  } catch {
+    // Install below.
+  }
+
+  if (process.env.SMC_SKIP_RUNTIME_PIP === "1") {
+    throw new Error("学习工具 Python 依赖缺失：请在部署构建阶段运行 npm install 或 npm run install:study");
+  }
+
+  if (!studyDepsPromise) {
+    studyDepsPromise = mkdir(studyPythonPackages, { recursive: true })
+      .then(() => runProcess(pythonCommand, [
+        "-m",
+        "pip",
+        "install",
+        "--disable-pip-version-check",
+        "--target",
+        studyPythonPackages,
+        "-r",
+        studyRequirements
+      ], {
+        cwd: __dirname,
+        env: process.env,
+        maxStdout: 512 * 1024,
+        timeoutMs: 120000
+      }))
+      .finally(() => {
+        studyDepsPromise = null;
+      });
+  }
+  await studyDepsPromise;
+
+  await runProcess(pythonCommand, ["-c", "import sympy, numpy"], {
+    env: studyPythonEnv(),
+    timeoutMs: 8000
   });
 }
 
@@ -280,6 +338,7 @@ async function runStudyTool(toolKey, body) {
   if (source.length > 40000) throw new Error("输入内容过长");
 
   if (tool.env.MPLCONFIGDIR) await mkdir(tool.env.MPLCONFIGDIR, { recursive: true });
+  await ensureStudyPythonDependencies();
 
   const tempRoot = await mkdtemp(join(tmpdir(), "smc-study-"));
   const inputFile = join(tempRoot, `input${tool.extension}`);
@@ -287,7 +346,7 @@ async function runStudyTool(toolKey, body) {
     await writeFile(inputFile, `${source}\n`, "utf8");
     const result = await runProcess(pythonCommand, [tool.script, ...tool.args(inputFile, body)], {
       cwd: tool.cwd,
-      env: { ...process.env, ...tool.env, COLUMNS: String(columns) },
+      env: studyPythonEnv({ ...tool.env, COLUMNS: String(columns) }),
       timeoutMs: tool.timeoutMs
     });
     return (result.stdout || result.stderr || "").trimEnd();

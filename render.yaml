@@ -3,6 +3,6 @@ services:
     name: small-magellanic-cloud
     env: node
     plan: free
-    buildCommand: npm install && python3 -m pip install --user -r tools/study/requirements.txt
+    buildCommand: npm install
     startCommand: node server.mjs
     autoDeploy: true

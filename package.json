@@ -7,6 +7,8 @@
     "node": ">=18"
   },
   "scripts": {
+    "install:study": "node scripts/install-study-deps.mjs",
+    "postinstall": "node scripts/install-study-deps.mjs",
     "start": "node server.mjs"
   }
 }

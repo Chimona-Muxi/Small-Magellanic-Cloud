@@ -949,10 +949,10 @@ body:has(.site-nav.trail .settings-menu.open) .board-grid {
   word-break: normal;
   border: 1px solid var(--line);
   border-radius: 8px;
-  padding: 18px;
+  padding: 16px 18px;
   color: color-mix(in srgb, var(--ink) 92%, transparent);
   background: rgba(0, 0, 0, 0.24);
-  font: 14px/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font: 13.5px/1.16 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-variant-ligatures: none;
   font-feature-settings: "liga" 0, "calt" 0;
   tab-size: 2;
@@ -1011,7 +1011,9 @@ html[data-theme="light"] .padic-output {
   padding: 16px;
   color: var(--ink);
   background: rgba(255, 255, 255, 0.08);
-  font: 14px/1.65 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font: 13.5px/1.32 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0, "calt" 0;
   tab-size: 2;
 }
 
