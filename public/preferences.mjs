@@ -50,6 +50,15 @@ const copy = {
     ko: "보드게임",
     ru: "Настольные игры"
   },
+  "nav.private": {
+    "zh-CN": "私人空间",
+    "zh-TW": "私人空間",
+    en: "Private Space",
+    fr: "Espace prive",
+    ja: "プライベート空間",
+    ko: "개인 공간",
+    ru: "Личное пространство"
+  },
   "nav.primary": {
     "zh-CN": "主导航",
     "zh-TW": "主導覽",
@@ -1120,6 +1129,258 @@ const copy = {
     ja: "途中成果、アルゴリズム実験、再利用部品を保存する場所です。",
     ko: "단계별 작업물, 알고리즘 실험, 재사용 컴포넌트를 모으는 곳입니다.",
     ru: "Место для черновиков, алгоритмов и переиспользуемых компонентов."
+  },
+  "module.private.kicker": {
+    "zh-CN": "需要密码",
+    "zh-TW": "需要密碼",
+    en: "Password required",
+    fr: "Mot de passe requis",
+    ja: "パスワードが必要",
+    ko: "비밀번호 필요",
+    ru: "Нужен пароль"
+  },
+  "module.private.title": {
+    "zh-CN": "我的私人空间",
+    "zh-TW": "我的私人空間",
+    en: "My Private Space",
+    fr: "Mon espace prive",
+    ja: "私のプライベート空間",
+    ko: "나의 개인 공간",
+    ru: "Мое личное пространство"
+  },
+  "module.private.copy": {
+    "zh-CN": "暂时先放自我简介，后续内容慢慢补进来。",
+    "zh-TW": "暫時先放自我簡介，後續內容慢慢補進來。",
+    en: "A protected place for the self-introduction first; more can be added later.",
+    fr: "Un espace protege pour l'auto-presentation, a completer plus tard.",
+    ja: "まず自己紹介を置く保護された場所です。あとで内容を追加できます。",
+    ko: "먼저 자기소개를 두는 보호된 공간입니다. 내용은 나중에 더할 수 있습니다.",
+    ru: "Защищенное место для автобиографии, остальное можно добавить позже."
+  },
+  "private.gate.eyebrow": {
+    "zh-CN": "私人空间",
+    "zh-TW": "私人空間",
+    en: "private space",
+    fr: "espace prive",
+    ja: "プライベート空間",
+    ko: "개인 공간",
+    ru: "личное пространство"
+  },
+  "private.gate.title": {
+    "zh-CN": "我的私人空间",
+    "zh-TW": "我的私人空間",
+    en: "My Private Space",
+    fr: "Mon espace prive",
+    ja: "私のプライベート空間",
+    ko: "나의 개인 공간",
+    ru: "Мое личное пространство"
+  },
+  "private.gate.copy": {
+    "zh-CN": "输入密码后进入。这里暂时只放自我简介，后面的内容之后再补。",
+    "zh-TW": "輸入密碼後進入。這裡暫時只放自我簡介，後面的內容之後再補。",
+    en: "Enter the password to continue. For now it keeps only the self-introduction.",
+    fr: "Entrez le mot de passe pour continuer. Pour l'instant, seul le profil est ici.",
+    ja: "パスワードを入力して進みます。今は自己紹介だけを置いています。",
+    ko: "비밀번호를 입력해 들어갑니다. 지금은 자기소개만 둡니다.",
+    ru: "Введите пароль, чтобы продолжить. Пока здесь только автобиография."
+  },
+  "private.password.label": {
+    "zh-CN": "密码",
+    "zh-TW": "密碼",
+    en: "Password",
+    fr: "Mot de passe",
+    ja: "パスワード",
+    ko: "비밀번호",
+    ru: "Пароль"
+  },
+  "private.password.placeholder": {
+    "zh-CN": "输入密码",
+    "zh-TW": "輸入密碼",
+    en: "Enter password",
+    fr: "Entrer le mot de passe",
+    ja: "パスワードを入力",
+    ko: "비밀번호 입력",
+    ru: "Введите пароль"
+  },
+  "private.password.error": {
+    "zh-CN": "密码不正确",
+    "zh-TW": "密碼不正確",
+    en: "Incorrect password",
+    fr: "Mot de passe incorrect",
+    ja: "パスワードが正しくありません",
+    ko: "비밀번호가 올바르지 않습니다",
+    ru: "Неверный пароль"
+  },
+  "private.password.rateLimited": {
+    "zh-CN": "尝试次数过多，请稍后再试",
+    "zh-TW": "嘗試次數過多，請稍後再試",
+    en: "Too many attempts. Please try again later.",
+    fr: "Trop de tentatives. Reessayez plus tard.",
+    ja: "試行回数が多すぎます。しばらくしてから再試行してください。",
+    ko: "시도 횟수가 너무 많습니다. 잠시 후 다시 시도하세요.",
+    ru: "Слишком много попыток. Попробуйте позже."
+  },
+  "private.remember": {
+    "zh-CN": "记住此登录设备",
+    "zh-TW": "記住此登入裝置",
+    en: "Remember this device",
+    fr: "Se souvenir de cet appareil",
+    ja: "この端末を記憶",
+    ko: "이 기기 기억",
+    ru: "Запомнить это устройство"
+  },
+  "private.enter": {
+    "zh-CN": "进入",
+    "zh-TW": "進入",
+    en: "Enter",
+    fr: "Entrer",
+    ja: "入る",
+    ko: "입장",
+    ru: "Войти"
+  },
+  "private.lock": {
+    "zh-CN": "退出",
+    "zh-TW": "退出",
+    en: "Sign out",
+    fr: "Deconnexion",
+    ja: "ログアウト",
+    ko: "로그아웃",
+    ru: "Выйти"
+  },
+  "private.profile.eyebrow": {
+    "zh-CN": "自我简介",
+    "zh-TW": "自我簡介",
+    en: "self introduction",
+    fr: "presentation",
+    ja: "自己紹介",
+    ko: "자기소개",
+    ru: "автобиография"
+  },
+  "private.profile.edit": {
+    "zh-CN": "编辑",
+    "zh-TW": "編輯",
+    en: "Edit",
+    fr: "Modifier",
+    ja: "編集",
+    ko: "편집",
+    ru: "Изменить"
+  },
+  "private.profile.save": {
+    "zh-CN": "保存",
+    "zh-TW": "儲存",
+    en: "Save",
+    fr: "Enregistrer",
+    ja: "保存",
+    ko: "저장",
+    ru: "Сохранить"
+  },
+  "private.profile.nameLabel": {
+    "zh-CN": "姓名",
+    "zh-TW": "姓名",
+    en: "Name",
+    fr: "Nom",
+    ja: "名前",
+    ko: "이름",
+    ru: "Имя"
+  },
+  "private.profile.birthLabel": {
+    "zh-CN": "出生",
+    "zh-TW": "出生",
+    en: "Born",
+    fr: "Naissance",
+    ja: "生年月日",
+    ko: "출생",
+    ru: "Рождение"
+  },
+  "private.profile.noteLabel": {
+    "zh-CN": "简介",
+    "zh-TW": "簡介",
+    en: "Profile",
+    fr: "Profil",
+    ja: "紹介",
+    ko: "소개",
+    ru: "Профиль"
+  },
+  "private.devices.eyebrow": {
+    "zh-CN": "可信设备",
+    "zh-TW": "可信裝置",
+    en: "trusted devices",
+    fr: "appareils fiables",
+    ja: "信頼済み端末",
+    ko: "신뢰 기기",
+    ru: "доверенные устройства"
+  },
+  "private.devices.title": {
+    "zh-CN": "登录设备管理",
+    "zh-TW": "登入裝置管理",
+    en: "Login Device Management",
+    fr: "Gestion des appareils",
+    ja: "ログイン端末管理",
+    ko: "로그인 기기 관리",
+    ru: "Управление устройствами"
+  },
+  "private.devices.refresh": {
+    "zh-CN": "刷新",
+    "zh-TW": "重新整理",
+    en: "Refresh",
+    fr: "Actualiser",
+    ja: "更新",
+    ko: "새로고침",
+    ru: "Обновить"
+  },
+  "private.devices.revokeOthers": {
+    "zh-CN": "移除其他设备",
+    "zh-TW": "移除其他裝置",
+    en: "Remove Other Devices",
+    fr: "Retirer les autres",
+    ja: "他の端末を削除",
+    ko: "다른 기기 제거",
+    ru: "Удалить другие"
+  },
+  "private.devices.revoke": {
+    "zh-CN": "移除",
+    "zh-TW": "移除",
+    en: "Remove",
+    fr: "Retirer",
+    ja: "削除",
+    ko: "제거",
+    ru: "Удалить"
+  },
+  "private.devices.current": {
+    "zh-CN": "当前设备",
+    "zh-TW": "目前裝置",
+    en: "Current device",
+    fr: "Appareil actuel",
+    ja: "現在の端末",
+    ko: "현재 기기",
+    ru: "Текущее устройство"
+  },
+  "private.devices.lastSeen": {
+    "zh-CN": "最近活动",
+    "zh-TW": "最近活動",
+    en: "Last active",
+    fr: "Derniere activite",
+    ja: "最近の活動",
+    ko: "최근 활동",
+    ru: "Последняя активность"
+  },
+  "private.devices.expires": {
+    "zh-CN": "到期",
+    "zh-TW": "到期",
+    en: "Expires",
+    fr: "Expire",
+    ja: "期限",
+    ko: "만료",
+    ru: "Истекает"
+  },
+  "private.devices.empty": {
+    "zh-CN": "暂无登录设备",
+    "zh-TW": "暫無登入裝置",
+    en: "No login devices yet",
+    fr: "Aucun appareil connecte",
+    ja: "ログイン端末はありません",
+    ko: "로그인 기기가 없습니다",
+    ru: "Нет устройств входа"
   },
   "game.copy": {
     "zh-CN": "互动游戏会按类型收纳。当前启用的是棋类，后续可以继续加入策略、谜题、物理模拟或其他实验。",

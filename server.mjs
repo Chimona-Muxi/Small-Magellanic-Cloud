@@ -1,5 +1,6 @@
 import { createServer } from "node:http";
 import { spawn } from "node:child_process";
+import { randomBytes, scryptSync, timingSafeEqual, createHash } from "node:crypto";
 import { access, mkdir, mkdtemp, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { delimiter, dirname, extname, join, normalize } from "node:path";
@@ -25,6 +26,9 @@ const padicRuntimeHome = join(__dirname, "tools", "padic", "runtime-home");
 const studyDir = join(__dirname, "tools", "study");
 const studyPythonPackages = join(studyDir, "python-packages");
 const studyRequirements = join(studyDir, "requirements.txt");
+const privateDir = join(__dirname, ".private");
+const privateSessionsFile = join(privateDir, "sessions.json");
+const privateProfileFile = join(privateDir, "profile.json");
 const pythonCommand = process.env.PYTHON || (process.platform === "win32" ? "python" : "python3");
 const matplotlibConfigDir = join(tmpdir(), "smc-matplotlib");
 const port = Number(process.env.PORT || 5226);
@@ -121,6 +125,23 @@ const studyTools = {
 const roomStores = new Map(Object.keys(gameConfigs).map((key) => [key, new Map()]));
 let padicBuildPromise = null;
 let studyDepsPromise = null;
+let privateSessionStore = null;
+let privateProfileStore = null;
+
+const privatePasswordHash = process.env.SMC_PRIVATE_PASSWORD_HASH
+  || "955aefbb1af2de242be0c35809425a88:f87bc55914323ebcd10c82004d708d3427273c5bbbe2fe704497a29907f1109e107b842c301607611687dfa8daa0925ea7548a580f5c8c2115447865d4a531a1";
+const privateCookieName = "smc_private_session";
+const privateSessionMs = 1000 * 60 * 60 * 8;
+const privateRememberMs = 1000 * 60 * 60 * 24 * 90;
+const privateLoginWindowMs = 1000 * 60 * 10;
+const privateLoginBlockMs = 1000 * 60 * 5;
+const privateLoginMaxFailures = 6;
+const privateLoginAttempts = new Map();
+const privateDefaultProfile = {
+  name: "",
+  birthday: "",
+  note: ""
+};
 
 function cleanPath(pathname) {
   const decoded = decodeURIComponent(pathname);
@@ -136,6 +157,183 @@ function json(res, status, data) {
     "Access-Control-Allow-Methods": "GET, POST, OPTIONS"
   });
   res.end(JSON.stringify(data));
+}
+
+function privateJson(res, status, data, headers = {}) {
+  res.writeHead(status, {
+    "Content-Type": "application/json; charset=utf-8",
+    "Cache-Control": "no-store, max-age=0",
+    "X-Content-Type-Options": "nosniff",
+    "Referrer-Policy": "same-origin",
+    ...headers
+  });
+  res.end(JSON.stringify(data));
+}
+
+function parseCookies(header = "") {
+  const cookies = {};
+  for (const item of header.split(";")) {
+    const index = item.indexOf("=");
+    if (index === -1) continue;
+    const key = item.slice(0, index).trim();
+    const value = item.slice(index + 1).trim();
+    if (key) cookies[key] = decodeURIComponent(value);
+  }
+  return cookies;
+}
+
+function privateCookie(value, req, maxAgeSeconds) {
+  const secure = req.headers["x-forwarded-proto"] === "https" || String(req.headers.host || "").startsWith("localhost:") === false && String(req.headers.host || "").startsWith("127.0.0.1:") === false;
+  return [
+    `${privateCookieName}=${encodeURIComponent(value)}`,
+    "Path=/",
+    "HttpOnly",
+    "SameSite=Strict",
+    secure ? "Secure" : "",
+    Number.isFinite(maxAgeSeconds) ? `Max-Age=${Math.max(0, Math.floor(maxAgeSeconds))}` : ""
+  ].filter(Boolean).join("; ");
+}
+
+function privateCookieClear(req) {
+  return privateCookie("", req, 0);
+}
+
+function hashPrivateToken(token) {
+  return createHash("sha256").update(token).digest("hex");
+}
+
+function clientIp(req) {
+  const forwarded = String(req.headers["x-forwarded-for"] || "").split(",")[0].trim();
+  return forwarded || req.socket.remoteAddress || "unknown";
+}
+
+function sameOrigin(req) {
+  const origin = req.headers.origin;
+  if (!origin) return true;
+  try {
+    return new URL(origin).host === req.headers.host;
+  } catch {
+    return false;
+  }
+}
+
+function verifyPrivatePassword(password) {
+  const [salt, expectedHex] = privatePasswordHash.split(":");
+  if (!salt || !expectedHex) return false;
+  const expected = Buffer.from(expectedHex, "hex");
+  const actual = scryptSync(String(password || ""), salt, expected.length);
+  return actual.length === expected.length && timingSafeEqual(actual, expected);
+}
+
+async function readPrivateJsonFile(filePath, fallback) {
+  try {
+    return JSON.parse(await readFile(filePath, "utf8"));
+  } catch {
+    return fallback;
+  }
+}
+
+async function writePrivateJsonFile(filePath, data) {
+  await mkdir(privateDir, { recursive: true });
+  await writeFile(filePath, `${JSON.stringify(data, null, 2)}\n`, "utf8");
+}
+
+async function loadPrivateSessions() {
+  if (privateSessionStore) return privateSessionStore;
+  const data = await readPrivateJsonFile(privateSessionsFile, { sessions: [] });
+  privateSessionStore = {
+    sessions: Array.isArray(data.sessions) ? data.sessions : []
+  };
+  return privateSessionStore;
+}
+
+async function savePrivateSessions() {
+  if (!privateSessionStore) return;
+  await writePrivateJsonFile(privateSessionsFile, privateSessionStore);
+}
+
+async function loadPrivateProfile() {
+  if (privateProfileStore) return privateProfileStore;
+  privateProfileStore = {
+    ...privateDefaultProfile,
+    ...await readPrivateJsonFile(privateProfileFile, {})
+  };
+  return privateProfileStore;
+}
+
+async function savePrivateProfile(profile) {
+  privateProfileStore = {
+    name: String(profile.name || privateDefaultProfile.name).trim().slice(0, 80) || privateDefaultProfile.name,
+    birthday: String(profile.birthday || privateDefaultProfile.birthday).trim().slice(0, 80) || privateDefaultProfile.birthday,
+    note: String(profile.note || privateDefaultProfile.note).trim().slice(0, 1200) || privateDefaultProfile.note
+  };
+  await writePrivateJsonFile(privateProfileFile, privateProfileStore);
+  return privateProfileStore;
+}
+
+function publicPrivateSession(session, currentId = "") {
+  return {
+    id: session.id,
+    current: session.id === currentId,
+    remember: Boolean(session.remember),
+    label: session.label || "Unknown device",
+    createdAt: session.createdAt,
+    lastSeenAt: session.lastSeenAt,
+    expiresAt: session.expiresAt
+  };
+}
+
+async function currentPrivateSession(req) {
+  const cookie = parseCookies(req.headers.cookie || "")[privateCookieName] || "";
+  const [id, token] = cookie.split(".");
+  if (!id || !token) return null;
+
+  const store = await loadPrivateSessions();
+  const now = Date.now();
+  let changed = false;
+  store.sessions = store.sessions.filter((session) => {
+    const keep = Date.parse(session.expiresAt) > now;
+    changed ||= !keep;
+    return keep;
+  });
+
+  const session = store.sessions.find((item) => item.id === id);
+  if (!session || session.tokenHash !== hashPrivateToken(token)) {
+    if (changed) await savePrivateSessions();
+    return null;
+  }
+
+  session.lastSeenAt = new Date(now).toISOString();
+  await savePrivateSessions();
+  return session;
+}
+
+function loginBlocked(req) {
+  const ip = clientIp(req);
+  const now = Date.now();
+  const attempt = privateLoginAttempts.get(ip);
+  if (!attempt) return false;
+  if (attempt.blockUntil && attempt.blockUntil > now) return true;
+  if (now - attempt.firstAt > privateLoginWindowMs) privateLoginAttempts.delete(ip);
+  return false;
+}
+
+function recordLoginFailure(req) {
+  const ip = clientIp(req);
+  const now = Date.now();
+  const attempt = privateLoginAttempts.get(ip) || { count: 0, firstAt: now, blockUntil: 0 };
+  if (now - attempt.firstAt > privateLoginWindowMs) {
+    attempt.count = 0;
+    attempt.firstAt = now;
+    attempt.blockUntil = 0;
+  }
+  attempt.count += 1;
+  if (attempt.count >= privateLoginMaxFailures) attempt.blockUntil = now + privateLoginBlockMs;
+  privateLoginAttempts.set(ip, attempt);
+}
+
+function clearLoginFailures(req) {
+  privateLoginAttempts.delete(clientIp(req));
 }
 
 function sanitizeName(value, fallback) {
@@ -287,6 +485,173 @@ async function ensurePadicBinary() {
     });
   }
   await padicBuildPromise;
+}
+
+function privateDeviceLabel(req) {
+  const ua = String(req.headers["user-agent"] || "Unknown device");
+  if (/iPhone|iPad|Android/i.test(ua)) return "Mobile browser";
+  if (/Macintosh|Mac OS X/i.test(ua)) return "Mac browser";
+  if (/Windows/i.test(ua)) return "Windows browser";
+  if (/Linux/i.test(ua)) return "Linux browser";
+  return "Browser";
+}
+
+async function requirePrivateSession(req, res) {
+  const session = await currentPrivateSession(req);
+  if (session) return session;
+  privateJson(res, 401, { authenticated: false, error: "Unauthorized" });
+  return null;
+}
+
+async function handlePrivateApi(req, res, url) {
+  if (!url.pathname.startsWith("/api/private/")) return false;
+  if (req.method === "OPTIONS") {
+    privateJson(res, 204, {});
+    return true;
+  }
+  if (["POST", "PUT", "DELETE"].includes(req.method) && !sameOrigin(req)) {
+    privateJson(res, 403, { error: "Forbidden" });
+    return true;
+  }
+
+  const route = url.pathname.replace(/\/+$/, "");
+
+  if (route === "/api/private/login") {
+    if (req.method !== "POST") {
+      privateJson(res, 405, { error: "Method not allowed" });
+      return true;
+    }
+    if (loginBlocked(req)) {
+      privateJson(res, 429, { error: "Too many attempts" });
+      return true;
+    }
+
+    const body = await readBody(req);
+    if (!verifyPrivatePassword(body.password)) {
+      recordLoginFailure(req);
+      privateJson(res, 401, { authenticated: false, error: "Invalid password" });
+      return true;
+    }
+
+    clearLoginFailures(req);
+    const remember = Boolean(body.remember);
+    const id = randomBytes(16).toString("hex");
+    const token = randomBytes(32).toString("base64url");
+    const now = Date.now();
+    const expiresAt = now + (remember ? privateRememberMs : privateSessionMs);
+    const session = {
+      id,
+      tokenHash: hashPrivateToken(token),
+      remember,
+      label: privateDeviceLabel(req),
+      createdAt: new Date(now).toISOString(),
+      lastSeenAt: new Date(now).toISOString(),
+      expiresAt: new Date(expiresAt).toISOString()
+    };
+
+    const store = await loadPrivateSessions();
+    store.sessions = store.sessions.filter((item) => Date.parse(item.expiresAt) > now);
+    store.sessions.push(session);
+    await savePrivateSessions();
+
+    const maxAge = remember ? privateRememberMs / 1000 : undefined;
+    privateJson(res, 200, {
+      authenticated: true,
+      session: publicPrivateSession(session, id)
+    }, {
+      "Set-Cookie": privateCookie(`${id}.${token}`, req, maxAge)
+    });
+    return true;
+  }
+
+  if (route === "/api/private/status") {
+    if (req.method !== "GET") {
+      privateJson(res, 405, { error: "Method not allowed" });
+      return true;
+    }
+    const session = await currentPrivateSession(req);
+    privateJson(res, 200, {
+      authenticated: Boolean(session),
+      session: session ? publicPrivateSession(session, session.id) : null
+    });
+    return true;
+  }
+
+  if (route === "/api/private/logout") {
+    if (req.method !== "POST") {
+      privateJson(res, 405, { error: "Method not allowed" });
+      return true;
+    }
+    const session = await currentPrivateSession(req);
+    if (session) {
+      const store = await loadPrivateSessions();
+      store.sessions = store.sessions.filter((item) => item.id !== session.id);
+      await savePrivateSessions();
+    }
+    privateJson(res, 200, { authenticated: false }, {
+      "Set-Cookie": privateCookieClear(req)
+    });
+    return true;
+  }
+
+  if (route === "/api/private/profile") {
+    const session = await requirePrivateSession(req, res);
+    if (!session) return true;
+    if (req.method === "GET") {
+      privateJson(res, 200, { profile: await loadPrivateProfile() });
+      return true;
+    }
+    if (req.method === "PUT") {
+      const body = await readBody(req);
+      const profile = await savePrivateProfile(body.profile || body);
+      privateJson(res, 200, { profile });
+      return true;
+    }
+    privateJson(res, 405, { error: "Method not allowed" });
+    return true;
+  }
+
+  if (route === "/api/private/devices") {
+    const session = await requirePrivateSession(req, res);
+    if (!session) return true;
+    if (req.method !== "GET") {
+      privateJson(res, 405, { error: "Method not allowed" });
+      return true;
+    }
+    const store = await loadPrivateSessions();
+    const now = Date.now();
+    store.sessions = store.sessions.filter((item) => Date.parse(item.expiresAt) > now);
+    await savePrivateSessions();
+    privateJson(res, 200, {
+      devices: store.sessions
+        .map((item) => publicPrivateSession(item, session.id))
+        .sort((a, b) => Date.parse(b.lastSeenAt) - Date.parse(a.lastSeenAt))
+    });
+    return true;
+  }
+
+  if (route === "/api/private/devices/revoke") {
+    const session = await requirePrivateSession(req, res);
+    if (!session) return true;
+    if (req.method !== "POST") {
+      privateJson(res, 405, { error: "Method not allowed" });
+      return true;
+    }
+    const body = await readBody(req);
+    const store = await loadPrivateSessions();
+    if (body.allOthers) {
+      store.sessions = store.sessions.filter((item) => item.id === session.id);
+    } else {
+      const id = String(body.id || "");
+      store.sessions = store.sessions.filter((item) => item.id !== id);
+    }
+    await savePrivateSessions();
+    privateJson(res, 200, { ok: true });
+    return true;
+  }
+
+  privateJson(res, 404, { error: "接口不存在" });
+  return true;
 }
 
 function cleanPadicOutput(text, command = "") {
@@ -635,6 +1000,7 @@ const server = createServer(async (req, res) => {
   try {
     const url = new URL(req.url || "/", `http://${req.headers.host || `${host}:${port}`}`);
 
+    if (await handlePrivateApi(req, res, url)) return;
     if (await handlePadicApi(req, res, url)) return;
     if (await handleStudyApi(req, res, url)) return;
     if (await handleApi(req, res, url)) return;

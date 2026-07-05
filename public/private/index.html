@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>我的私人空间 · Small Magellanic Cloud</title>
+  <meta name="description" content="Small Magellanic Cloud private space." />
+  <link rel="icon" href="/favicon.png" type="image/png" />
+  <link rel="stylesheet" href="/styles.css?v=20260706a" />
+</head>
+<body>
+  <div class="site-shell">
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="Small Magellanic Cloud">
+        <span class="brand-text">
+          <strong>Small Magellanic Cloud</strong>
+          <span data-i18n="site.subtitle">个人网站</span>
+        </span>
+      </a>
+      <nav class="site-nav trail" aria-label="当前位置" data-i18n-aria-label="nav.breadcrumb">
+        <a href="/" data-i18n="nav.home">主页</a>
+        <span>/</span>
+        <span class="current" data-i18n="nav.private">私人空间</span>
+        <div class="settings-menu" data-settings-menu-root>
+          <button class="settings-trigger" type="button" data-settings-toggle data-i18n="settings.label" aria-expanded="false" aria-label="设置">设置</button>
+          <div class="settings-popover" data-settings-menu>
+            <div class="settings-field">
+              <span data-i18n="settings.language">语言：</span>
+              <select data-language-select aria-label="Language"></select>
+            </div>
+            <div class="settings-field">
+              <span data-i18n="settings.appearance">外观：</span>
+              <select data-theme-select aria-label="Appearance"></select>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="private-main">
+      <section class="private-gate" data-private-gate data-reveal>
+        <p class="eyebrow" data-i18n="private.gate.eyebrow">private space</p>
+        <h1 data-i18n="private.gate.title">我的私人空间</h1>
+        <p data-i18n="private.gate.copy">输入密码后进入。这里暂时只放自我简介，后面的内容之后再补。</p>
+        <form class="private-form" data-private-form>
+          <label for="private-password" data-i18n="private.password.label">密码</label>
+          <div class="private-password-row">
+            <input id="private-password" type="password" autocomplete="current-password" data-private-password data-i18n-placeholder="private.password.placeholder" placeholder="输入密码" />
+            <button class="button primary" type="submit" data-i18n="private.enter">进入</button>
+          </div>
+          <label class="private-remember">
+            <input type="checkbox" data-private-remember />
+            <span data-i18n="private.remember">记住此登录设备</span>
+          </label>
+          <p class="private-error" data-private-error role="alert" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <section class="private-space" data-private-space hidden>
+        <article class="profile-panel" data-reveal>
+          <div class="profile-head">
+            <div class="profile-avatar" aria-hidden="true">墨</div>
+            <div class="profile-title">
+              <p class="eyebrow" data-i18n="private.profile.eyebrow">self introduction</p>
+              <h1 data-profile-name></h1>
+              <p data-profile-birthday></p>
+            </div>
+            <div class="profile-actions">
+              <button class="button" type="button" data-profile-edit data-i18n="private.profile.edit">编辑</button>
+              <button class="button primary" type="button" data-profile-save hidden data-i18n="private.profile.save">保存</button>
+              <button class="button" type="button" data-private-lock data-i18n="private.lock">退出</button>
+            </div>
+          </div>
+
+          <div class="profile-body" data-profile-view>
+            <div>
+              <span data-i18n="private.profile.nameLabel">姓名</span>
+              <strong data-profile-name-copy></strong>
+            </div>
+            <div>
+              <span data-i18n="private.profile.birthLabel">出生</span>
+              <strong data-profile-birthday-copy></strong>
+            </div>
+            <p data-profile-note></p>
+          </div>
+
+          <form class="profile-editor" data-profile-editor hidden>
+            <label>
+              <span data-i18n="private.profile.nameLabel">姓名</span>
+              <input type="text" data-profile-name-input />
+            </label>
+            <label>
+              <span data-i18n="private.profile.birthLabel">出生</span>
+              <input type="text" data-profile-birthday-input />
+            </label>
+            <label>
+              <span data-i18n="private.profile.noteLabel">简介</span>
+              <textarea rows="5" data-profile-note-input></textarea>
+            </label>
+          </form>
+        </article>
+
+        <article class="devices-panel" data-reveal>
+          <div class="devices-head">
+            <div>
+              <p class="eyebrow" data-i18n="private.devices.eyebrow">trusted devices</p>
+              <h2 data-i18n="private.devices.title">登录设备管理</h2>
+            </div>
+            <button class="button" type="button" data-devices-refresh data-i18n="private.devices.refresh">刷新</button>
+          </div>
+          <div class="devices-list" data-devices-list></div>
+          <button class="button" type="button" data-devices-revoke-others data-i18n="private.devices.revokeOthers">移除其他设备</button>
+        </article>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>Small Magellanic Cloud</span>
+      <span data-i18n="footer.built">一个持续生长的个人网站。</span>
+    </footer>
+  </div>
+  <script type="module" src="/private/private.mjs?v=20260706a"></script>
+</body>
+</html>
