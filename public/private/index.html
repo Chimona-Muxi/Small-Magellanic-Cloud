@@ -6,7 +6,7 @@
   <title>我的私人空间 · Small Magellanic Cloud</title>
   <meta name="description" content="Small Magellanic Cloud private space." />
   <link rel="icon" href="/favicon.png" type="image/png" />
-  <link rel="stylesheet" href="/styles.css?v=20260706a" />
+  <link rel="stylesheet" href="/styles.css?v=20260706b" />
 </head>
 <body>
   <div class="site-shell">
@@ -74,6 +74,10 @@
               <span class="private-nav-mark" aria-hidden="true"></span>
               <span data-i18n="private.nav.security">安全登录</span>
             </button>
+            <button class="private-nav-button" type="button" data-private-nav="data" aria-pressed="false">
+              <span class="private-nav-mark" aria-hidden="true"></span>
+              <span data-i18n="private.nav.data">数据管理</span>
+            </button>
           </nav>
         </aside>
 
@@ -135,6 +139,30 @@
               <button class="button subtle danger" type="button" data-private-lock data-i18n="private.lock">退出</button>
             </div>
           </article>
+
+          <article class="private-panel data-panel" data-private-panel="data" data-reveal hidden>
+            <div class="data-head">
+              <p class="eyebrow" data-i18n="private.data.eyebrow">data archive</p>
+              <h2 data-i18n="private.data.title">数据管理</h2>
+            </div>
+            <div class="data-menu-grid">
+              <div class="data-menu-group">
+                <button class="data-menu-trigger" type="button" data-data-menu="save" aria-expanded="false" data-i18n="private.data.save">保存</button>
+                <div class="data-menu-options" data-data-menu-panel="save" hidden>
+                  <button type="button" data-data-action="export-local" data-i18n="private.data.exportLocal">保存信息至本地</button>
+                  <button type="button" data-data-action="export-subsite" data-i18n="private.data.exportSubsite">传输信息至子网站</button>
+                </div>
+              </div>
+              <div class="data-menu-group">
+                <button class="data-menu-trigger" type="button" data-data-menu="import" aria-expanded="false" data-i18n="private.data.import">导入</button>
+                <div class="data-menu-options" data-data-menu-panel="import" hidden>
+                  <button type="button" data-data-action="import-local" data-i18n="private.data.importLocal">从本地导入</button>
+                  <button type="button" data-data-action="import-subsite" data-i18n="private.data.importSubsite">从子网站导入</button>
+                </div>
+              </div>
+            </div>
+            <p class="data-status" data-data-status role="status" aria-live="polite"></p>
+          </article>
         </div>
       </section>
     </main>
@@ -144,6 +172,6 @@
       <span data-i18n="footer.built">一个持续生长的个人网站。</span>
     </footer>
   </div>
-  <script type="module" src="/private/private.mjs?v=20260706a"></script>
+  <script type="module" src="/private/private.mjs?v=20260706b"></script>
 </body>
 </html>

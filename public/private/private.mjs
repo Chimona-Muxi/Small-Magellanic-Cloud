@@ -1,4 +1,4 @@
-import { t } from "../preferences.mjs?v=20260706a";
+import { t } from "../preferences.mjs?v=20260706b";
 
 const defaultProfile = {
   name: "",
@@ -33,6 +33,10 @@ const refreshDevicesButton = document.querySelector("[data-devices-refresh]");
 const revokeOthersButton = document.querySelector("[data-devices-revoke-others]");
 const navButtons = [...document.querySelectorAll("[data-private-nav]")];
 const panels = [...document.querySelectorAll("[data-private-panel]")];
+const dataMenuButtons = [...document.querySelectorAll("[data-data-menu]")];
+const dataMenuPanels = [...document.querySelectorAll("[data-data-menu-panel]")];
+const dataActionButtons = [...document.querySelectorAll("[data-data-action]")];
+const dataStatus = document.querySelector("[data-data-status]");
 
 let activeProfile = { ...defaultProfile };
 
@@ -64,6 +68,11 @@ function clearError() {
 function setSaveStatus(text = "", tone = "") {
   saveStatus.textContent = text;
   saveStatus.dataset.tone = tone;
+}
+
+function setDataStatus(text = "", tone = "") {
+  dataStatus.textContent = text;
+  dataStatus.dataset.tone = tone;
 }
 
 function renderProfile(profile = activeProfile) {
@@ -144,6 +153,16 @@ function setActivePanel(name) {
     panel.hidden = panel.dataset.privatePanel !== name;
   }
   if (name === "security") loadDevices().catch(() => {});
+}
+
+function setDataMenu(name) {
+  for (const button of dataMenuButtons) {
+    const active = button.dataset.dataMenu === name;
+    button.setAttribute("aria-expanded", active ? "true" : "false");
+  }
+  for (const panel of dataMenuPanels) {
+    panel.hidden = panel.dataset.dataMenuPanel !== name;
+  }
 }
 
 async function loadProfile() {
@@ -238,6 +257,46 @@ refreshDevicesButton.addEventListener("click", loadDevices);
 
 for (const button of navButtons) {
   button.addEventListener("click", () => setActivePanel(button.dataset.privateNav));
+}
+
+for (const button of dataMenuButtons) {
+  button.addEventListener("click", () => {
+    const name = button.getAttribute("aria-expanded") === "true" ? "" : button.dataset.dataMenu;
+    setDataMenu(name);
+  });
+}
+
+for (const button of dataActionButtons) {
+  button.addEventListener("click", async () => {
+    const action = button.dataset.dataAction;
+    const endpoints = {
+      "export-local": "/api/private/data/export/local",
+      "export-subsite": "/api/private/data/export/subsite",
+      "import-local": "/api/private/data/import/local",
+      "import-subsite": "/api/private/data/import/subsite"
+    };
+    try {
+      button.disabled = true;
+      const data = await api(endpoints[action], { method: "POST", body: "{}" });
+      if (action === "export-local") {
+        setDataStatus(`${t("private.data.savedLocal", "已保存到本地：")}${data.fileName}`, "ok");
+      } else if (action === "import-local") {
+        renderProfile(data.profile);
+        setEditing(false);
+        setDataStatus(`${t("private.data.importedLocal", "已从本地导入：")}${data.fileName}`, "ok");
+      }
+    } catch (dataError) {
+      if (dataError.message === "Subsite transfer not configured") {
+        setDataStatus(t("private.data.subsitePending", "子网站接口已预留"), "pending");
+      } else if (dataError.message === "No local archive") {
+        setDataStatus(t("private.data.noArchive", "没有找到本地归档"), "error");
+      } else {
+        setDataStatus(t("private.data.failed", "操作失败，请稍后再试"), "error");
+      }
+    } finally {
+      button.disabled = false;
+    }
+  });
 }
 
 revokeOthersButton.addEventListener("click", async () => {

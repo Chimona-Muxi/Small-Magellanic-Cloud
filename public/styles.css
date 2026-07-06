@@ -922,6 +922,100 @@ html[data-theme="light"] .nav-toggle {
   gap: 8px;
 }
 
+.data-panel {
+  align-content: start;
+}
+
+.data-head h2 {
+  margin: 6px 0 0;
+  font-size: clamp(24px, 3vw, 32px);
+  line-height: 1.05;
+}
+
+.data-menu-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.data-menu-group {
+  display: grid;
+  align-content: start;
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.data-menu-trigger,
+.data-menu-options button {
+  min-height: 36px;
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.055);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.data-menu-trigger {
+  text-align: left;
+  padding: 0 12px;
+}
+
+.data-menu-trigger[aria-expanded="true"] {
+  border-color: color-mix(in srgb, var(--green) 36%, var(--line));
+  background: color-mix(in srgb, var(--green) 12%, transparent);
+}
+
+.data-menu-options {
+  display: grid;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.data-menu-options button {
+  color: var(--muted);
+}
+
+.data-menu-options button:hover,
+.data-menu-options button:focus-visible,
+.data-menu-trigger:hover,
+.data-menu-trigger:focus-visible {
+  color: var(--ink);
+  border-color: color-mix(in srgb, var(--green) 28%, var(--line));
+  outline: 0;
+}
+
+.data-menu-options button:disabled {
+  cursor: progress;
+  opacity: 0.58;
+}
+
+.data-status {
+  min-height: 18px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.data-status[data-tone="ok"] {
+  color: var(--green);
+}
+
+.data-status[data-tone="pending"] {
+  color: var(--amber);
+}
+
+.data-status[data-tone="error"] {
+  color: var(--red);
+}
+
 .principles {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1113,6 +1207,11 @@ html[data-theme="light"] .nav-toggle {
   }
 
   .security-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .private-side-nav,
+  .data-menu-grid {
     grid-template-columns: 1fr;
   }
 

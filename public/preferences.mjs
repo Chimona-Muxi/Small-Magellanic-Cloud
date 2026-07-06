@@ -1292,6 +1292,15 @@ const copy = {
     ko: "보안",
     ru: "Безопасность"
   },
+  "private.nav.data": {
+    "zh-CN": "数据管理",
+    "zh-TW": "資料管理",
+    en: "Data",
+    fr: "Donnees",
+    ja: "データ",
+    ko: "데이터",
+    ru: "Данные"
+  },
   "private.profile.edit": {
     "zh-CN": "编辑",
     "zh-TW": "編輯",
@@ -1435,6 +1444,123 @@ const copy = {
     ja: "ログイン端末はありません",
     ko: "로그인 기기가 없습니다",
     ru: "Нет устройств входа"
+  },
+  "private.data.eyebrow": {
+    "zh-CN": "数据归档",
+    "zh-TW": "資料封存",
+    en: "data archive",
+    fr: "archive des donnees",
+    ja: "データ保管",
+    ko: "데이터 보관",
+    ru: "архив данных"
+  },
+  "private.data.title": {
+    "zh-CN": "数据管理",
+    "zh-TW": "資料管理",
+    en: "Data Management",
+    fr: "Gestion des donnees",
+    ja: "データ管理",
+    ko: "데이터 관리",
+    ru: "Управление данными"
+  },
+  "private.data.save": {
+    "zh-CN": "保存",
+    "zh-TW": "儲存",
+    en: "Save",
+    fr: "Enregistrer",
+    ja: "保存",
+    ko: "저장",
+    ru: "Сохранить"
+  },
+  "private.data.import": {
+    "zh-CN": "导入",
+    "zh-TW": "匯入",
+    en: "Import",
+    fr: "Importer",
+    ja: "読み込み",
+    ko: "가져오기",
+    ru: "Импорт"
+  },
+  "private.data.exportLocal": {
+    "zh-CN": "保存信息至本地",
+    "zh-TW": "儲存資訊至本機",
+    en: "Save information locally",
+    fr: "Enregistrer en local",
+    ja: "情報をローカルへ保存",
+    ko: "정보를 로컬에 저장",
+    ru: "Сохранить локально"
+  },
+  "private.data.exportSubsite": {
+    "zh-CN": "传输信息至子网站",
+    "zh-TW": "傳輸資訊至子網站",
+    en: "Transfer information to subsite",
+    fr: "Transferer au sous-site",
+    ja: "サブサイトへ転送",
+    ko: "하위 사이트로 전송",
+    ru: "Передать на поддомен"
+  },
+  "private.data.importLocal": {
+    "zh-CN": "从本地导入",
+    "zh-TW": "從本機匯入",
+    en: "Import from local",
+    fr: "Importer du local",
+    ja: "ローカルから読み込み",
+    ko: "로컬에서 가져오기",
+    ru: "Импорт из локального архива"
+  },
+  "private.data.importSubsite": {
+    "zh-CN": "从子网站导入",
+    "zh-TW": "從子網站匯入",
+    en: "Import from subsite",
+    fr: "Importer du sous-site",
+    ja: "サブサイトから読み込み",
+    ko: "하위 사이트에서 가져오기",
+    ru: "Импорт с поддомена"
+  },
+  "private.data.savedLocal": {
+    "zh-CN": "已保存到本地：",
+    "zh-TW": "已儲存到本機：",
+    en: "Saved locally: ",
+    fr: "Enregistre en local : ",
+    ja: "ローカルへ保存しました：",
+    ko: "로컬에 저장됨: ",
+    ru: "Сохранено локально: "
+  },
+  "private.data.importedLocal": {
+    "zh-CN": "已从本地导入：",
+    "zh-TW": "已從本機匯入：",
+    en: "Imported from local: ",
+    fr: "Importe du local : ",
+    ja: "ローカルから読み込みました：",
+    ko: "로컬에서 가져옴: ",
+    ru: "Импортировано локально: "
+  },
+  "private.data.subsitePending": {
+    "zh-CN": "子网站接口已预留",
+    "zh-TW": "子網站介面已預留",
+    en: "Subsite interface is reserved",
+    fr: "Interface de sous-site reservee",
+    ja: "サブサイト連携は予約済みです",
+    ko: "하위 사이트 인터페이스를 예약했습니다",
+    ru: "Интерфейс поддомена зарезервирован"
+  },
+  "private.data.failed": {
+    "zh-CN": "操作失败，请稍后再试",
+    "zh-TW": "操作失敗，請稍後再試",
+    en: "Operation failed. Please try again later.",
+    fr: "Operation echouee. Reessayez plus tard.",
+    ja: "操作に失敗しました。しばらくしてから再試行してください。",
+    ko: "작업에 실패했습니다. 잠시 후 다시 시도하세요.",
+    ru: "Операция не удалась. Попробуйте позже."
+  },
+  "private.data.noArchive": {
+    "zh-CN": "没有找到本地归档",
+    "zh-TW": "找不到本機封存",
+    en: "No local archive found",
+    fr: "Aucune archive locale trouvee",
+    ja: "ローカル保管が見つかりません",
+    ko: "로컬 보관 파일을 찾지 못했습니다",
+    ru: "Локальный архив не найден"
   },
   "game.copy": {
     "zh-CN": "互动游戏会按类型收纳。当前启用的是棋类，后续可以继续加入策略、谜题、物理模拟或其他实验。",

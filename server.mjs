@@ -1,10 +1,11 @@
 import { createServer } from "node:http";
 import { spawn } from "node:child_process";
 import { randomBytes, scryptSync, timingSafeEqual, createHash } from "node:crypto";
-import { access, mkdir, mkdtemp, readFile, rm, stat, writeFile } from "node:fs/promises";
+import { access, mkdir, mkdtemp, readFile, readdir, rm, stat, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { delimiter, dirname, extname, join, normalize } from "node:path";
 import { fileURLToPath } from "node:url";
+import { deflateRawSync, inflateRawSync } from "node:zlib";
 import {
   createInitialState as createLuqiangqiState,
   applyAction as applyLuqiangqiAction
@@ -29,6 +30,7 @@ const studyRequirements = join(studyDir, "requirements.txt");
 const privateDir = join(__dirname, ".private");
 const privateSessionsFile = join(privateDir, "sessions.json");
 const privateProfileFile = join(privateDir, "profile.json");
+const privateExportDir = process.env.SMC_PRIVATE_EXPORT_DIR || join(__dirname, "myproject.smallmagellaniccloud");
 const pythonCommand = process.env.PYTHON || (process.platform === "win32" ? "python" : "python3");
 const matplotlibConfigDir = join(tmpdir(), "smc-matplotlib");
 const port = Number(process.env.PORT || 5226);
@@ -138,6 +140,9 @@ const privateLoginBlockMs = 1000 * 60 * 5;
 const privateLoginMaxFailures = 6;
 const privateLoginAttempts = new Map();
 const privateDefaultProfile = privateProfileSeed();
+const privateArchiveType = "smc.private.archive";
+const privateArchiveVersion = 1;
+let zipCrcTable = null;
 
 function cleanPath(pathname) {
   const decoded = decodeURIComponent(pathname);
@@ -289,6 +294,212 @@ async function savePrivateProfile(profile) {
   privateProfileStore = cleanPrivateProfile(profile);
   await writePrivateJsonFile(privateProfileFile, privateProfileStore);
   return privateProfileStore;
+}
+
+function crcTable() {
+  if (zipCrcTable) return zipCrcTable;
+  zipCrcTable = new Uint32Array(256);
+  for (let i = 0; i < 256; i += 1) {
+    let value = i;
+    for (let bit = 0; bit < 8; bit += 1) {
+      value = value & 1 ? 0xedb88320 ^ (value >>> 1) : value >>> 1;
+    }
+    zipCrcTable[i] = value >>> 0;
+  }
+  return zipCrcTable;
+}
+
+function crc32(buffer) {
+  const table = crcTable();
+  let crc = 0xffffffff;
+  for (const byte of buffer) crc = table[(crc ^ byte) & 0xff] ^ (crc >>> 8);
+  return (crc ^ 0xffffffff) >>> 0;
+}
+
+function zipDateParts(date = new Date()) {
+  const year = Math.max(1980, date.getFullYear());
+  return {
+    time: (date.getHours() << 11) | (date.getMinutes() << 5) | Math.floor(date.getSeconds() / 2),
+    date: ((year - 1980) << 9) | ((date.getMonth() + 1) << 5) | date.getDate()
+  };
+}
+
+function makeZip(entries) {
+  const chunks = [];
+  const centralChunks = [];
+  let offset = 0;
+  const now = zipDateParts();
+
+  for (const entry of entries) {
+    const name = Buffer.from(entry.name.replace(/^\/+/, ""), "utf8");
+    const source = Buffer.isBuffer(entry.data) ? entry.data : Buffer.from(String(entry.data), "utf8");
+    const compressed = deflateRawSync(source);
+    const checksum = crc32(source);
+    const local = Buffer.alloc(30);
+    local.writeUInt32LE(0x04034b50, 0);
+    local.writeUInt16LE(20, 4);
+    local.writeUInt16LE(0, 6);
+    local.writeUInt16LE(8, 8);
+    local.writeUInt16LE(now.time, 10);
+    local.writeUInt16LE(now.date, 12);
+    local.writeUInt32LE(checksum, 14);
+    local.writeUInt32LE(compressed.length, 18);
+    local.writeUInt32LE(source.length, 22);
+    local.writeUInt16LE(name.length, 26);
+    local.writeUInt16LE(0, 28);
+
+    const central = Buffer.alloc(46);
+    central.writeUInt32LE(0x02014b50, 0);
+    central.writeUInt16LE(20, 4);
+    central.writeUInt16LE(20, 6);
+    central.writeUInt16LE(0, 8);
+    central.writeUInt16LE(8, 10);
+    central.writeUInt16LE(now.time, 12);
+    central.writeUInt16LE(now.date, 14);
+    central.writeUInt32LE(checksum, 16);
+    central.writeUInt32LE(compressed.length, 20);
+    central.writeUInt32LE(source.length, 24);
+    central.writeUInt16LE(name.length, 28);
+    central.writeUInt16LE(0, 30);
+    central.writeUInt16LE(0, 32);
+    central.writeUInt16LE(0, 34);
+    central.writeUInt16LE(0, 36);
+    central.writeUInt32LE(0, 38);
+    central.writeUInt32LE(offset, 42);
+
+    chunks.push(local, name, compressed);
+    centralChunks.push(central, name);
+    offset += local.length + name.length + compressed.length;
+  }
+
+  const centralSize = centralChunks.reduce((sum, chunk) => sum + chunk.length, 0);
+  const end = Buffer.alloc(22);
+  end.writeUInt32LE(0x06054b50, 0);
+  end.writeUInt16LE(0, 4);
+  end.writeUInt16LE(0, 6);
+  end.writeUInt16LE(entries.length, 8);
+  end.writeUInt16LE(entries.length, 10);
+  end.writeUInt32LE(centralSize, 12);
+  end.writeUInt32LE(offset, 16);
+  end.writeUInt16LE(0, 20);
+
+  return Buffer.concat([...chunks, ...centralChunks, end]);
+}
+
+function readZipEntries(buffer) {
+  const endSig = Buffer.from([0x50, 0x4b, 0x05, 0x06]);
+  const endOffset = buffer.lastIndexOf(endSig);
+  if (endOffset < 0) throw new Error("Invalid archive");
+
+  const count = buffer.readUInt16LE(endOffset + 10);
+  let cursor = buffer.readUInt32LE(endOffset + 16);
+  const entries = new Map();
+
+  for (let i = 0; i < count; i += 1) {
+    if (buffer.readUInt32LE(cursor) !== 0x02014b50) throw new Error("Invalid archive");
+    const method = buffer.readUInt16LE(cursor + 10);
+    const expectedCrc = buffer.readUInt32LE(cursor + 16);
+    const compressedSize = buffer.readUInt32LE(cursor + 20);
+    const nameLength = buffer.readUInt16LE(cursor + 28);
+    const extraLength = buffer.readUInt16LE(cursor + 30);
+    const commentLength = buffer.readUInt16LE(cursor + 32);
+    const localOffset = buffer.readUInt32LE(cursor + 42);
+    const name = buffer.subarray(cursor + 46, cursor + 46 + nameLength).toString("utf8");
+
+    if (buffer.readUInt32LE(localOffset) !== 0x04034b50) throw new Error("Invalid archive");
+    const localNameLength = buffer.readUInt16LE(localOffset + 26);
+    const localExtraLength = buffer.readUInt16LE(localOffset + 28);
+    const dataOffset = localOffset + 30 + localNameLength + localExtraLength;
+    const compressed = buffer.subarray(dataOffset, dataOffset + compressedSize);
+    const data = method === 0 ? compressed : method === 8 ? inflateRawSync(compressed) : null;
+    if (!data) throw new Error("Unsupported archive compression");
+    if (crc32(data) !== expectedCrc) throw new Error("Archive checksum mismatch");
+    entries.set(name, data);
+
+    cursor += 46 + nameLength + extraLength + commentLength;
+  }
+
+  return entries;
+}
+
+async function makePrivateArchive() {
+  const createdAt = new Date().toISOString();
+  const profile = await loadPrivateProfile();
+  const store = await loadPrivateSessions();
+  const manifest = {
+    archiveType: privateArchiveType,
+    archiveVersion: privateArchiveVersion,
+    createdAt,
+    source: "Small Magellanic Cloud",
+    modules: ["profile", "security-devices"],
+    compatibility: {
+      profile: 1,
+      securityDevices: 1,
+      reserved: ["temporary-files", "mail-hub", "subsite-transfer"]
+    }
+  };
+  const devices = store.sessions.map((session) => publicPrivateSession(session));
+  return {
+    createdAt,
+    buffer: makeZip([
+      { name: "manifest.json", data: `${JSON.stringify(manifest, null, 2)}\n` },
+      { name: "data/profile.json", data: `${JSON.stringify(profile, null, 2)}\n` },
+      { name: "data/security-devices.json", data: `${JSON.stringify({ devices }, null, 2)}\n` },
+      {
+        name: "data/reserved.json",
+        data: `${JSON.stringify({
+          modules: ["temporary-files", "mail-hub", "subsite-transfer"],
+          note: "Future data modules can be added under data/ without changing the archive container."
+        }, null, 2)}\n`
+      }
+    ])
+  };
+}
+
+async function exportPrivateArchiveLocal() {
+  await mkdir(privateExportDir, { recursive: true });
+  const { buffer, createdAt } = await makePrivateArchive();
+  const stamp = createdAt.replace(/[-:]/g, "").replace(/\.\d+Z$/, "Z").replace("T", "-").replace("Z", "");
+  const fileName = `smc-private-data-${stamp}.zip`;
+  const filePath = join(privateExportDir, fileName);
+  await writeFile(filePath, buffer);
+  return { fileName, path: filePath, createdAt };
+}
+
+async function latestPrivateArchivePath() {
+  let items = [];
+  try {
+    items = await readdir(privateExportDir, { withFileTypes: true });
+  } catch {
+    throw new Error("No local archive");
+  }
+
+  const archives = await Promise.all(items
+    .filter((item) => item.isFile() && /^smc-private-data-.+\.zip$/i.test(item.name))
+    .map(async (item) => {
+      const filePath = join(privateExportDir, item.name);
+      const info = await stat(filePath);
+      return { fileName: item.name, filePath, mtimeMs: info.mtimeMs };
+    }));
+  archives.sort((a, b) => b.mtimeMs - a.mtimeMs);
+  if (!archives[0]) throw new Error("No local archive");
+  return archives[0];
+}
+
+async function importPrivateArchiveLocal() {
+  const archive = await latestPrivateArchivePath();
+  const entries = readZipEntries(await readFile(archive.filePath));
+  const manifest = JSON.parse(entries.get("manifest.json")?.toString("utf8") || "{}");
+  if (manifest.archiveType !== privateArchiveType) throw new Error("Unsupported archive");
+  if (Number(manifest.archiveVersion) > privateArchiveVersion) throw new Error("Archive version is newer");
+
+  const profile = JSON.parse(entries.get("data/profile.json")?.toString("utf8") || "{}");
+  const savedProfile = await savePrivateProfile(profile);
+  return {
+    fileName: archive.fileName,
+    imported: ["profile"],
+    profile: savedProfile
+  };
 }
 
 function publicPrivateSession(session, currentId = "") {
@@ -675,6 +886,54 @@ async function handlePrivateApi(req, res, url) {
     }
     await savePrivateSessions();
     privateJson(res, 200, { ok: true });
+    return true;
+  }
+
+  if (route === "/api/private/data/export/local") {
+    const session = await requirePrivateSession(req, res);
+    if (!session) return true;
+    if (req.method !== "POST") {
+      privateJson(res, 405, { error: "Method not allowed" });
+      return true;
+    }
+    try {
+      const archive = await exportPrivateArchiveLocal();
+      privateJson(res, 200, {
+        ok: true,
+        archiveVersion: privateArchiveVersion,
+        modules: ["profile", "security-devices"],
+        ...archive
+      });
+    } catch {
+      privateJson(res, 500, { error: "Local export failed" });
+    }
+    return true;
+  }
+
+  if (route === "/api/private/data/import/local") {
+    const session = await requirePrivateSession(req, res);
+    if (!session) return true;
+    if (req.method !== "POST") {
+      privateJson(res, 405, { error: "Method not allowed" });
+      return true;
+    }
+    try {
+      privateJson(res, 200, { ok: true, ...(await importPrivateArchiveLocal()) });
+    } catch (error) {
+      const status = error.message === "No local archive" ? 404 : 500;
+      privateJson(res, status, { error: error.message || "Local import failed" });
+    }
+    return true;
+  }
+
+  if (route === "/api/private/data/export/subsite" || route === "/api/private/data/import/subsite") {
+    const session = await requirePrivateSession(req, res);
+    if (!session) return true;
+    if (req.method !== "POST") {
+      privateJson(res, 405, { error: "Method not allowed" });
+      return true;
+    }
+    privateJson(res, 501, { error: "Subsite transfer not configured" });
     return true;
   }
 
