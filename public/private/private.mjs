@@ -15,6 +15,7 @@ const error = document.querySelector("[data-private-error]");
 const lockButton = document.querySelector("[data-private-lock]");
 
 const profileName = document.querySelector("[data-profile-name]");
+const profileNameSide = document.querySelector("[data-profile-name-side]");
 const profileBirthday = document.querySelector("[data-profile-birthday]");
 const profileNameCopy = document.querySelector("[data-profile-name-copy]");
 const profileBirthdayCopy = document.querySelector("[data-profile-birthday-copy]");
@@ -26,9 +27,12 @@ const saveButton = document.querySelector("[data-profile-save]");
 const nameInput = document.querySelector("[data-profile-name-input]");
 const birthdayInput = document.querySelector("[data-profile-birthday-input]");
 const noteInput = document.querySelector("[data-profile-note-input]");
+const saveStatus = document.querySelector("[data-profile-save-status]");
 const devicesList = document.querySelector("[data-devices-list]");
 const refreshDevicesButton = document.querySelector("[data-devices-refresh]");
 const revokeOthersButton = document.querySelector("[data-devices-revoke-others]");
+const navButtons = [...document.querySelectorAll("[data-private-nav]")];
+const panels = [...document.querySelectorAll("[data-private-panel]")];
 
 let activeProfile = { ...defaultProfile };
 
@@ -57,9 +61,15 @@ function clearError() {
   error.textContent = "";
 }
 
+function setSaveStatus(text = "", tone = "") {
+  saveStatus.textContent = text;
+  saveStatus.dataset.tone = tone;
+}
+
 function renderProfile(profile = activeProfile) {
   activeProfile = { ...defaultProfile, ...profile };
   profileName.textContent = activeProfile.name;
+  profileNameSide.textContent = activeProfile.name;
   profileBirthday.textContent = activeProfile.birthday;
   profileNameCopy.textContent = activeProfile.name;
   profileBirthdayCopy.textContent = activeProfile.birthday;
@@ -76,6 +86,7 @@ function setEditing(editing) {
   profileEditor.hidden = !editing;
   editButton.hidden = editing;
   saveButton.hidden = !editing;
+  if (editing) setSaveStatus();
 }
 
 function formatTime(value) {
@@ -123,6 +134,18 @@ function renderDevices(devices = []) {
   }));
 }
 
+function setActivePanel(name) {
+  for (const button of navButtons) {
+    const active = button.dataset.privateNav === name;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", active ? "true" : "false");
+  }
+  for (const panel of panels) {
+    panel.hidden = panel.dataset.privatePanel !== name;
+  }
+  if (name === "security") loadDevices().catch(() => {});
+}
+
 async function loadProfile() {
   const data = await api("/api/private/profile");
   renderProfile(data.profile);
@@ -138,7 +161,9 @@ async function showSpace() {
   space.hidden = false;
   clearError();
   setEditing(false);
-  await Promise.all([loadProfile(), loadDevices()]);
+  await loadProfile();
+  await loadDevices().catch(() => {});
+  setActivePanel("profile");
   for (const item of space.querySelectorAll("[data-reveal]")) item.classList.add("visible");
 }
 
@@ -187,12 +212,20 @@ saveButton.addEventListener("click", async () => {
     birthday: birthdayInput.value,
     note: noteInput.value
   };
-  const data = await api("/api/private/profile", {
-    method: "PUT",
-    body: JSON.stringify({ profile })
-  });
-  renderProfile(data.profile);
-  setEditing(false);
+  try {
+    saveButton.disabled = true;
+    const data = await api("/api/private/profile", {
+      method: "PUT",
+      body: JSON.stringify({ profile })
+    });
+    renderProfile(data.profile);
+    setEditing(false);
+    setSaveStatus(t("private.profile.saved", "已保存"), "ok");
+  } catch {
+    setSaveStatus(t("private.profile.saveError", "保存失败，请稍后再试"), "error");
+  } finally {
+    saveButton.disabled = false;
+  }
 });
 
 lockButton.addEventListener("click", async () => {
@@ -202,6 +235,10 @@ lockButton.addEventListener("click", async () => {
 });
 
 refreshDevicesButton.addEventListener("click", loadDevices);
+
+for (const button of navButtons) {
+  button.addEventListener("click", () => setActivePanel(button.dataset.privateNav));
+}
 
 revokeOthersButton.addEventListener("click", async () => {
   await api("/api/private/devices/revoke", {
@@ -213,5 +250,7 @@ revokeOthersButton.addEventListener("click", async () => {
 
 window.addEventListener("smc:languagechange", () => {
   if (error.textContent) showError("private.password.error", "密码不正确");
+  if (saveStatus.dataset.tone === "ok") setSaveStatus(t("private.profile.saved", "已保存"), "ok");
+  if (saveStatus.dataset.tone === "error") setSaveStatus(t("private.profile.saveError", "保存失败，请稍后再试"), "error");
   loadDevices().catch(() => {});
 });

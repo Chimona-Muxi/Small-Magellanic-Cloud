@@ -46,7 +46,7 @@
           <label for="private-password" data-i18n="private.password.label">密码</label>
           <div class="private-password-row">
             <input id="private-password" type="password" autocomplete="current-password" data-private-password data-i18n-placeholder="private.password.placeholder" placeholder="输入密码" />
-            <button class="button primary" type="submit" data-i18n="private.enter">进入</button>
+            <button class="button primary private-submit" type="submit" data-i18n="private.enter">进入私人空间</button>
           </div>
           <label class="private-remember">
             <input type="checkbox" data-private-remember />
@@ -56,61 +56,86 @@
         </form>
       </section>
 
-      <section class="private-space" data-private-space hidden>
-        <article class="profile-panel" data-reveal>
-          <div class="profile-head">
-            <div class="profile-avatar" aria-hidden="true">墨</div>
-            <div class="profile-title">
-              <p class="eyebrow" data-i18n="private.profile.eyebrow">self introduction</p>
-              <h1 data-profile-name></h1>
-              <p data-profile-birthday></p>
-            </div>
-            <div class="profile-actions">
-              <button class="button" type="button" data-profile-edit data-i18n="private.profile.edit">编辑</button>
-              <button class="button primary" type="button" data-profile-save hidden data-i18n="private.profile.save">保存</button>
-              <button class="button" type="button" data-private-lock data-i18n="private.lock">退出</button>
+      <section class="private-space private-layout" data-private-space hidden>
+        <aside class="private-sidebar" data-reveal>
+          <div class="private-sidebar-id">
+            <div class="private-sidebar-avatar" aria-hidden="true">墨</div>
+            <div>
+              <strong data-profile-name-side></strong>
+              <span data-i18n="nav.private">私人空间</span>
             </div>
           </div>
+          <nav class="private-side-nav" aria-label="私人空间导航" data-i18n-aria-label="private.nav.label">
+            <button class="private-nav-button active" type="button" data-private-nav="profile" aria-pressed="true">
+              <span class="private-nav-mark" aria-hidden="true"></span>
+              <span data-i18n="private.nav.profile">自我简介</span>
+            </button>
+            <button class="private-nav-button" type="button" data-private-nav="security" aria-pressed="false">
+              <span class="private-nav-mark" aria-hidden="true"></span>
+              <span data-i18n="private.nav.security">安全登录</span>
+            </button>
+          </nav>
+        </aside>
 
-          <div class="profile-body" data-profile-view>
-            <div>
-              <span data-i18n="private.profile.nameLabel">姓名</span>
-              <strong data-profile-name-copy></strong>
+        <div class="private-panel-stack">
+          <article class="private-panel profile-panel" data-private-panel="profile" data-reveal>
+            <div class="profile-head">
+              <div class="profile-avatar" aria-hidden="true">墨</div>
+              <div class="profile-title">
+                <p class="eyebrow" data-i18n="private.profile.eyebrow">self introduction</p>
+                <h1 data-profile-name></h1>
+                <p data-profile-birthday></p>
+              </div>
+              <div class="profile-actions">
+                <button class="button" type="button" data-profile-edit data-i18n="private.profile.edit">编辑</button>
+                <button class="button primary" type="button" data-profile-save hidden data-i18n="private.profile.save">保存</button>
+              </div>
             </div>
-            <div>
-              <span data-i18n="private.profile.birthLabel">出生</span>
-              <strong data-profile-birthday-copy></strong>
-            </div>
-            <p data-profile-note></p>
-          </div>
 
-          <form class="profile-editor" data-profile-editor hidden>
-            <label>
-              <span data-i18n="private.profile.nameLabel">姓名</span>
-              <input type="text" data-profile-name-input />
-            </label>
-            <label>
-              <span data-i18n="private.profile.birthLabel">出生</span>
-              <input type="text" data-profile-birthday-input />
-            </label>
-            <label>
-              <span data-i18n="private.profile.noteLabel">简介</span>
-              <textarea rows="5" data-profile-note-input></textarea>
-            </label>
-          </form>
-        </article>
-
-        <article class="devices-panel" data-reveal>
-          <div class="devices-head">
-            <div>
-              <p class="eyebrow" data-i18n="private.devices.eyebrow">trusted devices</p>
-              <h2 data-i18n="private.devices.title">登录设备管理</h2>
+            <div class="profile-body" data-profile-view>
+              <div>
+                <span data-i18n="private.profile.nameLabel">姓名</span>
+                <strong data-profile-name-copy></strong>
+              </div>
+              <div>
+                <span data-i18n="private.profile.birthLabel">出生</span>
+                <strong data-profile-birthday-copy></strong>
+              </div>
+              <p data-profile-note></p>
             </div>
-            <button class="button" type="button" data-devices-refresh data-i18n="private.devices.refresh">刷新</button>
-          </div>
-          <div class="devices-list" data-devices-list></div>
-          <button class="button" type="button" data-devices-revoke-others data-i18n="private.devices.revokeOthers">移除其他设备</button>
-        </article>
+
+            <form class="profile-editor" data-profile-editor hidden>
+              <label>
+                <span data-i18n="private.profile.nameLabel">姓名</span>
+                <input type="text" data-profile-name-input />
+              </label>
+              <label>
+                <span data-i18n="private.profile.birthLabel">出生</span>
+                <input type="text" data-profile-birthday-input />
+              </label>
+              <label>
+                <span data-i18n="private.profile.noteLabel">简介</span>
+                <textarea rows="4" data-profile-note-input></textarea>
+              </label>
+            </form>
+            <p class="profile-save-status" data-profile-save-status role="status" aria-live="polite"></p>
+          </article>
+
+          <article class="private-panel devices-panel" data-private-panel="security" data-reveal hidden>
+            <div class="devices-head">
+              <div>
+                <p class="eyebrow" data-i18n="private.devices.eyebrow">trusted devices</p>
+                <h2 data-i18n="private.devices.title">登录设备管理</h2>
+              </div>
+              <button class="button" type="button" data-devices-refresh data-i18n="private.devices.refresh">刷新</button>
+            </div>
+            <div class="devices-list" data-devices-list></div>
+            <div class="security-actions">
+              <button class="button subtle" type="button" data-devices-revoke-others data-i18n="private.devices.revokeOthers">移除其他设备</button>
+              <button class="button subtle danger" type="button" data-private-lock data-i18n="private.lock">退出</button>
+            </div>
+          </article>
+        </div>
       </section>
     </main>
 

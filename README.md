@@ -20,6 +20,7 @@ Small Magellanic Cloud 是张墨霖的个人网站：一个把日常、学习工
 | `/study/padic/web/` | 浏览器版 p进数转换器 | 已启用 |
 | `/study/algebra/` | 高等代数学习辅助器 | 已启用 |
 | `/study/analysis/` | 数学分析学习辅助器 | 已启用 |
+| `/private/` | 私人空间 | 已启用 |
 
 ## 代码边界
 

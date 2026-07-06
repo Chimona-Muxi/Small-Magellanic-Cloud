@@ -1157,6 +1157,15 @@ const copy = {
     ko: "먼저 자기소개를 두는 보호된 공간입니다. 내용은 나중에 더할 수 있습니다.",
     ru: "Защищенное место для автобиографии, остальное можно добавить позже."
   },
+  "private.corner": {
+    "zh-CN": "私人空间",
+    "zh-TW": "私人空間",
+    en: "Private",
+    fr: "Prive",
+    ja: "Private",
+    ko: "개인 공간",
+    ru: "Личное"
+  },
   "private.gate.eyebrow": {
     "zh-CN": "私人空间",
     "zh-TW": "私人空間",
@@ -1230,13 +1239,13 @@ const copy = {
     ru: "Запомнить это устройство"
   },
   "private.enter": {
-    "zh-CN": "进入",
-    "zh-TW": "進入",
-    en: "Enter",
-    fr: "Entrer",
-    ja: "入る",
-    ko: "입장",
-    ru: "Войти"
+    "zh-CN": "进入私人空间",
+    "zh-TW": "進入私人空間",
+    en: "Enter Private Space",
+    fr: "Entrer dans l'espace prive",
+    ja: "プライベート空間へ",
+    ko: "개인 공간 입장",
+    ru: "Войти в личное пространство"
   },
   "private.lock": {
     "zh-CN": "退出",
@@ -1256,6 +1265,33 @@ const copy = {
     ko: "자기소개",
     ru: "автобиография"
   },
+  "private.nav.label": {
+    "zh-CN": "私人空间导航",
+    "zh-TW": "私人空間導覽",
+    en: "Private space navigation",
+    fr: "Navigation de l'espace prive",
+    ja: "プライベート空間ナビゲーション",
+    ko: "개인 공간 탐색",
+    ru: "Навигация личного пространства"
+  },
+  "private.nav.profile": {
+    "zh-CN": "自我简介",
+    "zh-TW": "自我簡介",
+    en: "Profile",
+    fr: "Profil",
+    ja: "自己紹介",
+    ko: "자기소개",
+    ru: "Профиль"
+  },
+  "private.nav.security": {
+    "zh-CN": "安全登录",
+    "zh-TW": "安全登入",
+    en: "Security",
+    fr: "Securite",
+    ja: "セキュリティ",
+    ko: "보안",
+    ru: "Безопасность"
+  },
   "private.profile.edit": {
     "zh-CN": "编辑",
     "zh-TW": "編輯",
@@ -1273,6 +1309,24 @@ const copy = {
     ja: "保存",
     ko: "저장",
     ru: "Сохранить"
+  },
+  "private.profile.saved": {
+    "zh-CN": "已保存",
+    "zh-TW": "已儲存",
+    en: "Saved",
+    fr: "Enregistre",
+    ja: "保存しました",
+    ko: "저장됨",
+    ru: "Сохранено"
+  },
+  "private.profile.saveError": {
+    "zh-CN": "保存失败，请稍后再试",
+    "zh-TW": "儲存失敗，請稍後再試",
+    en: "Save failed. Please try again later.",
+    fr: "Echec de l'enregistrement. Reessayez plus tard.",
+    ja: "保存に失敗しました。しばらくしてから再試行してください。",
+    ko: "저장에 실패했습니다. 잠시 후 다시 시도하세요.",
+    ru: "Не удалось сохранить. Попробуйте позже."
   },
   "private.profile.nameLabel": {
     "zh-CN": "姓名",

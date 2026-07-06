@@ -137,11 +137,7 @@ const privateLoginWindowMs = 1000 * 60 * 10;
 const privateLoginBlockMs = 1000 * 60 * 5;
 const privateLoginMaxFailures = 6;
 const privateLoginAttempts = new Map();
-const privateDefaultProfile = {
-  name: "",
-  birthday: "",
-  note: ""
-};
+const privateDefaultProfile = privateProfileSeed();
 
 function cleanPath(pathname) {
   const decoded = decodeURIComponent(pathname);
@@ -225,6 +221,37 @@ function verifyPrivatePassword(password) {
   return actual.length === expected.length && timingSafeEqual(actual, expected);
 }
 
+function privateProfileSeed() {
+  try {
+    if (process.env.SMC_PRIVATE_PROFILE_JSON) {
+      const profile = JSON.parse(process.env.SMC_PRIVATE_PROFILE_JSON);
+      return {
+        name: String(profile.name || "张墨霖").trim().slice(0, 80) || "张墨霖",
+        birthday: String(profile.birthday || "2006/09/17").trim().slice(0, 80) || "2006/09/17",
+        note: String(profile.note || "").trim().slice(0, 1200)
+      };
+    }
+  } catch {
+    // Fall back to individual fields below.
+  }
+  return {
+    name: process.env.SMC_PRIVATE_PROFILE_NAME || "张墨霖",
+    birthday: process.env.SMC_PRIVATE_PROFILE_BIRTHDAY || "2006/09/17",
+    note: process.env.SMC_PRIVATE_PROFILE_NOTE || ""
+  };
+}
+
+function cleanPrivateProfile(profile = {}) {
+  const name = String(profile.name ?? privateDefaultProfile?.name ?? "").trim().slice(0, 80);
+  const birthday = String(profile.birthday ?? privateDefaultProfile?.birthday ?? "").trim().slice(0, 80);
+  const note = String(profile.note ?? privateDefaultProfile?.note ?? "").trim().slice(0, 1200);
+  return {
+    name: name || privateDefaultProfile?.name || "",
+    birthday: birthday || privateDefaultProfile?.birthday || "",
+    note
+  };
+}
+
 async function readPrivateJsonFile(filePath, fallback) {
   try {
     return JSON.parse(await readFile(filePath, "utf8"));
@@ -254,19 +281,12 @@ async function savePrivateSessions() {
 
 async function loadPrivateProfile() {
   if (privateProfileStore) return privateProfileStore;
-  privateProfileStore = {
-    ...privateDefaultProfile,
-    ...await readPrivateJsonFile(privateProfileFile, {})
-  };
+  privateProfileStore = cleanPrivateProfile(await readPrivateJsonFile(privateProfileFile, privateDefaultProfile));
   return privateProfileStore;
 }
 
 async function savePrivateProfile(profile) {
-  privateProfileStore = {
-    name: String(profile.name || privateDefaultProfile.name).trim().slice(0, 80) || privateDefaultProfile.name,
-    birthday: String(profile.birthday || privateDefaultProfile.birthday).trim().slice(0, 80) || privateDefaultProfile.birthday,
-    note: String(profile.note || privateDefaultProfile.note).trim().slice(0, 1200) || privateDefaultProfile.note
-  };
+  privateProfileStore = cleanPrivateProfile(profile);
   await writePrivateJsonFile(privateProfileFile, privateProfileStore);
   return privateProfileStore;
 }
@@ -598,13 +618,21 @@ async function handlePrivateApi(req, res, url) {
     const session = await requirePrivateSession(req, res);
     if (!session) return true;
     if (req.method === "GET") {
-      privateJson(res, 200, { profile: await loadPrivateProfile() });
+      try {
+        privateJson(res, 200, { profile: await loadPrivateProfile() });
+      } catch {
+        privateJson(res, 500, { error: "Profile load failed" });
+      }
       return true;
     }
     if (req.method === "PUT") {
-      const body = await readBody(req);
-      const profile = await savePrivateProfile(body.profile || body);
-      privateJson(res, 200, { profile });
+      try {
+        const body = await readBody(req);
+        const profile = await savePrivateProfile(body.profile || body);
+        privateJson(res, 200, { profile });
+      } catch {
+        privateJson(res, 500, { error: "Profile save failed" });
+      }
       return true;
     }
     privateJson(res, 405, { error: "Method not allowed" });
