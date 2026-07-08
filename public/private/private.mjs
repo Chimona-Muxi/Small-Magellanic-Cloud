@@ -1,4 +1,4 @@
-import { t } from "../preferences.mjs?v=20260709b";
+import { t } from "../preferences.mjs?v=20260709c";
 
 const defaultProfile = {
   name: "",
@@ -42,6 +42,7 @@ const mailAddButton = document.querySelector("[data-mail-add]");
 const mailAddDialog = document.querySelector("[data-mail-add-dialog]");
 const mailCloseButton = document.querySelector("[data-mail-close]");
 const mailProviderChoices = [...document.querySelectorAll("[data-provider-choice]")];
+const mailProviderHint = document.querySelector("[data-mail-provider-hint]");
 const mailForm = document.querySelector("[data-mail-form]");
 const mailIdInput = document.querySelector("[data-mail-id]");
 const mailProviderInput = document.querySelector("[data-mail-provider]");
@@ -78,6 +79,14 @@ const mailProviders = {
   icloud: { label: "iCloud", hint: "App Password" },
   hrbeu: { label: "HRBEU", hint: "School Mail" },
   custom: { label: "Custom", hint: "Manual" }
+};
+const mailProviderGuides = {
+  gmail: "Gmail 请选择应用专用密码；需要先开启两步验证。这里暂不支持完整 Google OAuth 登录流程。",
+  qq: "QQ 邮箱请在网页邮箱设置里开启 IMAP/SMTP，并填写生成的授权码，不要填写 QQ 登录密码。",
+  "163": "163 邮箱请开启 IMAP/SMTP，并填写客户端授权密码。",
+  icloud: "iCloud 需要 Apple ID 的应用专用密码。",
+  hrbeu: "HRBEU 需要确认学校邮箱的 IMAP/SMTP 服务器地址后才能收发。",
+  custom: "自定义邮箱需要后续补入 IMAP/SMTP 服务器配置。"
 };
 
 async function api(path, options = {}) {
@@ -293,15 +302,15 @@ function setMailProvider(provider) {
     choice.classList.toggle("active", active);
     choice.setAttribute("aria-pressed", active ? "true" : "false");
   }
-  const auth = provider === "gmail" ? "oauth" : "app-password";
-  if (!mailSecretTypeInput.value) mailSecretTypeInput.value = auth;
+  mailProviderHint.textContent = mailProviderGuides[provider] || "";
+  const auth = provider === "gmail" || provider === "icloud" ? "app-password" : "imap-smtp";
+  mailSecretTypeInput.value = auth;
 }
 
 function clearMailForm() {
   mailIdInput.value = "";
   setMailProvider("gmail");
   mailAddressInput.value = "";
-  mailSecretTypeInput.value = "oauth";
   mailSecretInput.value = "";
   mailNoteInput.value = "";
 }

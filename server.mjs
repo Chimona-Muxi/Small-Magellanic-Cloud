@@ -791,16 +791,44 @@ function mailProviderConfig(provider) {
 }
 
 function cleanMailAccount(account = {}) {
+  const provider = String(account.provider || "").trim().toLowerCase();
   const address = String(account.address || "").trim().slice(0, 180);
-  const secret = String(account.secret || "").trim().slice(0, 6000);
+  const secretType = String(account.secretType || "app-password").trim().toLowerCase();
+  const rawSecret = String(account.secret || "").trim().slice(0, 6000);
+  const secret = secretType === "oauth" ? rawSecret : rawSecret.replace(/\s+/g, "");
   if (!address || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address)) throw new Error("Invalid mail account");
   if (!secret) throw new Error("Missing mail secret");
   return {
-    provider: String(account.provider || "").trim().toLowerCase(),
+    provider,
     address,
     secret,
-    secretType: String(account.secretType || "app-password").trim().toLowerCase()
+    secretType
   };
+}
+
+function mailFriendlyError(error, account = {}, action = "mail") {
+  const provider = String(account?.provider || "").toLowerCase();
+  const raw = String(error?.message || error || "").trim();
+  const lower = raw.toLowerCase();
+  if (provider === "qq" && (lower.includes("login fail") || lower.includes("account is abnormal") || lower.includes("password is incorrect"))) {
+    return "QQ 邮箱登录失败：请确认已在 QQ 邮箱网页版开启 IMAP/SMTP 服务，并填写“授权码”而不是 QQ 登录密码。若刚失败多次，请等几分钟后再试。";
+  }
+  if (provider === "gmail" && (lower.includes("auth") || lower.includes("535") || lower.includes("invalid") || lower.includes("mail send failed"))) {
+    return "Gmail 认证失败：当前实现需要 Gmail 应用专用密码，不能直接使用网页登录密码；请确认已开启两步验证并使用 16 位应用专用密码。";
+  }
+  if (provider === "icloud" && (lower.includes("auth") || lower.includes("535") || lower.includes("login"))) {
+    return "iCloud 认证失败：请使用 Apple ID 的应用专用密码，不要使用 Apple ID 登录密码。";
+  }
+  if (provider === "163" && (lower.includes("auth") || lower.includes("login") || lower.includes("password"))) {
+    return "163 邮箱登录失败：请确认已开启 IMAP/SMTP，并使用客户端授权密码。";
+  }
+  if (lower.includes("provider not configured")) {
+    return "这个邮箱类型还没有服务器配置；HRBEU 或自定义邮箱需要先补 IMAP/SMTP 主机和端口。";
+  }
+  if (lower.includes("timed out")) {
+    return "邮箱服务器连接超时：请稍后再试，或确认该邮箱已开启 IMAP/SMTP 服务。";
+  }
+  return raw || (action === "send" ? "Mail send failed" : "Mail fetch failed");
 }
 
 function encodeMailHeader(value = "") {
@@ -1234,11 +1262,11 @@ async function handlePrivateApi(req, res, url) {
       privateJson(res, 405, { error: "Method not allowed" });
       return true;
     }
+    const body = await readBody(req);
     try {
-      const body = await readBody(req);
       privateJson(res, 200, { ok: true, ...(await fetchProviderInbox(body.account)) });
     } catch (error) {
-      privateJson(res, 502, { error: error.message || "Mail fetch failed" });
+      privateJson(res, 502, { error: mailFriendlyError(error, body.account, "fetch") });
     }
     return true;
   }
@@ -1250,11 +1278,11 @@ async function handlePrivateApi(req, res, url) {
       privateJson(res, 405, { error: "Method not allowed" });
       return true;
     }
+    const body = await readBody(req);
     try {
-      const body = await readBody(req);
       privateJson(res, 200, await sendProviderMail(body.account, body.message));
     } catch (error) {
-      privateJson(res, 502, { error: error.message || "Mail send failed" });
+      privateJson(res, 502, { error: mailFriendlyError(error, body.account, "send") });
     }
     return true;
   }

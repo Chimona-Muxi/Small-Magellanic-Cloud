@@ -1317,6 +1317,13 @@ html[data-theme="light"] .nav-toggle {
   outline: 0;
 }
 
+.mail-provider-hint {
+  margin: 0;
+  color: var(--amber);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
 .mail-modal {
   position: fixed;
   inset: 0;
