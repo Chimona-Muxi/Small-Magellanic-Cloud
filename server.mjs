@@ -831,6 +831,13 @@ function mailFriendlyError(error, account = {}, action = "mail") {
   return raw || (action === "send" ? "Mail send failed" : "Mail fetch failed");
 }
 
+function mailLoginIdentities(account) {
+  const address = String(account.address || "").trim();
+  const local = address.split("@")[0];
+  if (account.provider === "qq" && local && local !== address) return [address, local];
+  return [address];
+}
+
 function encodeMailHeader(value = "") {
   const text = String(value || "").replace(/[\r\n]+/g, " ").trim();
   if (/^[\x20-\x7e]*$/.test(text)) return text;
@@ -937,9 +944,18 @@ async function smtpAuth(client, account) {
     if (response.code === 334) await smtpCommand(client, "", [235]);
     return;
   }
-  await smtpCommand(client, "AUTH LOGIN", [334]);
-  await smtpCommand(client, Buffer.from(account.address, "utf8").toString("base64"), [334]);
-  await smtpCommand(client, Buffer.from(account.secret, "utf8").toString("base64"), [235]);
+  let lastError = null;
+  for (const identity of mailLoginIdentities(account)) {
+    try {
+      await smtpCommand(client, "AUTH LOGIN", [334]);
+      await smtpCommand(client, Buffer.from(identity, "utf8").toString("base64"), [334]);
+      await smtpCommand(client, Buffer.from(account.secret, "utf8").toString("base64"), [235]);
+      return;
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  throw lastError || new Error("SMTP authentication failed");
 }
 
 async function upgradeSmtpStartTls(client, host) {
@@ -1012,7 +1028,18 @@ async function imapAuth(client, account) {
     await imapCommand(client, "A1", `AUTHENTICATE XOAUTH2 ${token}`);
     return;
   }
-  await imapCommand(client, "A1", `LOGIN ${quoteImap(account.address)} ${quoteImap(account.secret)}`);
+  let lastError = null;
+  let index = 1;
+  for (const identity of mailLoginIdentities(account)) {
+    try {
+      await imapCommand(client, `A${index}`, `LOGIN ${quoteImap(identity)} ${quoteImap(account.secret)}`);
+      return;
+    } catch (error) {
+      lastError = error;
+      index += 1;
+    }
+  }
+  throw lastError || new Error("IMAP authentication failed");
 }
 
 function decodeMailHeader(value = "") {

@@ -660,7 +660,14 @@ mailForm.addEventListener("submit", async (event) => {
     return;
   }
   const now = new Date().toISOString();
-  const id = mailIdInput.value || `mail-${Date.now()}-${randomBase64Url(8)}`;
+  let id = mailIdInput.value || "";
+  if (!id) {
+    const existing = activeMailAccounts.find((item) =>
+      item.provider === mailProviderInput.value
+      && String(item.address || "").toLowerCase() === address.toLowerCase()
+    );
+    id = existing?.id || `mail-${Date.now()}-${randomBase64Url(8)}`;
+  }
   const account = {
     id,
     provider: mailProviderInput.value,
