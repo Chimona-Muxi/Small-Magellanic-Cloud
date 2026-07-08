@@ -2,8 +2,10 @@ import { createServer } from "node:http";
 import { spawn } from "node:child_process";
 import { randomBytes, scryptSync, timingSafeEqual, createHash } from "node:crypto";
 import { access, mkdir, mkdtemp, readFile, readdir, rm, stat, writeFile } from "node:fs/promises";
+import { connect as netConnect } from "node:net";
 import { tmpdir } from "node:os";
 import { delimiter, dirname, extname, join, normalize } from "node:path";
+import { connect as tlsConnect } from "node:tls";
 import { fileURLToPath } from "node:url";
 import { deflateRawSync, inflateRawSync } from "node:zlib";
 import {
@@ -775,6 +777,269 @@ function privateDeviceLabel(req) {
   return "Browser";
 }
 
+const mailProviderConfigs = {
+  gmail: { imapHost: "imap.gmail.com", imapPort: 993, smtpHost: "smtp.gmail.com", smtpPort: 465, smtpSecure: true },
+  qq: { imapHost: "imap.qq.com", imapPort: 993, smtpHost: "smtp.qq.com", smtpPort: 465, smtpSecure: true },
+  "163": { imapHost: "imap.163.com", imapPort: 993, smtpHost: "smtp.163.com", smtpPort: 465, smtpSecure: true },
+  icloud: { imapHost: "imap.mail.me.com", imapPort: 993, smtpHost: "smtp.mail.me.com", smtpPort: 587, smtpSecure: false, startTls: true }
+};
+
+function mailProviderConfig(provider) {
+  const config = mailProviderConfigs[String(provider || "").toLowerCase()];
+  if (!config) throw new Error("Mail provider not configured");
+  return config;
+}
+
+function cleanMailAccount(account = {}) {
+  const address = String(account.address || "").trim().slice(0, 180);
+  const secret = String(account.secret || "").trim().slice(0, 6000);
+  if (!address || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address)) throw new Error("Invalid mail account");
+  if (!secret) throw new Error("Missing mail secret");
+  return {
+    provider: String(account.provider || "").trim().toLowerCase(),
+    address,
+    secret,
+    secretType: String(account.secretType || "app-password").trim().toLowerCase()
+  };
+}
+
+function encodeMailHeader(value = "") {
+  const text = String(value || "").replace(/[\r\n]+/g, " ").trim();
+  if (/^[\x20-\x7e]*$/.test(text)) return text;
+  return `=?UTF-8?B?${Buffer.from(text, "utf8").toString("base64")}?=`;
+}
+
+function normalizeMailBody(value = "") {
+  return String(value || "")
+    .replace(/\r\n/g, "\n")
+    .replace(/\r/g, "\n")
+    .split("\n")
+    .map((line) => line.startsWith(".") ? `.${line}` : line)
+    .join("\r\n");
+}
+
+function socketLineClient(socket, timeoutMs = 25000) {
+  let buffer = "";
+  const waiters = [];
+  const fail = (error) => {
+    while (waiters.length) waiters.shift().reject(error);
+  };
+  socket.setEncoding("utf8");
+  socket.on("data", (chunk) => {
+    buffer += chunk;
+    while (waiters.length) {
+      const index = buffer.indexOf("\n");
+      if (index < 0) break;
+      const line = buffer.slice(0, index + 1).replace(/\r?\n$/, "");
+      buffer = buffer.slice(index + 1);
+      waiters.shift().resolve(line);
+    }
+  });
+  socket.on("error", fail);
+  socket.on("close", () => fail(new Error("Mail connection closed")));
+  return {
+    socket,
+    readLine() {
+      const index = buffer.indexOf("\n");
+      if (index >= 0) {
+        const line = buffer.slice(0, index + 1).replace(/\r?\n$/, "");
+        buffer = buffer.slice(index + 1);
+        return Promise.resolve(line);
+      }
+      return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => reject(new Error("Mail connection timed out")), timeoutMs);
+        waiters.push({
+          resolve(line) {
+            clearTimeout(timer);
+            resolve(line);
+          },
+          reject(error) {
+            clearTimeout(timer);
+            reject(error);
+          }
+        });
+      });
+    },
+    writeLine(line) {
+      socket.write(`${line}\r\n`);
+    },
+    end() {
+      socket.end();
+    }
+  };
+}
+
+function openMailSocket(config, mode = "imap") {
+  return new Promise((resolve, reject) => {
+    const secure = mode === "imap" || config.smtpSecure;
+    const host = mode === "imap" ? config.imapHost : config.smtpHost;
+    const port = mode === "imap" ? config.imapPort : config.smtpPort;
+    const socket = secure
+      ? tlsConnect({ host, port, servername: host }, () => resolve(socketLineClient(socket)))
+      : netConnect({ host, port }, () => resolve(socketLineClient(socket)));
+    socket.setTimeout(25000, () => {
+      socket.destroy(new Error("Mail connection timed out"));
+    });
+    socket.once("error", reject);
+  });
+}
+
+async function readSmtpResponse(client) {
+  const lines = [];
+  while (true) {
+    const line = await client.readLine();
+    lines.push(line);
+    if (/^\d{3} /.test(line)) break;
+  }
+  const code = Number(lines[0]?.slice(0, 3));
+  return { code, text: lines.join("\n") };
+}
+
+async function smtpCommand(client, command, ok = [250]) {
+  if (command) client.writeLine(command);
+  const response = await readSmtpResponse(client);
+  if (!ok.includes(response.code)) throw new Error(response.text || "SMTP command failed");
+  return response;
+}
+
+async function smtpAuth(client, account) {
+  if (account.secretType === "oauth") {
+    const token = Buffer.from(`user=${account.address}\x01auth=Bearer ${account.secret}\x01\x01`, "utf8").toString("base64");
+    const response = await smtpCommand(client, `AUTH XOAUTH2 ${token}`, [235, 334]);
+    if (response.code === 334) await smtpCommand(client, "", [235]);
+    return;
+  }
+  await smtpCommand(client, "AUTH LOGIN", [334]);
+  await smtpCommand(client, Buffer.from(account.address, "utf8").toString("base64"), [334]);
+  await smtpCommand(client, Buffer.from(account.secret, "utf8").toString("base64"), [235]);
+}
+
+async function upgradeSmtpStartTls(client, host) {
+  await smtpCommand(client, "STARTTLS", [220]);
+  const oldSocket = client.socket;
+  oldSocket.removeAllListeners("data");
+  return new Promise((resolve, reject) => {
+    const secureSocket = tlsConnect({ socket: oldSocket, servername: host }, () => resolve(socketLineClient(secureSocket)));
+    secureSocket.once("error", reject);
+  });
+}
+
+async function sendProviderMail(accountInput, message = {}) {
+  const account = cleanMailAccount(accountInput);
+  const config = mailProviderConfig(account.provider);
+  const to = String(message.to || "").trim().slice(0, 260);
+  const subject = String(message.subject || "").trim().slice(0, 240);
+  const body = String(message.body || "").slice(0, 100000);
+  if (!to || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) throw new Error("Invalid recipient");
+  if (!subject) throw new Error("Missing subject");
+
+  let client = await openMailSocket(config, "smtp");
+  try {
+    await smtpCommand(client, null, [220]);
+    await smtpCommand(client, "EHLO smallmagellaniccloud.local");
+    if (config.startTls) {
+      client = await upgradeSmtpStartTls(client, config.smtpHost);
+      await smtpCommand(client, "EHLO smallmagellaniccloud.local");
+    }
+    await smtpAuth(client, account);
+    await smtpCommand(client, `MAIL FROM:<${account.address}>`);
+    await smtpCommand(client, `RCPT TO:<${to}>`, [250, 251]);
+    await smtpCommand(client, "DATA", [354]);
+    const headers = [
+      `From: <${account.address}>`,
+      `To: <${to}>`,
+      `Subject: ${encodeMailHeader(subject)}`,
+      "MIME-Version: 1.0",
+      "Content-Type: text/plain; charset=UTF-8",
+      "Content-Transfer-Encoding: 8bit"
+    ].join("\r\n");
+    client.writeLine(`${headers}\r\n\r\n${normalizeMailBody(body)}\r\n.`);
+    await smtpCommand(client, null);
+    client.writeLine("QUIT");
+    return { ok: true, sentAt: new Date().toISOString() };
+  } finally {
+    client.end();
+  }
+}
+
+function quoteImap(value = "") {
+  return `"${String(value).replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
+}
+
+async function imapCommand(client, tag, command) {
+  client.writeLine(`${tag} ${command}`);
+  const lines = [];
+  while (true) {
+    const line = await client.readLine();
+    lines.push(line);
+    if (line.startsWith(`${tag} `)) break;
+  }
+  if (!new RegExp(`^${tag} OK`, "i").test(lines.at(-1) || "")) throw new Error(lines.at(-1) || "IMAP command failed");
+  return lines;
+}
+
+async function imapAuth(client, account) {
+  if (account.secretType === "oauth") {
+    const token = Buffer.from(`user=${account.address}\x01auth=Bearer ${account.secret}\x01\x01`, "utf8").toString("base64");
+    await imapCommand(client, "A1", `AUTHENTICATE XOAUTH2 ${token}`);
+    return;
+  }
+  await imapCommand(client, "A1", `LOGIN ${quoteImap(account.address)} ${quoteImap(account.secret)}`);
+}
+
+function decodeMailHeader(value = "") {
+  return String(value || "").replace(/=\?utf-8\?b\?([^?]+)\?=/ig, (_, encoded) => {
+    try {
+      return Buffer.from(encoded, "base64").toString("utf8");
+    } catch {
+      return _;
+    }
+  });
+}
+
+function parseFetchedHeaders(lines) {
+  const messages = [];
+  let current = null;
+  for (const line of lines) {
+    const uidMatch = line.match(/UID\s+(\d+)/i);
+    if (uidMatch) {
+      current = { id: uidMatch[1], from: "", subject: "", date: "" };
+      messages.push(current);
+    }
+    if (!current) continue;
+    const header = line.match(/^(From|Subject|Date):\s*(.*)$/i);
+    if (!header) continue;
+    const key = header[1].toLowerCase();
+    current[key] = decodeMailHeader(header[2].trim()).slice(0, 260);
+  }
+  return messages.filter((item) => item.id).slice(-20).reverse();
+}
+
+async function fetchProviderInbox(accountInput) {
+  const account = cleanMailAccount(accountInput);
+  const config = mailProviderConfig(account.provider);
+  const client = await openMailSocket(config, "imap");
+  try {
+    await client.readLine();
+    await imapAuth(client, account);
+    await imapCommand(client, "A2", "SELECT INBOX");
+    const searchLines = await imapCommand(client, "A3", "UID SEARCH ALL");
+    const ids = searchLines
+      .flatMap((line) => line.startsWith("* SEARCH") ? line.replace("* SEARCH", "").trim().split(/\s+/) : [])
+      .filter(Boolean)
+      .slice(-20);
+    if (!ids.length) {
+      await imapCommand(client, "A5", "LOGOUT").catch(() => {});
+      return { messages: [] };
+    }
+    const fetchLines = await imapCommand(client, "A4", `UID FETCH ${ids.join(",")} (UID BODY.PEEK[HEADER.FIELDS (FROM SUBJECT DATE)])`);
+    await imapCommand(client, "A5", "LOGOUT").catch(() => {});
+    return { messages: parseFetchedHeaders(fetchLines) };
+  } finally {
+    client.end();
+  }
+}
+
 async function requirePrivateSession(req, res) {
   const session = await currentPrivateSession(req);
   if (session) return session;
@@ -959,6 +1224,38 @@ async function handlePrivateApi(req, res, url) {
       return true;
     }
     privateJson(res, 405, { error: "Method not allowed" });
+    return true;
+  }
+
+  if (route === "/api/private/mail/inbox") {
+    const session = await requirePrivateSession(req, res);
+    if (!session) return true;
+    if (req.method !== "POST") {
+      privateJson(res, 405, { error: "Method not allowed" });
+      return true;
+    }
+    try {
+      const body = await readBody(req);
+      privateJson(res, 200, { ok: true, ...(await fetchProviderInbox(body.account)) });
+    } catch (error) {
+      privateJson(res, 502, { error: error.message || "Mail fetch failed" });
+    }
+    return true;
+  }
+
+  if (route === "/api/private/mail/send") {
+    const session = await requirePrivateSession(req, res);
+    if (!session) return true;
+    if (req.method !== "POST") {
+      privateJson(res, 405, { error: "Method not allowed" });
+      return true;
+    }
+    try {
+      const body = await readBody(req);
+      privateJson(res, 200, await sendProviderMail(body.account, body.message));
+    } catch (error) {
+      privateJson(res, 502, { error: error.message || "Mail send failed" });
+    }
     return true;
   }
 

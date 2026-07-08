@@ -1,4 +1,4 @@
-import { t } from "../preferences.mjs?v=20260709a";
+import { t } from "../preferences.mjs?v=20260709b";
 
 const defaultProfile = {
   name: "",
@@ -54,6 +54,7 @@ const mailAccountList = document.querySelector("[data-mail-account-list]");
 const mailActiveAccount = document.querySelector("[data-mail-active-account]");
 const mailComposeFrom = document.querySelector("[data-mail-compose-from]");
 const mailVaultNote = document.querySelector("[data-mail-vault-note]");
+const mailThreadEmpty = document.querySelector("[data-mail-thread-empty]");
 const mailSyncButton = document.querySelector("[data-mail-sync]");
 const mailComposeButton = document.querySelector("[data-mail-compose]");
 const mailComposeForm = document.querySelector("[data-mail-compose-form]");
@@ -338,6 +339,26 @@ function renderMailClient() {
   } else {
     mailVaultNote.textContent = `${t("private.mail.selected", "当前邮箱")}：${accountLabel}`;
   }
+}
+
+function renderMailMessages(messages = []) {
+  if (!messages.length) {
+    mailThreadEmpty.className = "mail-thread-empty";
+    mailThreadEmpty.innerHTML = `<strong>${t("private.mail.noMessages", "暂无邮件")}</strong><span>${t("private.mail.noMessagesCopy", "邮箱连接成功，但当前没有可显示的收件。")}</span>`;
+    return;
+  }
+  mailThreadEmpty.className = "mail-message-list";
+  mailThreadEmpty.replaceChildren(...messages.map((message) => {
+    const row = document.createElement("button");
+    row.type = "button";
+    row.className = "mail-message-row";
+    const title = document.createElement("strong");
+    title.textContent = message.subject || t("private.mail.noSubject", "无主题");
+    const meta = document.createElement("span");
+    meta.textContent = `${message.from || ""} ${message.date ? `· ${message.date}` : ""}`.trim();
+    row.append(title, meta);
+    return row;
+  }));
 }
 
 function renderMailAccounts() {
@@ -660,7 +681,20 @@ mailForm.addEventListener("submit", async (event) => {
 mailSyncButton.addEventListener("click", async () => {
   const account = currentMailAccount();
   if (!account) return setMailStatus(t("private.mail.noAccount", "未选择邮箱"), "error");
-  setMailStatus(t("private.mail.connectorPending", "收发信连接器待配置：需要为该邮箱完成 OAuth 或 IMAP/SMTP 接入"), "pending");
+  try {
+    mailSyncButton.disabled = true;
+    setMailStatus(t("private.mail.fetching", "正在收取邮件"), "pending");
+    const data = await api("/api/private/mail/inbox", {
+      method: "POST",
+      body: JSON.stringify({ account })
+    });
+    renderMailMessages(data.messages || []);
+    setMailStatus(t("private.mail.fetched", "邮件已收取"), "ok");
+  } catch (syncError) {
+    setMailStatus(`${t("private.mail.fetchFailed", "收取失败")}：${syncError.message}`, "error");
+  } finally {
+    renderMailClient();
+  }
 });
 
 mailComposeButton.addEventListener("click", () => {
@@ -674,7 +708,30 @@ mailComposeForm.addEventListener("submit", async (event) => {
   if (!mailToInput.value.trim() || !mailSubjectInput.value.trim()) {
     return setMailStatus(t("private.mail.composeRequired", "请填写收件人和主题"), "error");
   }
-  setMailStatus(t("private.mail.connectorPending", "收发信连接器待配置：需要为该邮箱完成 OAuth 或 IMAP/SMTP 接入"), "pending");
+  try {
+    const submit = mailComposeForm.querySelector("button[type='submit']");
+    submit.disabled = true;
+    setMailStatus(t("private.mail.sending", "正在发送邮件"), "pending");
+    await api("/api/private/mail/send", {
+      method: "POST",
+      body: JSON.stringify({
+        account,
+        message: {
+          to: mailToInput.value,
+          subject: mailSubjectInput.value,
+          body: mailBodyInput.value
+        }
+      })
+    });
+    mailToInput.value = "";
+    mailSubjectInput.value = "";
+    mailBodyInput.value = "";
+    setMailStatus(t("private.mail.sent", "邮件已发送"), "ok");
+  } catch (sendError) {
+    setMailStatus(`${t("private.mail.sendFailed", "发送失败")}：${sendError.message}`, "error");
+  } finally {
+    renderMailClient();
+  }
 });
 
 revokeOthersButton.addEventListener("click", async () => {

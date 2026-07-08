@@ -1888,6 +1888,51 @@ const copy = {
     "zh-TW": "請填寫收件人和主題",
     en: "Fill in recipient and subject"
   },
+  "private.mail.fetching": {
+    "zh-CN": "正在收取邮件",
+    "zh-TW": "正在收取郵件",
+    en: "Fetching mail"
+  },
+  "private.mail.fetched": {
+    "zh-CN": "邮件已收取",
+    "zh-TW": "郵件已收取",
+    en: "Mail fetched"
+  },
+  "private.mail.fetchFailed": {
+    "zh-CN": "收取失败",
+    "zh-TW": "收取失敗",
+    en: "Fetch failed"
+  },
+  "private.mail.sending": {
+    "zh-CN": "正在发送邮件",
+    "zh-TW": "正在發送郵件",
+    en: "Sending mail"
+  },
+  "private.mail.sent": {
+    "zh-CN": "邮件已发送",
+    "zh-TW": "郵件已發送",
+    en: "Mail sent"
+  },
+  "private.mail.sendFailed": {
+    "zh-CN": "发送失败",
+    "zh-TW": "發送失敗",
+    en: "Send failed"
+  },
+  "private.mail.noMessages": {
+    "zh-CN": "暂无邮件",
+    "zh-TW": "暫無郵件",
+    en: "No messages"
+  },
+  "private.mail.noMessagesCopy": {
+    "zh-CN": "邮箱连接成功，但当前没有可显示的收件。",
+    "zh-TW": "信箱連接成功，但目前沒有可顯示的收件。",
+    en: "The mailbox connected, but there are no messages to show."
+  },
+  "private.mail.noSubject": {
+    "zh-CN": "无主题",
+    "zh-TW": "無主題",
+    en: "No subject"
+  },
   "private.devices.eyebrow": {
     "zh-CN": "可信设备",
     "zh-TW": "可信裝置",

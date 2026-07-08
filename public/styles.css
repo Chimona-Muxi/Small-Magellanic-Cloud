@@ -1210,6 +1210,38 @@ html[data-theme="light"] .nav-toggle {
   font-size: 16px;
 }
 
+.mail-message-list {
+  display: grid;
+  align-content: start;
+  gap: 7px;
+  min-height: 320px;
+}
+
+.mail-message-row {
+  display: grid;
+  gap: 5px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.055);
+  font: inherit;
+  text-align: left;
+}
+
+.mail-message-row strong,
+.mail-message-row span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mail-message-row span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
 .mail-compose-box label,
 .mail-form label {
   display: grid;
