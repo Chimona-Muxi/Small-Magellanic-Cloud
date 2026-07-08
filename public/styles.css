@@ -1179,8 +1179,10 @@ html[data-theme="light"] .nav-toggle {
 
 .mail-client-grid {
   display: grid;
-  grid-template-columns: minmax(0, 0.92fr) minmax(280px, 0.72fr);
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.72fr);
   gap: 12px;
+  align-items: stretch;
+  min-height: 0;
 }
 
 .mail-thread-list,
@@ -1194,15 +1196,30 @@ html[data-theme="light"] .nav-toggle {
   background: rgba(255, 255, 255, 0.045);
 }
 
+.mail-thread-list,
+.mail-compose-box {
+  min-height: 0;
+  height: min(560px, calc(100vh - 360px));
+}
+
+.mail-thread-list {
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.mail-compose-box {
+  grid-template-rows: auto auto auto minmax(0, 1fr) auto;
+}
+
 .mail-thread-empty {
   display: grid;
   place-items: center;
   gap: 6px;
-  min-height: 320px;
+  min-height: 0;
   border: 1px dashed color-mix(in srgb, var(--line) 86%, transparent);
   border-radius: 8px;
   color: var(--muted);
   text-align: center;
+  overflow-y: auto;
 }
 
 .mail-thread-empty strong {
@@ -1214,7 +1231,10 @@ html[data-theme="light"] .nav-toggle {
   display: grid;
   align-content: start;
   gap: 7px;
-  min-height: 320px;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 4px;
 }
 
 .mail-message-row {
@@ -1275,6 +1295,11 @@ html[data-theme="light"] .nav-toggle {
   padding: 10px 12px;
   line-height: 1.65;
   resize: vertical;
+}
+
+.mail-compose-box textarea {
+  min-height: 0;
+  height: 100%;
 }
 
 .mail-compose-box input:focus,
@@ -1494,6 +1519,20 @@ html[data-theme="light"] .nav-toggle {
 
   .mail-client-grid {
     grid-template-columns: 1fr;
+  }
+
+  .mail-thread-list,
+  .mail-compose-box {
+    height: auto;
+  }
+
+  .mail-message-list {
+    max-height: 380px;
+  }
+
+  .mail-compose-box textarea {
+    min-height: 160px;
+    height: auto;
   }
 
   .hero {
