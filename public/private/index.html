@@ -6,7 +6,7 @@
   <title>我的私人空间 · Small Magellanic Cloud</title>
   <meta name="description" content="Small Magellanic Cloud private space." />
   <link rel="icon" href="/favicon.png" type="image/png" />
-  <link rel="stylesheet" href="/styles.css?v=20260706b" />
+  <link rel="stylesheet" href="/styles.css?v=20260709a" />
 </head>
 <body>
   <div class="site-shell">
@@ -43,6 +43,7 @@
         <h1 data-i18n="private.gate.title">我的私人空间</h1>
         <p data-i18n="private.gate.copy">输入密码后进入。这里暂时只放自我简介，后面的内容之后再补。</p>
         <form class="private-form" data-private-form>
+          <input type="text" name="username" value="private-space" autocomplete="username" hidden />
           <label for="private-password" data-i18n="private.password.label">密码</label>
           <div class="private-password-row">
             <input id="private-password" type="password" autocomplete="current-password" data-private-password data-i18n-placeholder="private.password.placeholder" placeholder="输入密码" />
@@ -73,6 +74,10 @@
             <button class="private-nav-button" type="button" data-private-nav="security" aria-pressed="false">
               <span class="private-nav-mark" aria-hidden="true"></span>
               <span data-i18n="private.nav.security">安全登录</span>
+            </button>
+            <button class="private-nav-button" type="button" data-private-nav="mail" aria-pressed="false">
+              <span class="private-nav-mark" aria-hidden="true"></span>
+              <span data-i18n="private.nav.mail">邮箱登录</span>
             </button>
             <button class="private-nav-button" type="button" data-private-nav="data" aria-pressed="false">
               <span class="private-nav-mark" aria-hidden="true"></span>
@@ -140,6 +145,116 @@
             </div>
           </article>
 
+          <article class="private-panel mail-panel mail-hub-panel" data-private-panel="mail" data-reveal hidden>
+            <div class="mail-hub">
+              <aside class="mail-account-rail" aria-label="邮箱列表" data-i18n-aria-label="private.mail.accounts">
+                <div class="mail-account-head">
+                  <span data-i18n="private.mail.accounts">邮箱列表</span>
+                  <button class="mail-icon-button" type="button" data-mail-refresh aria-label="刷新" data-i18n-aria-label="private.mail.refresh">↻</button>
+                </div>
+                <div class="mail-account-list" data-mail-account-list></div>
+                <button class="mail-add-button" type="button" data-mail-add aria-label="添加邮箱" data-i18n-aria-label="private.mail.add">+</button>
+              </aside>
+
+              <section class="mail-client" aria-label="个人邮箱总站" data-i18n-aria-label="private.mail.hubTitle">
+                <div class="mail-client-head">
+                  <div>
+                    <p class="eyebrow" data-i18n="private.mail.eyebrow">mail hub</p>
+                    <h2 data-i18n="private.mail.hubTitle">个人邮箱总站</h2>
+                    <p data-mail-vault-note data-i18n="private.mail.hubCopy">一次进入私人空间后，在这里切换多个邮箱、查看收件和写邮件。邮箱密钥会二次加密后保存。</p>
+                  </div>
+                  <div class="mail-client-actions">
+                    <button class="button" type="button" data-mail-sync data-i18n="private.mail.sync">收取</button>
+                    <button class="button primary" type="button" data-mail-compose data-i18n="private.mail.compose">写邮件</button>
+                  </div>
+                </div>
+
+                <div class="mail-client-grid">
+                  <section class="mail-thread-list">
+                    <div class="mail-section-title">
+                      <span data-i18n="private.mail.inbox">收件箱</span>
+                      <small data-mail-active-account data-i18n="private.mail.noAccount">未选择邮箱</small>
+                    </div>
+                    <div class="mail-thread-empty" data-mail-thread-empty>
+                      <strong data-i18n="private.mail.readyTitle">邮箱总站已就绪</strong>
+                      <span data-i18n="private.mail.readyCopy">添加邮箱后，这里会显示对应邮箱的收件列表。</span>
+                    </div>
+                  </section>
+
+                  <form class="mail-compose-box" data-mail-compose-form>
+                    <div class="mail-section-title">
+                      <span data-i18n="private.mail.compose">写邮件</span>
+                      <small data-mail-compose-from data-i18n="private.mail.noAccount">未选择邮箱</small>
+                    </div>
+                    <label>
+                      <span data-i18n="private.mail.to">收件人</span>
+                      <input type="email" autocomplete="off" data-mail-to placeholder="to@example.com" />
+                    </label>
+                    <label>
+                      <span data-i18n="private.mail.subject">主题</span>
+                      <input type="text" autocomplete="off" data-mail-subject placeholder="Subject" />
+                    </label>
+                    <label>
+                      <span data-i18n="private.mail.body">正文</span>
+                      <textarea rows="8" data-mail-body placeholder="写下邮件内容"></textarea>
+                    </label>
+                    <button class="button primary" type="submit" data-i18n="private.mail.send">发送</button>
+                  </form>
+                </div>
+
+                <p class="mail-status" data-mail-status role="status" aria-live="polite"></p>
+              </section>
+            </div>
+
+            <div class="mail-modal" data-mail-add-dialog hidden>
+              <form class="mail-modal-card" data-mail-form>
+                <input type="hidden" data-mail-id />
+                <div class="mail-modal-head">
+                  <div>
+                    <p class="eyebrow" data-i18n="private.mail.addEyebrow">add mailbox</p>
+                    <h3 data-i18n="private.mail.addTitle">添加邮箱</h3>
+                  </div>
+                  <button class="mail-icon-button" type="button" data-mail-close aria-label="关闭">×</button>
+                </div>
+                <div class="mail-provider-grid" data-mail-provider-grid>
+                  <button type="button" data-provider-choice="gmail">Gmail</button>
+                  <button type="button" data-provider-choice="qq">QQ</button>
+                  <button type="button" data-provider-choice="163">163</button>
+                  <button type="button" data-provider-choice="icloud">iCloud</button>
+                  <button type="button" data-provider-choice="hrbeu">HRBEU</button>
+                  <button type="button" data-provider-choice="custom" data-i18n="private.mail.providerCustom">自定义</button>
+                </div>
+                <input type="hidden" data-mail-provider value="gmail" />
+                <div class="mail-form-grid">
+                  <label>
+                    <span data-i18n="private.mail.address">邮箱账号</span>
+                    <input type="email" autocomplete="off" data-mail-address data-i18n-placeholder="private.mail.addressPlaceholder" placeholder="name@example.com" />
+                  </label>
+                  <label>
+                    <span data-i18n="private.mail.authType">授权方式</span>
+                    <select data-mail-secret-type>
+                      <option value="oauth" data-i18n="private.mail.secretOauth">OAuth 授权令牌</option>
+                      <option value="app-password" data-i18n="private.mail.secretAppPassword">应用专用密码</option>
+                      <option value="imap-smtp" data-i18n="private.mail.secretImapSmtp">IMAP/SMTP 密钥</option>
+                    </select>
+                  </label>
+                </div>
+                <label>
+                  <span data-i18n="private.mail.secret">令牌或应用专用密码</span>
+                  <textarea rows="4" autocomplete="off" spellcheck="false" data-mail-secret data-i18n-placeholder="private.mail.secretPlaceholder" placeholder="粘贴授权令牌、应用专用密码或 IMAP/SMTP 密钥"></textarea>
+                </label>
+                <label>
+                  <span data-i18n="private.mail.note">备注</span>
+                  <textarea rows="3" data-mail-note data-i18n-placeholder="private.mail.notePlaceholder" placeholder="例如：学校邮箱、备用 Gmail、QQ 主邮箱"></textarea>
+                </label>
+                <div class="mail-actions">
+                  <button class="button primary" type="submit" data-i18n="private.mail.saveAccount">添加邮箱</button>
+                  <button class="button subtle" type="button" data-mail-clear data-i18n="private.mail.clear">清空</button>
+                </div>
+              </form>
+            </div>
+          </article>
+
           <article class="private-panel data-panel" data-private-panel="data" data-reveal hidden>
             <div class="data-head">
               <p class="eyebrow" data-i18n="private.data.eyebrow">data archive</p>
@@ -172,6 +287,6 @@
       <span data-i18n="footer.built">一个持续生长的个人网站。</span>
     </footer>
   </div>
-  <script type="module" src="/private/private.mjs?v=20260706b"></script>
+  <script type="module" src="/private/private.mjs?v=20260709a"></script>
 </body>
 </html>

@@ -30,6 +30,7 @@ const studyRequirements = join(studyDir, "requirements.txt");
 const privateDir = join(__dirname, ".private");
 const privateSessionsFile = join(privateDir, "sessions.json");
 const privateProfileFile = join(privateDir, "profile.json");
+const privateMailVaultFile = join(privateDir, "mail-vault.json");
 const privateExportDir = process.env.SMC_PRIVATE_EXPORT_DIR || join(__dirname, "myproject.smallmagellaniccloud");
 const pythonCommand = process.env.PYTHON || (process.platform === "win32" ? "python" : "python3");
 const matplotlibConfigDir = join(tmpdir(), "smc-matplotlib");
@@ -129,6 +130,7 @@ let padicBuildPromise = null;
 let studyDepsPromise = null;
 let privateSessionStore = null;
 let privateProfileStore = null;
+let privateMailVaultStore = null;
 
 const privatePasswordHash = process.env.SMC_PRIVATE_PASSWORD_HASH
   || "955aefbb1af2de242be0c35809425a88:f87bc55914323ebcd10c82004d708d3427273c5bbbe2fe704497a29907f1109e107b842c301607611687dfa8daa0925ea7548a580f5c8c2115447865d4a531a1";
@@ -257,6 +259,32 @@ function cleanPrivateProfile(profile = {}) {
   };
 }
 
+function cleanPrivateMailVault(vault = {}) {
+  const hasPayload = vault && typeof vault === "object" && String(vault.ciphertext || "").trim();
+  if (!hasPayload) {
+    return {
+      vaultVersion: 1,
+      updatedAt: new Date().toISOString(),
+      algorithm: "AES-GCM",
+      kdf: "PBKDF2-SHA-256",
+      iterations: 240000,
+      salt: "",
+      iv: "",
+      ciphertext: ""
+    };
+  }
+  return {
+    vaultVersion: 1,
+    updatedAt: String(vault.updatedAt || new Date().toISOString()).slice(0, 40),
+    algorithm: "AES-GCM",
+    kdf: "PBKDF2-SHA-256",
+    iterations: Math.min(600000, Math.max(120000, Number(vault.iterations) || 240000)),
+    salt: String(vault.salt || "").slice(0, 256),
+    iv: String(vault.iv || "").slice(0, 256),
+    ciphertext: String(vault.ciphertext || "").slice(0, 256 * 1024)
+  };
+}
+
 async function readPrivateJsonFile(filePath, fallback) {
   try {
     return JSON.parse(await readFile(filePath, "utf8"));
@@ -294,6 +322,18 @@ async function savePrivateProfile(profile) {
   privateProfileStore = cleanPrivateProfile(profile);
   await writePrivateJsonFile(privateProfileFile, privateProfileStore);
   return privateProfileStore;
+}
+
+async function loadPrivateMailVault() {
+  if (privateMailVaultStore) return privateMailVaultStore;
+  privateMailVaultStore = cleanPrivateMailVault(await readPrivateJsonFile(privateMailVaultFile, {}));
+  return privateMailVaultStore;
+}
+
+async function savePrivateMailVault(vault) {
+  privateMailVaultStore = cleanPrivateMailVault(vault);
+  await writePrivateJsonFile(privateMailVaultFile, privateMailVaultStore);
+  return privateMailVaultStore;
 }
 
 function crcTable() {
@@ -425,17 +465,19 @@ function readZipEntries(buffer) {
 async function makePrivateArchive() {
   const createdAt = new Date().toISOString();
   const profile = await loadPrivateProfile();
+  const mailVault = await loadPrivateMailVault();
   const store = await loadPrivateSessions();
   const manifest = {
     archiveType: privateArchiveType,
     archiveVersion: privateArchiveVersion,
     createdAt,
     source: "Small Magellanic Cloud",
-    modules: ["profile", "security-devices"],
+    modules: ["profile", "security-devices", "mail-vault"],
     compatibility: {
       profile: 1,
       securityDevices: 1,
-      reserved: ["temporary-files", "mail-hub", "subsite-transfer"]
+      mailVault: 1,
+      reserved: ["temporary-files", "subsite-transfer"]
     }
   };
   const devices = store.sessions.map((session) => publicPrivateSession(session));
@@ -445,10 +487,11 @@ async function makePrivateArchive() {
       { name: "manifest.json", data: `${JSON.stringify(manifest, null, 2)}\n` },
       { name: "data/profile.json", data: `${JSON.stringify(profile, null, 2)}\n` },
       { name: "data/security-devices.json", data: `${JSON.stringify({ devices }, null, 2)}\n` },
+      { name: "data/mail-vault.json", data: `${JSON.stringify(mailVault, null, 2)}\n` },
       {
         name: "data/reserved.json",
         data: `${JSON.stringify({
-          modules: ["temporary-files", "mail-hub", "subsite-transfer"],
+          modules: ["temporary-files", "subsite-transfer"],
           note: "Future data modules can be added under data/ without changing the archive container."
         }, null, 2)}\n`
       }
@@ -495,10 +538,15 @@ async function importPrivateArchiveLocal() {
 
   const profile = JSON.parse(entries.get("data/profile.json")?.toString("utf8") || "{}");
   const savedProfile = await savePrivateProfile(profile);
+  const mailVaultEntry = entries.get("data/mail-vault.json");
+  const savedMailVault = mailVaultEntry
+    ? await savePrivateMailVault(JSON.parse(mailVaultEntry.toString("utf8") || "{}"))
+    : await loadPrivateMailVault();
   return {
     fileName: archive.fileName,
-    imported: ["profile"],
-    profile: savedProfile
+    imported: mailVaultEntry ? ["profile", "mail-vault"] : ["profile"],
+    profile: savedProfile,
+    mailVault: savedMailVault
   };
 }
 
@@ -889,6 +937,31 @@ async function handlePrivateApi(req, res, url) {
     return true;
   }
 
+  if (route === "/api/private/mail-vault") {
+    const session = await requirePrivateSession(req, res);
+    if (!session) return true;
+    if (req.method === "GET") {
+      try {
+        privateJson(res, 200, { vault: await loadPrivateMailVault() });
+      } catch {
+        privateJson(res, 500, { error: "Mail vault load failed" });
+      }
+      return true;
+    }
+    if (req.method === "PUT") {
+      try {
+        const body = await readBody(req);
+        const vault = await savePrivateMailVault(body.vault || body);
+        privateJson(res, 200, { vault });
+      } catch {
+        privateJson(res, 500, { error: "Mail vault save failed" });
+      }
+      return true;
+    }
+    privateJson(res, 405, { error: "Method not allowed" });
+    return true;
+  }
+
   if (route === "/api/private/data/export/local") {
     const session = await requirePrivateSession(req, res);
     if (!session) return true;
@@ -901,7 +974,7 @@ async function handlePrivateApi(req, res, url) {
       privateJson(res, 200, {
         ok: true,
         archiveVersion: privateArchiveVersion,
-        modules: ["profile", "security-devices"],
+        modules: ["profile", "security-devices", "mail-vault"],
         ...archive
       });
     } catch {
