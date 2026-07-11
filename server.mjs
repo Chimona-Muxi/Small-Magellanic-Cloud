@@ -1,7 +1,7 @@
 import { createServer } from "node:http";
 import { spawn } from "node:child_process";
 import { randomBytes, scryptSync, timingSafeEqual, createHash } from "node:crypto";
-import { access, mkdir, mkdtemp, readFile, readdir, rm, stat, writeFile } from "node:fs/promises";
+import { access, mkdir, mkdtemp, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { connect as netConnect } from "node:net";
 import { tmpdir } from "node:os";
 import { delimiter, dirname, extname, join, normalize } from "node:path";
@@ -29,11 +29,10 @@ const padicRuntimeHome = join(__dirname, "tools", "padic", "runtime-home");
 const studyDir = join(__dirname, "tools", "study");
 const studyPythonPackages = join(studyDir, "python-packages");
 const studyRequirements = join(studyDir, "requirements.txt");
-const privateDir = join(__dirname, ".private");
+const privateDir = process.env.SMC_PRIVATE_DATA_DIR || join(__dirname, ".private");
 const privateSessionsFile = join(privateDir, "sessions.json");
 const privateProfileFile = join(privateDir, "profile.json");
 const privateMailVaultFile = join(privateDir, "mail-vault.json");
-const privateExportDir = process.env.SMC_PRIVATE_EXPORT_DIR || join(__dirname, "myproject.smallmagellaniccloud");
 const pythonCommand = process.env.PYTHON || (process.platform === "win32" ? "python" : "python3");
 const matplotlibConfigDir = join(tmpdir(), "smc-matplotlib");
 const port = Number(process.env.PORT || 5226);
@@ -290,14 +289,21 @@ function cleanPrivateMailVault(vault = {}) {
 async function readPrivateJsonFile(filePath, fallback) {
   try {
     return JSON.parse(await readFile(filePath, "utf8"));
-  } catch {
+  } catch (error) {
+    if (error?.code !== "ENOENT") console.error(`Private data read failed: ${filePath}`, error);
     return fallback;
   }
 }
 
 async function writePrivateJsonFile(filePath, data) {
   await mkdir(privateDir, { recursive: true });
-  await writeFile(filePath, `${JSON.stringify(data, null, 2)}\n`, "utf8");
+  const tempPath = `${filePath}.${randomBytes(8).toString("hex")}.tmp`;
+  try {
+    await writeFile(tempPath, `${JSON.stringify(data, null, 2)}\n`, "utf8");
+    await rename(tempPath, filePath);
+  } finally {
+    await rm(tempPath, { force: true }).catch(() => {});
+  }
 }
 
 async function loadPrivateSessions() {
@@ -429,32 +435,50 @@ function makeZip(entries) {
 }
 
 function readZipEntries(buffer) {
+  if (!Buffer.isBuffer(buffer) || buffer.length < 22 || buffer.length > 4 * 1024 * 1024) {
+    throw new Error(buffer?.length > 4 * 1024 * 1024 ? "Archive too large" : "Invalid archive");
+  }
   const endSig = Buffer.from([0x50, 0x4b, 0x05, 0x06]);
   const endOffset = buffer.lastIndexOf(endSig);
   if (endOffset < 0) throw new Error("Invalid archive");
 
   const count = buffer.readUInt16LE(endOffset + 10);
+  if (!count || count > 24) throw new Error("Invalid archive");
   let cursor = buffer.readUInt32LE(endOffset + 16);
   const entries = new Map();
+  let totalUncompressed = 0;
 
   for (let i = 0; i < count; i += 1) {
+    if (cursor < 0 || cursor + 46 > buffer.length) throw new Error("Invalid archive");
     if (buffer.readUInt32LE(cursor) !== 0x02014b50) throw new Error("Invalid archive");
     const method = buffer.readUInt16LE(cursor + 10);
     const expectedCrc = buffer.readUInt32LE(cursor + 16);
     const compressedSize = buffer.readUInt32LE(cursor + 20);
+    const uncompressedSize = buffer.readUInt32LE(cursor + 24);
     const nameLength = buffer.readUInt16LE(cursor + 28);
     const extraLength = buffer.readUInt16LE(cursor + 30);
     const commentLength = buffer.readUInt16LE(cursor + 32);
     const localOffset = buffer.readUInt32LE(cursor + 42);
     const name = buffer.subarray(cursor + 46, cursor + 46 + nameLength).toString("utf8");
+    if (!name || name.includes("..") || name.startsWith("/") || name.includes("\\")) throw new Error("Invalid archive");
+    if (uncompressedSize > 2 * 1024 * 1024) throw new Error("Archive too large");
+    totalUncompressed += uncompressedSize;
+    if (totalUncompressed > 4 * 1024 * 1024) throw new Error("Archive too large");
 
+    if (localOffset < 0 || localOffset + 30 > buffer.length) throw new Error("Invalid archive");
     if (buffer.readUInt32LE(localOffset) !== 0x04034b50) throw new Error("Invalid archive");
     const localNameLength = buffer.readUInt16LE(localOffset + 26);
     const localExtraLength = buffer.readUInt16LE(localOffset + 28);
     const dataOffset = localOffset + 30 + localNameLength + localExtraLength;
+    if (dataOffset < 0 || dataOffset + compressedSize > buffer.length) throw new Error("Invalid archive");
     const compressed = buffer.subarray(dataOffset, dataOffset + compressedSize);
-    const data = method === 0 ? compressed : method === 8 ? inflateRawSync(compressed) : null;
+    const data = method === 0
+      ? compressed
+      : method === 8
+        ? inflateRawSync(compressed, { maxOutputLength: 2 * 1024 * 1024 })
+        : null;
     if (!data) throw new Error("Unsupported archive compression");
+    if (data.length !== uncompressedSize) throw new Error("Invalid archive");
     if (crc32(data) !== expectedCrc) throw new Error("Archive checksum mismatch");
     entries.set(name, data);
 
@@ -468,27 +492,23 @@ async function makePrivateArchive() {
   const createdAt = new Date().toISOString();
   const profile = await loadPrivateProfile();
   const mailVault = await loadPrivateMailVault();
-  const store = await loadPrivateSessions();
   const manifest = {
     archiveType: privateArchiveType,
     archiveVersion: privateArchiveVersion,
     createdAt,
     source: "Small Magellanic Cloud",
-    modules: ["profile", "security-devices", "mail-vault"],
+    modules: ["profile", "mail-vault"],
     compatibility: {
       profile: 1,
-      securityDevices: 1,
       mailVault: 1,
       reserved: ["temporary-files", "subsite-transfer"]
     }
   };
-  const devices = store.sessions.map((session) => publicPrivateSession(session));
   return {
     createdAt,
     buffer: makeZip([
       { name: "manifest.json", data: `${JSON.stringify(manifest, null, 2)}\n` },
       { name: "data/profile.json", data: `${JSON.stringify(profile, null, 2)}\n` },
-      { name: "data/security-devices.json", data: `${JSON.stringify({ devices }, null, 2)}\n` },
       { name: "data/mail-vault.json", data: `${JSON.stringify(mailVault, null, 2)}\n` },
       {
         name: "data/reserved.json",
@@ -501,54 +521,43 @@ async function makePrivateArchive() {
   };
 }
 
-async function exportPrivateArchiveLocal() {
-  await mkdir(privateExportDir, { recursive: true });
-  const { buffer, createdAt } = await makePrivateArchive();
+function privateArchiveFileName(createdAt) {
   const stamp = createdAt.replace(/[-:]/g, "").replace(/\.\d+Z$/, "Z").replace("T", "-").replace("Z", "");
-  const fileName = `smc-private-data-${stamp}.zip`;
-  const filePath = join(privateExportDir, fileName);
-  await writeFile(filePath, buffer);
-  return { fileName, path: filePath, createdAt };
+  return `smc-private-data-${stamp}.zip`;
 }
 
-async function latestPrivateArchivePath() {
-  let items = [];
-  try {
-    items = await readdir(privateExportDir, { withFileTypes: true });
-  } catch {
-    throw new Error("No local archive");
-  }
-
-  const archives = await Promise.all(items
-    .filter((item) => item.isFile() && /^smc-private-data-.+\.zip$/i.test(item.name))
-    .map(async (item) => {
-      const filePath = join(privateExportDir, item.name);
-      const info = await stat(filePath);
-      return { fileName: item.name, filePath, mtimeMs: info.mtimeMs };
-    }));
-  archives.sort((a, b) => b.mtimeMs - a.mtimeMs);
-  if (!archives[0]) throw new Error("No local archive");
-  return archives[0];
-}
-
-async function importPrivateArchiveLocal() {
-  const archive = await latestPrivateArchivePath();
-  const entries = readZipEntries(await readFile(archive.filePath));
+async function importPrivateArchiveBuffer(buffer, fileName = "smc-private-data.zip") {
+  const entries = readZipEntries(buffer);
   const manifest = JSON.parse(entries.get("manifest.json")?.toString("utf8") || "{}");
   if (manifest.archiveType !== privateArchiveType) throw new Error("Unsupported archive");
   if (Number(manifest.archiveVersion) > privateArchiveVersion) throw new Error("Archive version is newer");
 
-  const profile = JSON.parse(entries.get("data/profile.json")?.toString("utf8") || "{}");
-  const savedProfile = await savePrivateProfile(profile);
+  const profile = cleanPrivateProfile(JSON.parse(entries.get("data/profile.json")?.toString("utf8") || "{}"));
   const mailVaultEntry = entries.get("data/mail-vault.json");
-  const savedMailVault = mailVaultEntry
-    ? await savePrivateMailVault(JSON.parse(mailVaultEntry.toString("utf8") || "{}"))
-    : await loadPrivateMailVault();
+  const parsedMailVault = mailVaultEntry
+    ? cleanPrivateMailVault(JSON.parse(mailVaultEntry.toString("utf8") || "{}"))
+    : null;
+  const previousProfile = { ...(await loadPrivateProfile()) };
+  const previousMailVault = { ...(await loadPrivateMailVault()) };
+  try {
+    await writePrivateJsonFile(privateProfileFile, profile);
+    if (parsedMailVault) await writePrivateJsonFile(privateMailVaultFile, parsedMailVault);
+    privateProfileStore = profile;
+    if (parsedMailVault) privateMailVaultStore = parsedMailVault;
+  } catch (error) {
+    await Promise.allSettled([
+      writePrivateJsonFile(privateProfileFile, previousProfile),
+      writePrivateJsonFile(privateMailVaultFile, previousMailVault)
+    ]);
+    privateProfileStore = previousProfile;
+    privateMailVaultStore = previousMailVault;
+    throw error;
+  }
   return {
-    fileName: archive.fileName,
+    fileName: String(fileName || "smc-private-data.zip").replace(/[^\w.-]+/g, "_").slice(0, 160),
     imported: mailVaultEntry ? ["profile", "mail-vault"] : ["profile"],
-    profile: savedProfile,
-    mailVault: savedMailVault
+    profile,
+    mailVault: parsedMailVault || previousMailVault
   };
 }
 
@@ -648,6 +657,34 @@ function readBody(req) {
       }
     });
     req.on("error", () => resolve({}));
+  });
+}
+
+function readBufferBody(req, maxBytes = 4 * 1024 * 1024) {
+  return new Promise((resolve, reject) => {
+    const declaredSize = Number(req.headers["content-length"] || 0);
+    if (Number.isFinite(declaredSize) && declaredSize > maxBytes) {
+      reject(new Error("Archive too large"));
+      req.resume();
+      return;
+    }
+    const chunks = [];
+    let size = 0;
+    let failed = false;
+    req.on("data", (chunk) => {
+      size += chunk.length;
+      if (size > maxBytes) {
+        failed = true;
+        chunks.length = 0;
+        return;
+      }
+      if (!failed) chunks.push(chunk);
+    });
+    req.on("end", () => {
+      if (failed) reject(new Error("Archive too large"));
+      else resolve(Buffer.concat(chunks));
+    });
+    req.on("error", reject);
   });
 }
 
@@ -783,6 +820,10 @@ const mailProviderConfigs = {
   "163": { imapHost: "imap.163.com", imapPort: 993, smtpHost: "smtp.163.com", smtpPort: 465, smtpSecure: true },
   icloud: { imapHost: "imap.mail.me.com", imapPort: 993, smtpHost: "smtp.mail.me.com", smtpPort: 587, smtpSecure: false, startTls: true }
 };
+const mailSmtpBlockedReason = String(process.env.SMC_MAIL_SMTP_BLOCKED || "").trim();
+const mailEhloHost = String(process.env.SMC_MAIL_EHLO_HOST || "smallmagellaniccloud.cyou")
+  .trim()
+  .replace(/[^a-z0-9.-]/gi, "") || "smallmagellaniccloud.cyou";
 
 function mailProviderConfig(provider) {
   const config = mailProviderConfigs[String(provider || "").toLowerCase()];
@@ -810,7 +851,10 @@ function mailFriendlyError(error, account = {}, action = "mail") {
   const provider = String(account?.provider || "").toLowerCase();
   const raw = String(error?.message || error || "").trim();
   const lower = raw.toLowerCase();
-  if (provider === "qq" && (lower.includes("login fail") || lower.includes("account is abnormal") || lower.includes("password is incorrect"))) {
+  if (lower.includes("smtp blocked by hosting")) {
+    return "当前 Render 免费实例禁止连接 SMTP 发件端口（QQ 使用 465）；IMAP 993 收件不受影响。若要在本站发信，请升级为付费实例或配置 HTTPS 邮件中继。";
+  }
+  if (provider === "qq" && (lower.includes("login fail") || lower.includes("account is abnormal") || lower.includes("password is incorrect") || lower.includes("535") || lower.includes("auth"))) {
     return "QQ 邮箱登录失败：请确认已在 QQ 邮箱网页版开启 IMAP/SMTP 服务，并填写“授权码”而不是 QQ 登录密码。若刚失败多次，请等几分钟后再试。";
   }
   if (provider === "gmail" && (lower.includes("auth") || lower.includes("535") || lower.includes("invalid") || lower.includes("mail send failed"))) {
@@ -824,6 +868,9 @@ function mailFriendlyError(error, account = {}, action = "mail") {
   }
   if (lower.includes("provider not configured")) {
     return "这个邮箱类型还没有服务器配置；HRBEU 或自定义邮箱需要先补 IMAP/SMTP 主机和端口。";
+  }
+  if (action === "send" && (lower.includes("timed out") || lower.includes("econnrefused") || lower.includes("enetunreach") || lower.includes("ehostunreach"))) {
+    return "无法连接 SMTP 发件服务器；收件与发件使用不同端口，因此收件正常并不代表发件连接可用。";
   }
   if (lower.includes("timed out")) {
     return "邮箱服务器连接超时：请稍后再试，或确认该邮箱已开启 IMAP/SMTP 服务。";
@@ -976,14 +1023,15 @@ async function sendProviderMail(accountInput, message = {}) {
   const body = String(message.body || "").slice(0, 100000);
   if (!to || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) throw new Error("Invalid recipient");
   if (!subject) throw new Error("Missing subject");
+  if (mailSmtpBlockedReason) throw new Error(`SMTP blocked by hosting: ${mailSmtpBlockedReason}`);
 
   let client = await openMailSocket(config, "smtp");
   try {
     await smtpCommand(client, null, [220]);
-    await smtpCommand(client, "EHLO smallmagellaniccloud.local");
+    await smtpCommand(client, `EHLO ${mailEhloHost}`);
     if (config.startTls) {
       client = await upgradeSmtpStartTls(client, config.smtpHost);
-      await smtpCommand(client, "EHLO smallmagellaniccloud.local");
+      await smtpCommand(client, `EHLO ${mailEhloHost}`);
     }
     await smtpAuth(client, account);
     await smtpCommand(client, `MAIL FROM:<${account.address}>`);
@@ -993,6 +1041,8 @@ async function sendProviderMail(accountInput, message = {}) {
       `From: <${account.address}>`,
       `To: <${to}>`,
       `Subject: ${encodeMailHeader(subject)}`,
+      `Date: ${new Date().toUTCString()}`,
+      `Message-ID: <${randomBytes(18).toString("hex")}@${mailEhloHost}>`,
       "MIME-Version: 1.0",
       "Content-Type: text/plain; charset=UTF-8",
       "Content-Transfer-Encoding: 8bit"
@@ -1282,6 +1332,23 @@ async function handlePrivateApi(req, res, url) {
     return true;
   }
 
+  if (route === "/api/private/mail/capabilities") {
+    const session = await requirePrivateSession(req, res);
+    if (!session) return true;
+    if (req.method !== "GET") {
+      privateJson(res, 405, { error: "Method not allowed" });
+      return true;
+    }
+    privateJson(res, 200, {
+      receiveAvailable: true,
+      smtpAvailable: !mailSmtpBlockedReason,
+      smtpBlockedReason: mailSmtpBlockedReason || null,
+      gmailAuth: "app-password",
+      portableVaultKey: true
+    });
+    return true;
+  }
+
   if (route === "/api/private/mail/inbox") {
     const session = await requirePrivateSession(req, res);
     if (!session) return true;
@@ -1322,14 +1389,18 @@ async function handlePrivateApi(req, res, url) {
       return true;
     }
     try {
-      const archive = await exportPrivateArchiveLocal();
-      privateJson(res, 200, {
-        ok: true,
-        archiveVersion: privateArchiveVersion,
-        modules: ["profile", "security-devices", "mail-vault"],
-        ...archive
+      const archive = await makePrivateArchive();
+      const fileName = privateArchiveFileName(archive.createdAt);
+      res.writeHead(200, {
+        "Content-Type": "application/zip",
+        "Content-Disposition": `attachment; filename="${fileName}"`,
+        "Content-Length": archive.buffer.length,
+        "Cache-Control": "no-store, max-age=0",
+        "X-Content-Type-Options": "nosniff",
+        "Referrer-Policy": "same-origin"
       });
-    } catch {
+      res.end(archive.buffer);
+    } catch (error) {
       privateJson(res, 500, { error: "Local export failed" });
     }
     return true;
@@ -1343,9 +1414,21 @@ async function handlePrivateApi(req, res, url) {
       return true;
     }
     try {
-      privateJson(res, 200, { ok: true, ...(await importPrivateArchiveLocal()) });
+      const contentType = String(req.headers["content-type"] || "").toLowerCase();
+      if (!contentType.includes("application/zip") && !contentType.includes("application/octet-stream")) {
+        privateJson(res, 415, { error: "Unsupported archive" });
+        return true;
+      }
+      const buffer = await readBufferBody(req);
+      let fileName = "smc-private-data.zip";
+      try {
+        fileName = decodeURIComponent(String(req.headers["x-archive-filename"] || fileName));
+      } catch {
+        // Keep the safe fallback file name.
+      }
+      privateJson(res, 200, { ok: true, ...(await importPrivateArchiveBuffer(buffer, fileName)) });
     } catch (error) {
-      const status = error.message === "No local archive" ? 404 : 500;
+      const status = error.message === "Archive too large" ? 413 : 400;
       privateJson(res, status, { error: error.message || "Local import failed" });
     }
     return true;

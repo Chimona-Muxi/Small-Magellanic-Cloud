@@ -6,3 +6,6 @@ services:
     buildCommand: npm install
     startCommand: node server.mjs
     autoDeploy: true
+    envVars:
+      - key: SMC_MAIL_SMTP_BLOCKED
+        value: render-free

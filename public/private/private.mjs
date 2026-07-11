@@ -1,4 +1,4 @@
-import { t } from "../preferences.mjs?v=20260709c";
+import { t } from "../preferences.mjs?v=20260712a";
 
 const defaultProfile = {
   name: "",
@@ -33,10 +33,9 @@ const refreshDevicesButton = document.querySelector("[data-devices-refresh]");
 const revokeOthersButton = document.querySelector("[data-devices-revoke-others]");
 const navButtons = [...document.querySelectorAll("[data-private-nav]")];
 const panels = [...document.querySelectorAll("[data-private-panel]")];
-const dataMenuButtons = [...document.querySelectorAll("[data-data-menu]")];
-const dataMenuPanels = [...document.querySelectorAll("[data-data-menu-panel]")];
 const dataActionButtons = [...document.querySelectorAll("[data-data-action]")];
 const dataStatus = document.querySelector("[data-data-status]");
+const dataImportFile = document.querySelector("[data-data-import-file]");
 const mailRefreshButton = document.querySelector("[data-mail-refresh]");
 const mailAddButton = document.querySelector("[data-mail-add]");
 const mailAddDialog = document.querySelector("[data-mail-add-dialog]");
@@ -59,34 +58,54 @@ const mailThreadEmpty = document.querySelector("[data-mail-thread-empty]");
 const mailSyncButton = document.querySelector("[data-mail-sync]");
 const mailComposeButton = document.querySelector("[data-mail-compose]");
 const mailComposeForm = document.querySelector("[data-mail-compose-form]");
+const mailComposeCloseButton = document.querySelector("[data-mail-compose-close]");
+const mailClientGrid = document.querySelector("[data-mail-client-grid]");
 const mailToInput = document.querySelector("[data-mail-to]");
 const mailSubjectInput = document.querySelector("[data-mail-subject]");
 const mailBodyInput = document.querySelector("[data-mail-body]");
+const mailWebmailLink = document.querySelector("[data-mail-webmail]");
 const mailStatus = document.querySelector("[data-mail-status]");
+const mailTransportNote = document.querySelector("[data-mail-transport-note]");
+const mailKeyManageButtons = [...document.querySelectorAll("[data-mail-key-manage]")];
+const mailKeyDialog = document.querySelector("[data-mail-key-dialog]");
+const mailKeyForm = document.querySelector("[data-mail-key-form]");
+const mailKeyCloseButton = document.querySelector("[data-mail-key-close]");
+const mailKeyInput = document.querySelector("[data-mail-key-input]");
+const mailKeyCopyButton = document.querySelector("[data-mail-key-copy]");
+const mailKeyStatus = document.querySelector("[data-mail-key-status]");
 
 let activeProfile = { ...defaultProfile };
 let activeMailVault = null;
 let activeMailAccounts = [];
 let mailUnlocked = false;
 let selectedMailAccountId = "";
+let mailDialogReturnFocus = null;
+let mailSmtpAvailable = true;
+let mailCapabilitiesLoaded = false;
 
 const mailKeyStorage = "smc-mail-vault-key";
 const mailVaultIterations = 240000;
 const mailProviders = {
-  gmail: { label: "Gmail", hint: "OAuth / App Password" },
+  gmail: { label: "Gmail", hint: "App Password" },
   qq: { label: "QQ", hint: "IMAP/SMTP" },
   "163": { label: "163", hint: "IMAP/SMTP" },
   icloud: { label: "iCloud", hint: "App Password" },
   hrbeu: { label: "HRBEU", hint: "School Mail" },
   custom: { label: "Custom", hint: "Manual" }
 };
-const mailProviderGuides = {
-  gmail: "Gmail 请选择应用专用密码；需要先开启两步验证。这里暂不支持完整 Google OAuth 登录流程。",
-  qq: "QQ 邮箱请在网页邮箱设置里开启 IMAP/SMTP，并填写生成的授权码，不要填写 QQ 登录密码。",
-  "163": "163 邮箱请开启 IMAP/SMTP，并填写客户端授权密码。",
-  icloud: "iCloud 需要 Apple ID 的应用专用密码。",
-  hrbeu: "HRBEU 需要确认学校邮箱的 IMAP/SMTP 服务器地址后才能收发。",
-  custom: "自定义邮箱需要后续补入 IMAP/SMTP 服务器配置。"
+const mailProviderGuideKeys = {
+  gmail: "private.mail.guide.gmail",
+  qq: "private.mail.guide.qq",
+  "163": "private.mail.guide.163",
+  icloud: "private.mail.guide.icloud",
+  hrbeu: "private.mail.guide.hrbeu",
+  custom: "private.mail.guide.custom"
+};
+const mailProviderWebmail = {
+  gmail: "https://mail.google.com/",
+  qq: "https://mail.qq.com/",
+  "163": "https://mail.163.com/",
+  icloud: "https://www.icloud.com/mail/"
 };
 
 async function api(path, options = {}) {
@@ -302,7 +321,8 @@ function setMailProvider(provider) {
     choice.classList.toggle("active", active);
     choice.setAttribute("aria-pressed", active ? "true" : "false");
   }
-  mailProviderHint.textContent = mailProviderGuides[provider] || "";
+  const guideKey = mailProviderGuideKeys[provider];
+  mailProviderHint.textContent = guideKey ? t(guideKey, "") : "";
   const auth = provider === "gmail" || provider === "icloud" ? "app-password" : "imap-smtp";
   mailSecretTypeInput.value = auth;
 }
@@ -321,16 +341,54 @@ function openMailDialog(account = null) {
     mailIdInput.value = account.id;
     setMailProvider(account.provider || "custom");
     mailAddressInput.value = account.address || "";
-    mailSecretTypeInput.value = account.secretType || "oauth";
+    mailSecretTypeInput.value = account.secretType || "app-password";
     mailSecretInput.value = account.secret || "";
     mailNoteInput.value = account.note || "";
   }
+  mailDialogReturnFocus = document.activeElement;
   mailAddDialog.hidden = false;
   mailAddressInput.focus();
 }
 
 function closeMailDialog() {
   mailAddDialog.hidden = true;
+  if (mailDialogReturnFocus instanceof HTMLElement) mailDialogReturnFocus.focus();
+  mailDialogReturnFocus = null;
+}
+
+function setMailKeyStatus(text = "", tone = "") {
+  mailKeyStatus.textContent = text;
+  mailKeyStatus.dataset.tone = tone;
+}
+
+function openMailKeyDialog() {
+  const storedKey = localStorage.getItem(mailKeyStorage) || "";
+  const canCopy = Boolean(storedKey && mailUnlocked);
+  mailDialogReturnFocus = document.activeElement;
+  mailKeyInput.value = storedKey;
+  mailKeyInput.readOnly = canCopy;
+  mailKeyCopyButton.hidden = !canCopy;
+  mailKeyForm.querySelector("button[type='submit']").hidden = canCopy;
+  setMailKeyStatus();
+  mailKeyDialog.hidden = false;
+  if (canCopy) mailKeyCopyButton.focus();
+  else mailKeyInput.focus();
+}
+
+function closeMailKeyDialog() {
+  mailKeyDialog.hidden = true;
+  mailKeyInput.value = "";
+  setMailKeyStatus();
+  if (mailDialogReturnFocus instanceof HTMLElement) mailDialogReturnFocus.focus();
+  mailDialogReturnFocus = null;
+}
+
+function setComposeOpen(open) {
+  const shouldOpen = Boolean(open && currentMailAccount());
+  mailComposeForm.hidden = !shouldOpen;
+  mailClientGrid.classList.toggle("compose-open", shouldOpen);
+  mailComposeButton.setAttribute("aria-pressed", shouldOpen ? "true" : "false");
+  if (shouldOpen) mailToInput.focus();
 }
 
 function renderMailClient() {
@@ -340,13 +398,18 @@ function renderMailClient() {
   mailComposeFrom.textContent = accountLabel;
   mailSyncButton.disabled = !account;
   mailComposeButton.disabled = !account;
-  mailComposeForm.querySelector("button[type='submit']").disabled = !account;
+  mailComposeForm.querySelector("button[type='submit']").disabled = !account || !mailSmtpAvailable;
+  mailTransportNote.hidden = mailSmtpAvailable;
+  const webmailUrl = account ? mailProviderWebmail[account.provider] : "";
+  mailWebmailLink.hidden = !webmailUrl;
+  mailWebmailLink.href = webmailUrl || "#";
+  if (!account) setComposeOpen(false);
   if (!mailUnlocked) {
-    mailVaultNote.textContent = t("private.mail.lockedHint", "此设备没有邮箱库钥匙。请重新添加邮箱或导入恢复钥匙。");
+    mailVaultNote.textContent = t("private.mail.lockedHint", "此设备尚未解锁邮箱库，请使用恢复钥匙解锁。");
   } else if (!activeMailAccounts.length) {
-    mailVaultNote.textContent = t("private.mail.hubCopy", "一次进入私人空间后，在这里切换多个邮箱、查看收件和写邮件。邮箱密钥会二次加密后保存。");
+    mailVaultNote.textContent = t("private.mail.emptyHint", "添加第一个邮箱后即可开始收件。");
   } else {
-    mailVaultNote.textContent = `${t("private.mail.selected", "当前邮箱")}：${accountLabel}`;
+    mailVaultNote.textContent = `${t("private.mail.selected", "当前邮箱")}: ${accountLabel}`;
   }
 }
 
@@ -358,8 +421,7 @@ function renderMailMessages(messages = []) {
   }
   mailThreadEmpty.className = "mail-message-list";
   mailThreadEmpty.replaceChildren(...messages.map((message) => {
-    const row = document.createElement("button");
-    row.type = "button";
+    const row = document.createElement("article");
     row.className = "mail-message-row";
     const title = document.createElement("strong");
     title.textContent = message.subject || t("private.mail.noSubject", "无主题");
@@ -372,17 +434,44 @@ function renderMailMessages(messages = []) {
 
 function renderMailAccounts() {
   if (!mailUnlocked) {
-    mailAccountList.innerHTML = `<p class="mail-empty">${t("private.mail.locked", "邮箱库未解锁")}</p>`;
+    const empty = document.createElement("div");
+    empty.className = "mail-rail-empty";
+    const title = document.createElement("strong");
+    title.textContent = t("private.mail.locked", "邮箱库未解锁");
+    const copy = document.createElement("span");
+    copy.textContent = t("private.mail.unlockCopy", "用另一台设备提供的恢复钥匙解锁。");
+    const unlock = document.createElement("button");
+    unlock.type = "button";
+    unlock.className = "button";
+    unlock.textContent = t("private.mail.unlockDevice", "在此设备解锁");
+    unlock.addEventListener("click", openMailKeyDialog);
+    empty.append(title, copy, unlock);
+    mailAccountList.replaceChildren(empty);
     renderMailClient();
     return;
   }
   if (!activeMailAccounts.length) {
-    mailAccountList.innerHTML = `<p class="mail-empty">${t("private.mail.empty", "暂无邮箱账号")}</p>`;
+    const empty = document.createElement("div");
+    empty.className = "mail-rail-empty";
+    const title = document.createElement("strong");
+    title.textContent = t("private.mail.empty", "暂无邮箱账号");
+    const copy = document.createElement("span");
+    copy.textContent = t("private.mail.emptyCopy", "添加邮箱后可在这里切换账号。");
+    const add = document.createElement("button");
+    add.type = "button";
+    add.className = "button";
+    add.textContent = t("private.mail.addFirst", "添加第一个邮箱");
+    add.addEventListener("click", () => openMailDialog());
+    empty.append(title, copy, add);
+    mailAccountList.replaceChildren(empty);
     renderMailClient();
     return;
   }
   if (!currentMailAccount()) selectedMailAccountId = activeMailAccounts[0].id;
   mailAccountList.replaceChildren(...activeMailAccounts.map((account) => {
+    const row = document.createElement("div");
+    row.className = "mail-account-row";
+    row.classList.toggle("active", account.id === selectedMailAccountId);
     const button = document.createElement("button");
     button.type = "button";
     button.className = "mail-account-button";
@@ -401,10 +490,17 @@ function renderMailAccounts() {
     button.append(mark, body);
     button.addEventListener("click", () => {
       selectedMailAccountId = account.id;
+      renderMailMessages([]);
       renderMailAccounts();
     });
-    button.addEventListener("dblclick", () => openMailDialog(account));
-    return button;
+    const edit = document.createElement("button");
+    edit.type = "button";
+    edit.className = "mail-account-edit";
+    edit.setAttribute("aria-label", `${t("private.mail.edit", "编辑邮箱")} ${account.address || ""}`.trim());
+    edit.textContent = t("private.mail.edit", "编辑");
+    edit.addEventListener("click", () => openMailDialog(account));
+    row.append(button, edit);
+    return row;
   }));
   renderMailClient();
 }
@@ -422,16 +518,8 @@ function setActivePanel(name) {
   if (name === "mail" && !activeMailVault) loadMailVault().catch(() => {
     setMailStatus(t("private.mail.loadFailed", "邮箱库读取失败"), "error");
   });
-}
-
-function setDataMenu(name) {
-  for (const button of dataMenuButtons) {
-    const active = button.dataset.dataMenu === name;
-    button.setAttribute("aria-expanded", active ? "true" : "false");
-  }
-  for (const panel of dataMenuPanels) {
-    panel.hidden = panel.dataset.dataMenuPanel !== name;
-  }
+  if (name === "mail" && !mailCapabilitiesLoaded) loadMailCapabilities().catch(() => {});
+  if (name !== "mail") setComposeOpen(false);
 }
 
 async function loadProfile() {
@@ -453,14 +541,14 @@ async function loadMailVault() {
     mailUnlocked = true;
     activeMailAccounts = [];
     renderMailAccounts();
-    setMailStatus(t("private.mail.noVault", "还没有邮箱，请点左下角 + 添加"), "pending");
+    setMailStatus(t("private.mail.noVault", "还没有邮箱，请添加第一个邮箱"), "pending");
     return;
   }
   if (!storedKey) {
     mailUnlocked = false;
     activeMailAccounts = [];
     renderMailAccounts();
-    setMailStatus(t("private.mail.needsUnlock", "此设备没有邮箱库钥匙，请重新添加或导入恢复钥匙"), "error");
+    setMailStatus(t("private.mail.needsUnlock", "此设备没有邮箱库恢复钥匙，请从已解锁设备复制后在这里解锁"), "pending");
     return;
   }
   try {
@@ -475,6 +563,27 @@ async function loadMailVault() {
     renderMailAccounts();
     setMailStatus(t("private.mail.unlockFailed", "本设备钥匙无法解开邮箱库"), "error");
   }
+}
+
+async function loadMailCapabilities() {
+  const data = await api("/api/private/mail/capabilities");
+  mailSmtpAvailable = data.smtpAvailable !== false;
+  mailCapabilitiesLoaded = true;
+  renderMailClient();
+}
+
+async function unlockMailVaultWithKey(passphrase) {
+  const key = String(passphrase || "").trim();
+  if (key.length < 24) throw new Error("Mail key too short");
+  if (activeMailVault?.ciphertext) {
+    activeMailAccounts = await decryptMailVault(activeMailVault, key);
+  } else {
+    activeMailAccounts = [];
+  }
+  localStorage.setItem(mailKeyStorage, key);
+  mailUnlocked = true;
+  selectedMailAccountId = activeMailAccounts[0]?.id || "";
+  renderMailAccounts();
 }
 
 async function saveMailVault() {
@@ -511,6 +620,8 @@ function showGate() {
   if (mailAccountList) mailAccountList.replaceChildren();
   if (mailStatus) setMailStatus();
   if (mailAddDialog) closeMailDialog();
+  if (mailKeyDialog) closeMailKeyDialog();
+  setComposeOpen(false);
   passwordInput.focus();
 }
 
@@ -580,41 +691,49 @@ for (const button of navButtons) {
   button.addEventListener("click", () => setActivePanel(button.dataset.privateNav));
 }
 
-for (const button of dataMenuButtons) {
-  button.addEventListener("click", () => {
-    const name = button.getAttribute("aria-expanded") === "true" ? "" : button.dataset.dataMenu;
-    setDataMenu(name);
-  });
-}
-
 for (const button of dataActionButtons) {
   button.addEventListener("click", async () => {
     const action = button.dataset.dataAction;
-    const endpoints = {
-      "export-local": "/api/private/data/export/local",
-      "export-subsite": "/api/private/data/export/subsite",
-      "import-local": "/api/private/data/import/local",
-      "import-subsite": "/api/private/data/import/subsite"
-    };
+    if (action === "import-local") {
+      dataImportFile.click();
+      return;
+    }
     try {
       button.disabled = true;
-      const data = await api(endpoints[action], { method: "POST", body: "{}" });
       if (action === "export-local") {
-        setDataStatus(`${t("private.data.savedLocal", "已保存到本地：")}${data.fileName}`, "ok");
-      } else if (action === "import-local") {
-        renderProfile(data.profile);
-        activeMailVault = data.mailVault || activeMailVault;
-        mailUnlocked = false;
-        activeMailAccounts = [];
-        renderMailAccounts();
-        setEditing(false);
-        setDataStatus(`${t("private.data.importedLocal", "已从本地导入：")}${data.fileName}`, "ok");
+        setDataStatus(t("private.data.preparing", "正在准备备份文件"), "pending");
+        const response = await fetch("/api/private/data/export/local", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: { "Content-Type": "application/json" },
+          body: "{}"
+        });
+        if (!response.ok) {
+          const data = await response.json().catch(() => ({}));
+          throw new Error(data.error || response.statusText || "Local export failed");
+        }
+        const blob = await response.blob();
+        const disposition = response.headers.get("Content-Disposition") || "";
+        const match = disposition.match(/filename="?([^";]+)"?/i);
+        const fileName = match?.[1] || `smc-private-data-${Date.now()}.zip`;
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = fileName;
+        document.body.append(link);
+        link.click();
+        link.remove();
+        window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+        setDataStatus(`${t("private.data.savedLocal", "备份已下载：")}${fileName}`, "ok");
+      } else {
+        const endpoint = action === "export-subsite"
+          ? "/api/private/data/export/subsite"
+          : "/api/private/data/import/subsite";
+        await api(endpoint, { method: "POST", body: "{}" });
       }
     } catch (dataError) {
       if (dataError.message === "Subsite transfer not configured") {
         setDataStatus(t("private.data.subsitePending", "子网站接口已预留"), "pending");
-      } else if (dataError.message === "No local archive") {
-        setDataStatus(t("private.data.noArchive", "没有找到本地归档"), "error");
       } else {
         setDataStatus(t("private.data.failed", "操作失败，请稍后再试"), "error");
       }
@@ -624,12 +743,111 @@ for (const button of dataActionButtons) {
   });
 }
 
+dataImportFile.addEventListener("change", async () => {
+  const file = dataImportFile.files?.[0];
+  if (!file) return;
+  try {
+    setDataStatus(t("private.data.importing", "正在检查并恢复备份"), "pending");
+    const response = await fetch("/api/private/data/import/local", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: {
+        "Content-Type": "application/zip",
+        "X-Archive-Filename": encodeURIComponent(file.name)
+      },
+      body: file
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || response.statusText || "Local import failed");
+    renderProfile(data.profile);
+    activeMailVault = data.mailVault || null;
+    mailUnlocked = false;
+    activeMailAccounts = [];
+    selectedMailAccountId = "";
+    await loadMailVault();
+    setEditing(false);
+    setDataStatus(`${t("private.data.importedLocal", "已从备份恢复：")}${data.fileName || file.name}`, "ok");
+  } catch (dataError) {
+    const key = dataError.message === "Archive too large"
+      ? "private.data.tooLarge"
+      : dataError.message === "Unsupported archive" || dataError.message === "Invalid archive"
+        ? "private.data.invalidArchive"
+        : "private.data.failed";
+    setDataStatus(t(key, "无法恢复这个备份文件"), "error");
+  } finally {
+    dataImportFile.value = "";
+  }
+});
+
 mailAddButton.addEventListener("click", () => openMailDialog());
 
 mailCloseButton.addEventListener("click", closeMailDialog);
 
 mailAddDialog.addEventListener("click", (event) => {
   if (event.target === mailAddDialog) closeMailDialog();
+});
+
+for (const button of mailKeyManageButtons) {
+  button.addEventListener("click", openMailKeyDialog);
+}
+
+mailKeyCloseButton.addEventListener("click", closeMailKeyDialog);
+
+mailKeyDialog.addEventListener("click", (event) => {
+  if (event.target === mailKeyDialog) closeMailKeyDialog();
+});
+
+mailKeyForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const key = mailKeyInput.value.trim();
+  try {
+    setMailKeyStatus(t("private.mail.unlocking", "正在解锁邮箱库"), "pending");
+    await unlockMailVaultWithKey(key);
+    closeMailKeyDialog();
+    setMailStatus(t("private.mail.deviceUnlocked", "邮箱库已在此设备解锁"), "ok");
+  } catch (unlockError) {
+    const statusKey = unlockError.message === "Mail key too short"
+      ? "private.mail.keyTooShort"
+      : "private.mail.unlockFailed";
+    setMailKeyStatus(t(statusKey, "恢复钥匙不正确，无法解开邮箱库"), "error");
+    mailKeyInput.select();
+  }
+});
+
+mailKeyCopyButton.addEventListener("click", async () => {
+  const key = localStorage.getItem(mailKeyStorage) || "";
+  if (!key) return;
+  try {
+    await navigator.clipboard.writeText(key);
+    setMailKeyStatus(t("private.mail.keyCopied", "恢复钥匙已复制"), "ok");
+  } catch {
+    mailKeyInput.readOnly = false;
+    mailKeyInput.select();
+    setMailKeyStatus(t("private.mail.copyKeyFallback", "请手动复制已选中的恢复钥匙"), "pending");
+  }
+});
+
+document.addEventListener("keydown", (event) => {
+  const openDialog = !mailAddDialog.hidden ? mailAddDialog : !mailKeyDialog.hidden ? mailKeyDialog : null;
+  if (event.key === "Escape") {
+    if (openDialog === mailAddDialog) closeMailDialog();
+    else if (openDialog === mailKeyDialog) closeMailKeyDialog();
+    else if (!mailComposeForm.hidden) setComposeOpen(false);
+    return;
+  }
+  if (event.key !== "Tab" || !openDialog) return;
+  const focusable = [...openDialog.querySelectorAll("button, input, select, textarea, a[href]")]
+    .filter((element) => !element.hidden && !element.disabled && element.getClientRects().length);
+  if (!focusable.length) return;
+  const first = focusable[0];
+  const last = focusable.at(-1);
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first.focus();
+  }
 });
 
 for (const choice of mailProviderChoices) {
@@ -714,8 +932,10 @@ mailSyncButton.addEventListener("click", async () => {
 });
 
 mailComposeButton.addEventListener("click", () => {
-  mailToInput.focus();
+  setComposeOpen(mailComposeForm.hidden);
 });
+
+mailComposeCloseButton.addEventListener("click", () => setComposeOpen(false));
 
 mailComposeForm.addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -742,6 +962,7 @@ mailComposeForm.addEventListener("submit", async (event) => {
     mailToInput.value = "";
     mailSubjectInput.value = "";
     mailBodyInput.value = "";
+    setComposeOpen(false);
     setMailStatus(t("private.mail.sent", "邮件已发送"), "ok");
   } catch (sendError) {
     setMailStatus(`${t("private.mail.sendFailed", "发送失败")}：${sendError.message}`, "error");
@@ -762,6 +983,15 @@ window.addEventListener("smc:languagechange", () => {
   if (error.textContent) showError("private.password.error", "密码不正确");
   if (saveStatus.dataset.tone === "ok") setSaveStatus(t("private.profile.saved", "已保存"), "ok");
   if (saveStatus.dataset.tone === "error") setSaveStatus(t("private.profile.saveError", "保存失败，请稍后再试"), "error");
+  const guideKey = mailProviderGuideKeys[mailProviderInput.value];
+  mailProviderHint.textContent = guideKey ? t(guideKey, "") : "";
   renderMailAccounts();
+  if (!mailUnlocked) {
+    setMailStatus(t("private.mail.needsUnlock", "此设备没有邮箱库恢复钥匙"), "pending");
+  } else if (!activeMailAccounts.length) {
+    setMailStatus(t("private.mail.noVault", "还没有邮箱，请添加第一个邮箱"), "pending");
+  } else {
+    setMailStatus(t("private.mail.unlocked", "邮箱库已解锁"), "ok");
+  }
   loadDevices().catch(() => {});
 });

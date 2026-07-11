@@ -1287,25 +1287,25 @@ const copy = {
     "zh-CN": "安全登录",
     "zh-TW": "安全登入",
     en: "Security",
-    fr: "Securite",
+    fr: "Sécurité",
     ja: "セキュリティ",
     ko: "보안",
     ru: "Безопасность"
   },
   "private.nav.mail": {
-    "zh-CN": "邮箱登录",
-    "zh-TW": "信箱登入",
-    en: "Mail Login",
-    fr: "Connexion mail",
-    ja: "メールログイン",
-    ko: "메일 로그인",
-    ru: "Почтовый вход"
+    "zh-CN": "邮箱管理",
+    "zh-TW": "信箱管理",
+    en: "Mail",
+    fr: "Messagerie",
+    ja: "メール管理",
+    ko: "메일 관리",
+    ru: "Почта"
   },
   "private.nav.data": {
     "zh-CN": "数据管理",
     "zh-TW": "資料管理",
     en: "Data",
-    fr: "Donnees",
+    fr: "Données",
     ja: "データ",
     ko: "데이터",
     ru: "Данные"
@@ -1394,82 +1394,326 @@ const copy = {
   "private.mail.hubTitle": {
     "zh-CN": "个人邮箱总站",
     "zh-TW": "個人信箱總站",
-    en: "Personal Mail Hub"
+    en: "Personal Mail Hub",
+    fr: "Centre de messagerie",
+    ja: "個人メールハブ",
+    ko: "개인 메일 허브",
+    ru: "Личный почтовый центр"
   },
   "private.mail.hubCopy": {
-    "zh-CN": "一次进入私人空间后，在这里切换多个邮箱、查看收件和写邮件。邮箱密钥会二次加密后保存。",
-    "zh-TW": "一次進入私人空間後，在這裡切換多個信箱、查看收件和寫郵件。信箱金鑰會二次加密後保存。",
-    en: "After entering the private space once, switch mailboxes, read mail, and compose here. Mail secrets are encrypted before storage."
+    "zh-CN": "集中切换邮箱与查看收件。秘密信息在浏览器内加密后保存，服务端只保存密文。",
+    "zh-TW": "集中切換信箱與查看收件。秘密資訊在瀏覽器內加密後保存，服務端只保存密文。",
+    en: "Switch mailboxes and read messages in one place. Secrets are encrypted in the browser; the server stores ciphertext only.",
+    fr: "Basculez entre vos comptes et consultez les messages au même endroit. Les secrets sont chiffrés dans le navigateur ; le serveur ne conserve que le texte chiffré.",
+    ja: "複数のメールを切り替えて受信を確認できます。秘密情報はブラウザ内で暗号化され、サーバーには暗号文だけが保存されます。",
+    ko: "여러 메일 계정을 전환하고 받은 메일을 한곳에서 확인합니다. 비밀 정보는 브라우저에서 암호화되며 서버에는 암호문만 저장됩니다.",
+    ru: "Переключайтесь между ящиками и читайте входящие в одном месте. Секреты шифруются в браузере; сервер хранит только шифротекст."
   },
   "private.mail.accounts": {
     "zh-CN": "邮箱列表",
     "zh-TW": "信箱列表",
-    en: "Mailboxes"
+    en: "Mailboxes",
+    fr: "Boîtes mail",
+    ja: "メール一覧",
+    ko: "메일 목록",
+    ru: "Почтовые ящики"
   },
   "private.mail.add": {
     "zh-CN": "添加邮箱",
     "zh-TW": "添加信箱",
-    en: "Add mailbox"
+    en: "Add mailbox",
+    fr: "Ajouter une boîte",
+    ja: "メールを追加",
+    ko: "메일 추가",
+    ru: "Добавить ящик"
   },
   "private.mail.sync": {
     "zh-CN": "收取",
     "zh-TW": "收取",
-    en: "Fetch"
+    en: "Fetch",
+    fr: "Relever",
+    ja: "受信",
+    ko: "받기",
+    ru: "Получить"
   },
   "private.mail.compose": {
     "zh-CN": "写邮件",
     "zh-TW": "寫郵件",
-    en: "Compose"
+    en: "Compose",
+    fr: "Nouveau message",
+    ja: "メール作成",
+    ko: "메일 쓰기",
+    ru: "Написать"
   },
   "private.mail.inbox": {
     "zh-CN": "收件箱",
     "zh-TW": "收件箱",
-    en: "Inbox"
+    en: "Inbox",
+    fr: "Boîte de réception",
+    ja: "受信トレイ",
+    ko: "받은편지함",
+    ru: "Входящие"
   },
   "private.mail.noAccount": {
     "zh-CN": "未选择邮箱",
     "zh-TW": "未選擇信箱",
-    en: "No mailbox selected"
+    en: "No mailbox selected",
+    fr: "Aucune boîte sélectionnée",
+    ja: "メール未選択",
+    ko: "선택한 메일 없음",
+    ru: "Ящик не выбран"
   },
   "private.mail.readyTitle": {
     "zh-CN": "邮箱总站已就绪",
     "zh-TW": "信箱總站已就緒",
-    en: "Mail hub is ready"
+    en: "Mail hub is ready",
+    fr: "La messagerie est prête",
+    ja: "メールハブの準備ができました",
+    ko: "메일 허브가 준비되었습니다",
+    ru: "Почтовый центр готов"
   },
   "private.mail.readyCopy": {
     "zh-CN": "添加邮箱后，这里会显示对应邮箱的收件列表。",
     "zh-TW": "添加信箱後，這裡會顯示對應信箱的收件列表。",
-    en: "After adding a mailbox, its inbox will appear here."
+    en: "After adding a mailbox, its inbox will appear here.",
+    fr: "Après l'ajout d'une boîte, ses messages apparaîtront ici.",
+    ja: "メールを追加すると、受信一覧がここに表示されます。",
+    ko: "메일을 추가하면 받은 메일이 여기에 표시됩니다.",
+    ru: "После добавления ящика здесь появятся входящие сообщения."
   },
   "private.mail.to": {
     "zh-CN": "收件人",
     "zh-TW": "收件人",
-    en: "To"
+    en: "To",
+    fr: "Destinataire",
+    ja: "宛先",
+    ko: "받는 사람",
+    ru: "Получатель"
   },
   "private.mail.subject": {
     "zh-CN": "主题",
     "zh-TW": "主題",
-    en: "Subject"
+    en: "Subject",
+    fr: "Objet",
+    ja: "件名",
+    ko: "제목",
+    ru: "Тема"
   },
   "private.mail.body": {
     "zh-CN": "正文",
     "zh-TW": "正文",
-    en: "Body"
+    en: "Message",
+    fr: "Message",
+    ja: "本文",
+    ko: "본문",
+    ru: "Текст"
   },
   "private.mail.send": {
     "zh-CN": "发送",
     "zh-TW": "發送",
-    en: "Send"
+    en: "Send",
+    fr: "Envoyer",
+    ja: "送信",
+    ko: "보내기",
+    ru: "Отправить"
   },
   "private.mail.addEyebrow": {
     "zh-CN": "添加邮箱",
     "zh-TW": "添加信箱",
-    en: "add mailbox"
+    en: "add mailbox",
+    fr: "ajouter une boîte",
+    ja: "メールを追加",
+    ko: "메일 추가",
+    ru: "добавление ящика"
   },
   "private.mail.addTitle": {
     "zh-CN": "添加邮箱",
     "zh-TW": "添加信箱",
-    en: "Add Mailbox"
+    en: "Add Mailbox",
+    fr: "Ajouter une boîte mail",
+    ja: "メールを追加",
+    ko: "메일 추가",
+    ru: "Добавить почтовый ящик"
+  },
+  "private.mail.addCopy": {
+    "zh-CN": "选择邮箱服务，并填写该服务提供的授权码或应用专用密码。不要填写网页登录密码。",
+    "zh-TW": "選擇信箱服務，並填寫該服務提供的授權碼或應用程式專用密碼。不要填寫網頁登入密碼。",
+    en: "Choose a mail service and enter its authorization code or app password. Do not enter your web sign-in password.",
+    fr: "Choisissez un service puis saisissez son code d'autorisation ou son mot de passe d'application. N'utilisez pas le mot de passe du site web.",
+    ja: "メールサービスを選び、認証コードまたはアプリパスワードを入力してください。Web ログイン用パスワードは入力しないでください。",
+    ko: "메일 서비스를 선택하고 인증 코드나 앱 비밀번호를 입력하세요. 웹 로그인 비밀번호는 입력하지 마세요.",
+    ru: "Выберите почтовый сервис и введите код авторизации или пароль приложения. Не вводите пароль веб-входа."
+  },
+  "private.mail.close": {
+    "zh-CN": "关闭",
+    "zh-TW": "關閉",
+    en: "Close",
+    fr: "Fermer",
+    ja: "閉じる",
+    ko: "닫기",
+    ru: "Закрыть"
+  },
+  "private.mail.closeCompose": {
+    "zh-CN": "关闭写信",
+    "zh-TW": "關閉寫信",
+    en: "Close composer",
+    fr: "Fermer le nouveau message",
+    ja: "メール作成を閉じる",
+    ko: "메일 작성 닫기",
+    ru: "Закрыть редактор"
+  },
+  "private.mail.toPlaceholder": {
+    "zh-CN": "to@example.com",
+    "zh-TW": "to@example.com",
+    en: "to@example.com",
+    fr: "destinataire@example.com",
+    ja: "to@example.com",
+    ko: "to@example.com",
+    ru: "to@example.com"
+  },
+  "private.mail.subjectPlaceholder": {
+    "zh-CN": "填写主题",
+    "zh-TW": "填寫主題",
+    en: "Add a subject",
+    fr: "Ajouter un objet",
+    ja: "件名を入力",
+    ko: "제목 입력",
+    ru: "Введите тему"
+  },
+  "private.mail.bodyPlaceholder": {
+    "zh-CN": "写下邮件内容",
+    "zh-TW": "寫下郵件內容",
+    en: "Write your message",
+    fr: "Rédigez votre message",
+    ja: "本文を入力",
+    ko: "메일 내용 입력",
+    ru: "Введите текст сообщения"
+  },
+  "private.mail.openWebmail": {
+    "zh-CN": "打开网页版邮箱",
+    "zh-TW": "開啟網頁版信箱",
+    en: "Open webmail",
+    fr: "Ouvrir le webmail",
+    ja: "Web メールを開く",
+    ko: "웹메일 열기",
+    ru: "Открыть веб-почту"
+  },
+  "private.mail.receiveOnlyTitle": {
+    "zh-CN": "当前部署仅支持直接收件",
+    "zh-TW": "目前部署僅支援直接收件",
+    en: "This deployment can receive mail directly only",
+    fr: "Ce déploiement ne peut recevoir les messages que directement",
+    ja: "現在の環境では直接受信のみ利用できます",
+    ko: "현재 배포에서는 직접 수신만 지원합니다",
+    ru: "В этом развёртывании доступно только прямое получение"
+  },
+  "private.mail.receiveOnlyCopy": {
+    "zh-CN": "Render 免费实例禁止连接 SMTP 发件端口；可继续在这里收件，并用“打开网页版邮箱”完成发送。",
+    "zh-TW": "Render 免費執行個體禁止連線 SMTP 發件連接埠；可繼續在這裡收件，並用「開啟網頁版信箱」完成發送。",
+    en: "Render's free instance blocks outbound SMTP ports. You can still receive here and use Open webmail to send.",
+    fr: "L'instance gratuite de Render bloque les ports SMTP sortants. Vous pouvez toujours recevoir ici et utiliser Ouvrir le webmail pour envoyer.",
+    ja: "Render の無料インスタンスは送信用 SMTP ポートを遮断します。ここで受信し、Web メールから送信できます。",
+    ko: "Render 무료 인스턴스는 발신 SMTP 포트를 차단합니다. 여기서 메일을 받고 웹메일 열기로 보낼 수 있습니다.",
+    ru: "Бесплатный экземпляр Render блокирует исходящие SMTP-порты. Получайте почту здесь, а для отправки откройте веб-почту."
+  },
+  "private.mail.deviceSync": {
+    "zh-CN": "设备同步",
+    "zh-TW": "裝置同步",
+    en: "Device access",
+    fr: "Accès sur les appareils",
+    ja: "端末同期",
+    ko: "기기 동기화",
+    ru: "Доступ с устройств"
+  },
+  "private.mail.deviceSyncEyebrow": {
+    "zh-CN": "设备同步",
+    "zh-TW": "裝置同步",
+    en: "device access",
+    fr: "accès multi-appareils",
+    ja: "端末同期",
+    ko: "기기 동기화",
+    ru: "доступ с устройств"
+  },
+  "private.mail.deviceSyncTitle": {
+    "zh-CN": "在其他设备解锁邮箱",
+    "zh-TW": "在其他裝置解鎖信箱",
+    en: "Unlock mail on another device",
+    fr: "Déverrouiller la messagerie sur un autre appareil",
+    ja: "別の端末でメールを解除",
+    ko: "다른 기기에서 메일 잠금 해제",
+    ru: "Открыть почту на другом устройстве"
+  },
+  "private.mail.deviceSyncCopy": {
+    "zh-CN": "在已解锁的设备复制恢复钥匙，再粘贴到其他设备。恢复钥匙不会上传到服务端。",
+    "zh-TW": "在已解鎖的裝置複製恢復鑰匙，再貼到其他裝置。恢復鑰匙不會上傳到服務端。",
+    en: "Copy the recovery key on an unlocked device, then paste it on another device. The key is never uploaded to the server.",
+    fr: "Copiez la clé de récupération sur un appareil déverrouillé, puis collez-la sur l'autre appareil. La clé n'est jamais envoyée au serveur.",
+    ja: "解除済み端末で復旧キーをコピーし、別の端末に貼り付けます。キーはサーバーへ送信されません。",
+    ko: "잠금이 해제된 기기에서 복구 키를 복사해 다른 기기에 붙여 넣으세요. 키는 서버로 업로드되지 않습니다.",
+    ru: "Скопируйте ключ восстановления на открытом устройстве и вставьте его на другом. Ключ не отправляется на сервер."
+  },
+  "private.mail.copyKey": {
+    "zh-CN": "复制恢复钥匙",
+    "zh-TW": "複製恢復鑰匙",
+    en: "Copy recovery key",
+    fr: "Copier la clé de récupération",
+    ja: "復旧キーをコピー",
+    ko: "복구 키 복사",
+    ru: "Скопировать ключ"
+  },
+  "private.mail.unlockDevice": {
+    "zh-CN": "在此设备解锁",
+    "zh-TW": "在此裝置解鎖",
+    en: "Unlock on this device",
+    fr: "Déverrouiller cet appareil",
+    ja: "この端末で解除",
+    ko: "이 기기에서 잠금 해제",
+    ru: "Открыть на этом устройстве"
+  },
+  "private.mail.unlockCopy": {
+    "zh-CN": "用另一台设备提供的恢复钥匙解锁。",
+    "zh-TW": "使用另一台裝置提供的恢復鑰匙解鎖。",
+    en: "Unlock it with the recovery key from another device.",
+    fr: "Déverrouillez-la avec la clé de récupération d'un autre appareil.",
+    ja: "別の端末の復旧キーで解除します。",
+    ko: "다른 기기의 복구 키로 잠금을 해제하세요.",
+    ru: "Откройте его ключом восстановления с другого устройства."
+  },
+  "private.mail.emptyHint": {
+    "zh-CN": "添加第一个邮箱后即可开始收件。",
+    "zh-TW": "添加第一個信箱後即可開始收件。",
+    en: "Add your first mailbox to start fetching messages.",
+    fr: "Ajoutez votre première boîte pour relever les messages.",
+    ja: "最初のメールを追加すると受信できます。",
+    ko: "첫 메일 계정을 추가하면 메일을 받을 수 있습니다.",
+    ru: "Добавьте первый ящик, чтобы получать сообщения."
+  },
+  "private.mail.emptyCopy": {
+    "zh-CN": "添加邮箱后可在这里切换账号。",
+    "zh-TW": "添加信箱後可在這裡切換帳號。",
+    en: "Added mailboxes will be available here.",
+    fr: "Les boîtes ajoutées seront disponibles ici.",
+    ja: "追加したメールはここで切り替えられます。",
+    ko: "추가한 메일 계정을 여기서 전환할 수 있습니다.",
+    ru: "Добавленные ящики появятся здесь."
+  },
+  "private.mail.addFirst": {
+    "zh-CN": "添加第一个邮箱",
+    "zh-TW": "添加第一個信箱",
+    en: "Add first mailbox",
+    fr: "Ajouter la première boîte",
+    ja: "最初のメールを追加",
+    ko: "첫 메일 추가",
+    ru: "Добавить первый ящик"
+  },
+  "private.mail.edit": {
+    "zh-CN": "编辑",
+    "zh-TW": "編輯",
+    en: "Edit",
+    fr: "Modifier",
+    ja: "編集",
+    ko: "편집",
+    ru: "Изменить"
   },
   "private.mail.copy": {
     "zh-CN": "这里保存各邮箱的登录入口和密钥备注。密钥会先在浏览器内二次加密，服务端只保存密文。",
@@ -1490,22 +1734,22 @@ const copy = {
     ru: "Обновить"
   },
   "private.mail.keyLabel": {
-    "zh-CN": "邮箱库私钥",
-    "zh-TW": "信箱庫私鑰",
-    en: "Mail vault private key",
-    fr: "Cle privee du coffre mail",
-    ja: "メール保管庫の秘密鍵",
-    ko: "메일 보관함 개인 키",
-    ru: "Закрытый ключ почтового хранилища"
+    "zh-CN": "邮箱库恢复钥匙",
+    "zh-TW": "信箱庫恢復鑰匙",
+    en: "Mail recovery key",
+    fr: "Clé de récupération de la messagerie",
+    ja: "メール復旧キー",
+    ko: "메일 복구 키",
+    ru: "Ключ восстановления почты"
   },
   "private.mail.keyPlaceholder": {
-    "zh-CN": "输入或生成私钥",
-    "zh-TW": "輸入或生成私鑰",
-    en: "Enter or generate a private key",
-    fr: "Saisir ou generer une cle privee",
-    ja: "秘密鍵を入力または生成",
-    ko: "개인 키 입력 또는 생성",
-    ru: "Введите или создайте закрытый ключ"
+    "zh-CN": "粘贴恢复钥匙",
+    "zh-TW": "貼上恢復鑰匙",
+    en: "Paste the recovery key",
+    fr: "Collez la clé de récupération",
+    ja: "復旧キーを貼り付け",
+    ko: "복구 키 붙여넣기",
+    ru: "Вставьте ключ восстановления"
   },
   "private.mail.generateKey": {
     "zh-CN": "生成私钥",
@@ -1526,13 +1770,13 @@ const copy = {
     ru: "Открыть хранилище"
   },
   "private.mail.keyHint": {
-    "zh-CN": "请把私钥保存在本网站之外；丢失后无法解开已保存的邮箱密钥。",
-    "zh-TW": "請把私鑰保存在本網站之外；遺失後無法解開已保存的信箱金鑰。",
-    en: "Keep this key outside the website; saved mail secrets cannot be recovered if it is lost.",
-    fr: "Gardez cette cle hors du site; les secrets mail seront irrecuperables si elle est perdue.",
-    ja: "この鍵はサイト外に保管してください。紛失すると保存済みの秘密情報は復元できません。",
-    ko: "이 키는 사이트 밖에 보관하세요. 잃어버리면 저장된 메일 비밀 정보를 복구할 수 없습니다.",
-    ru: "Храните ключ вне сайта; при потере сохраненные почтовые секреты нельзя восстановить."
+    "zh-CN": "请把恢复钥匙保存在网站之外；丢失后无法在新设备解开邮箱库。",
+    "zh-TW": "請把恢復鑰匙保存在網站之外；遺失後無法在新裝置解開信箱庫。",
+    en: "Keep the recovery key outside this site; without it, a new device cannot decrypt the mail vault.",
+    fr: "Conservez la clé de récupération hors de ce site ; sans elle, un nouvel appareil ne pourra pas déchiffrer la messagerie.",
+    ja: "復旧キーはサイト外に保管してください。紛失すると新しい端末でメール保管庫を復号できません。",
+    ko: "복구 키를 사이트 밖에 보관하세요. 키를 잃으면 새 기기에서 메일 보관함을 복호화할 수 없습니다.",
+    ru: "Храните ключ вне сайта: без него новое устройство не сможет расшифровать почтовое хранилище."
   },
   "private.mail.provider": {
     "zh-CN": "邮箱服务",
@@ -1547,10 +1791,64 @@ const copy = {
     "zh-CN": "自定义",
     "zh-TW": "自訂",
     en: "Custom",
-    fr: "Personnalise",
+    fr: "Personnalisé",
     ja: "カスタム",
     ko: "사용자 지정",
     ru: "Другое"
+  },
+  "private.mail.guide.gmail": {
+    "zh-CN": "Gmail 请先开启两步验证并生成 16 位应用专用密码。当前没有完整的“使用 Google 登录”流程；手动 OAuth 访问令牌通常约一小时失效。",
+    "zh-TW": "Gmail 請先開啟兩步驗證並生成 16 位應用程式專用密碼。目前沒有完整的「使用 Google 登入」流程；手動 OAuth 存取權杖通常約一小時失效。",
+    en: "For Gmail, enable 2-Step Verification and create a 16-digit app password. Full Sign in with Google is not implemented; manually entered OAuth access tokens usually expire in about an hour.",
+    fr: "Pour Gmail, activez la validation en deux étapes et créez un mot de passe d'application à 16 chiffres. La connexion Google complète n'est pas disponible ; les jetons OAuth saisis manuellement expirent généralement après environ une heure.",
+    ja: "Gmail は 2 段階認証を有効にし、16 桁のアプリパスワードを作成してください。完全な Google ログインは未実装で、手動入力した OAuth トークンは通常約 1 時間で失効します。",
+    ko: "Gmail은 2단계 인증을 켠 뒤 16자리 앱 비밀번호를 만드세요. Google 로그인 전체 흐름은 아직 없으며 수동 OAuth 액세스 토큰은 보통 약 1시간 후 만료됩니다.",
+    ru: "Для Gmail включите двухэтапную проверку и создайте 16-значный пароль приложения. Полный вход через Google не реализован; вручную введённый токен OAuth обычно истекает примерно через час."
+  },
+  "private.mail.guide.qq": {
+    "zh-CN": "QQ 邮箱请在网页版设置中开启 IMAP/SMTP，并填写生成的授权码，不要填写 QQ 登录密码。收件使用 993 端口，发件使用 465 端口。",
+    "zh-TW": "QQ 信箱請在網頁版設定中開啟 IMAP/SMTP，並填寫生成的授權碼，不要填寫 QQ 登入密碼。收件使用 993 連接埠，發件使用 465 連接埠。",
+    en: "Enable IMAP/SMTP in QQ Mail settings and enter the generated authorization code, not your QQ password. Receiving uses port 993; sending uses port 465.",
+    fr: "Activez IMAP/SMTP dans les réglages de QQ Mail et saisissez le code d'autorisation généré, pas votre mot de passe QQ. La réception utilise le port 993 et l'envoi le port 465.",
+    ja: "QQ メール設定で IMAP/SMTP を有効にし、QQ パスワードではなく発行された認証コードを入力してください。受信は 993、送信は 465 ポートです。",
+    ko: "QQ 메일 설정에서 IMAP/SMTP를 켜고 QQ 로그인 비밀번호가 아닌 발급된 인증 코드를 입력하세요. 수신은 993, 발신은 465 포트를 사용합니다.",
+    ru: "Включите IMAP/SMTP в настройках QQ Mail и введите выданный код авторизации, а не пароль QQ. Для получения используется порт 993, для отправки — 465."
+  },
+  "private.mail.guide.163": {
+    "zh-CN": "163 邮箱请开启 IMAP/SMTP，并填写客户端授权密码。",
+    "zh-TW": "163 信箱請開啟 IMAP/SMTP，並填寫用戶端授權密碼。",
+    en: "Enable IMAP/SMTP in 163 Mail and enter its client authorization password.",
+    fr: "Activez IMAP/SMTP dans 163 Mail et saisissez son mot de passe d'autorisation client.",
+    ja: "163 メールで IMAP/SMTP を有効にし、クライアント認証パスワードを入力してください。",
+    ko: "163 메일에서 IMAP/SMTP를 켜고 클라이언트 인증 비밀번호를 입력하세요.",
+    ru: "Включите IMAP/SMTP в 163 Mail и введите пароль авторизации клиента."
+  },
+  "private.mail.guide.icloud": {
+    "zh-CN": "iCloud 需要 Apple ID 的应用专用密码。",
+    "zh-TW": "iCloud 需要 Apple ID 的應用程式專用密碼。",
+    en: "iCloud requires an app-specific password from your Apple ID.",
+    fr: "iCloud nécessite un mot de passe spécifique à l'application depuis votre identifiant Apple.",
+    ja: "iCloud には Apple ID のアプリ用パスワードが必要です。",
+    ko: "iCloud는 Apple ID의 앱 전용 비밀번호가 필요합니다.",
+    ru: "Для iCloud нужен пароль приложения из Apple ID."
+  },
+  "private.mail.guide.hrbeu": {
+    "zh-CN": "HRBEU 服务器参数尚未配置，暂时不能在本站收发。",
+    "zh-TW": "HRBEU 伺服器參數尚未設定，暫時不能在本站收發。",
+    en: "HRBEU server settings are not configured yet, so this site cannot fetch or send its mail.",
+    fr: "Les paramètres du serveur HRBEU ne sont pas encore configurés ; la réception et l'envoi ne sont donc pas disponibles ici.",
+    ja: "HRBEU のサーバー設定は未構成のため、このサイトではまだ送受信できません。",
+    ko: "HRBEU 서버 설정이 아직 구성되지 않아 이 사이트에서 송수신할 수 없습니다.",
+    ru: "Параметры сервера HRBEU ещё не настроены, поэтому получение и отправка здесь недоступны."
+  },
+  "private.mail.guide.custom": {
+    "zh-CN": "自定义邮箱尚未提供服务器主机与端口输入，暂时不能在本站收发。",
+    "zh-TW": "自訂信箱尚未提供伺服器主機與連接埠輸入，暫時不能在本站收發。",
+    en: "Custom server host and port fields are not available yet, so custom mail cannot fetch or send here.",
+    fr: "Les champs d'hôte et de port personnalisés ne sont pas encore disponibles ; ces comptes ne peuvent donc pas envoyer ni recevoir ici.",
+    ja: "カスタムサーバーのホストとポート入力は未実装のため、まだ送受信できません。",
+    ko: "사용자 지정 서버 호스트와 포트 입력이 아직 없어 이 사이트에서 송수신할 수 없습니다.",
+    ru: "Поля хоста и порта пользовательского сервера ещё не добавлены, поэтому отправка и получение недоступны."
   },
   "private.mail.address": {
     "zh-CN": "邮箱账号",
@@ -1600,7 +1898,11 @@ const copy = {
   "private.mail.authType": {
     "zh-CN": "授权方式",
     "zh-TW": "授權方式",
-    en: "Authorization"
+    en: "Authorization",
+    fr: "Autorisation",
+    ja: "認証方式",
+    ko: "인증 방식",
+    ru: "Способ авторизации"
   },
   "private.mail.secretAppPassword": {
     "zh-CN": "应用专用密码",
@@ -1612,18 +1914,22 @@ const copy = {
     ru: "Пароль приложения"
   },
   "private.mail.secretOauth": {
-    "zh-CN": "OAuth 授权令牌",
-    "zh-TW": "OAuth 授權權杖",
-    en: "OAuth token",
-    fr: "Note de jeton OAuth",
-    ja: "OAuth トークンメモ",
-    ko: "OAuth 토큰 메모",
-    ru: "Заметка OAuth-токена"
+    "zh-CN": "OAuth 访问令牌（高级）",
+    "zh-TW": "OAuth 存取權杖（進階）",
+    en: "OAuth access token (advanced)",
+    fr: "Jeton d'accès OAuth (avancé)",
+    ja: "OAuth アクセストークン（上級）",
+    ko: "OAuth 액세스 토큰(고급)",
+    ru: "Токен доступа OAuth (для опытных)"
   },
   "private.mail.secretImapSmtp": {
     "zh-CN": "IMAP/SMTP 密钥",
     "zh-TW": "IMAP/SMTP 金鑰",
-    en: "IMAP/SMTP secret"
+    en: "IMAP/SMTP authorization code",
+    fr: "Code d'autorisation IMAP/SMTP",
+    ja: "IMAP/SMTP 認証コード",
+    ko: "IMAP/SMTP 인증 코드",
+    ru: "Код авторизации IMAP/SMTP"
   },
   "private.mail.secretSecurityKey": {
     "zh-CN": "安全密钥备注",
@@ -1647,19 +1953,19 @@ const copy = {
     "zh-CN": "令牌或应用专用密码",
     "zh-TW": "權杖或應用專用密碼",
     en: "Token or app password",
-    fr: "Contenu chiffre",
-    ja: "暗号化保存内容",
-    ko: "암호화 저장 내용",
-    ru: "Зашифрованное содержимое"
+    fr: "Jeton ou mot de passe d'application",
+    ja: "トークンまたはアプリパスワード",
+    ko: "토큰 또는 앱 비밀번호",
+    ru: "Токен или пароль приложения"
   },
   "private.mail.secretPlaceholder": {
     "zh-CN": "粘贴授权令牌、应用专用密码或 IMAP/SMTP 密钥",
     "zh-TW": "貼上授權權杖、應用專用密碼或 IMAP/SMTP 金鑰",
     en: "Paste an OAuth token, app password, or IMAP/SMTP secret",
-    fr: "Chiffre seulement dans le navigateur; le serveur ne garde pas le texte clair",
-    ja: "ブラウザ内だけで暗号化され、サーバーは平文を保存しません",
-    ko: "브라우저 안에서만 암호화되며 서버에는 평문이 저장되지 않습니다",
-    ru: "Шифруется только в браузере; сервер не хранит открытый текст"
+    fr: "Collez le jeton, le mot de passe d'application ou le code IMAP/SMTP",
+    ja: "トークン、アプリパスワード、または IMAP/SMTP 認証コードを貼り付け",
+    ko: "토큰, 앱 비밀번호 또는 IMAP/SMTP 인증 코드를 붙여넣으세요",
+    ru: "Вставьте токен, пароль приложения или код IMAP/SMTP"
   },
   "private.mail.note": {
     "zh-CN": "备注",
@@ -1674,10 +1980,10 @@ const copy = {
     "zh-CN": "例如：学校邮箱、备用 Gmail、QQ 主邮箱",
     "zh-TW": "例如：學校信箱、備用 Gmail、QQ 主信箱",
     en: "Example: school mail, backup Gmail, main QQ mailbox",
-    fr: "Exemple : Gmail devrait utiliser OAuth ou un mot de passe d'application",
-    ja: "例: Gmail は OAuth またはアプリ専用パスワードを推奨",
-    ko: "예: Gmail은 OAuth 또는 앱 비밀번호 사용 권장",
-    ru: "Например: для Gmail лучше OAuth или пароль приложения"
+    fr: "Exemple : université, Gmail secondaire, boîte QQ principale",
+    ja: "例：大学メール、予備 Gmail、メイン QQ メール",
+    ko: "예: 학교 메일, 보조 Gmail, 주 QQ 메일",
+    ru: "Например: университетская почта, запасной Gmail, основной QQ"
   },
   "private.mail.saveAccount": {
     "zh-CN": "添加邮箱",
@@ -1761,22 +2067,22 @@ const copy = {
     ru: "Почтовый аккаунт удален"
   },
   "private.mail.needsUnlock": {
-    "zh-CN": "请输入私钥解锁邮箱库",
-    "zh-TW": "請輸入私鑰解鎖信箱庫",
-    en: "Enter the private key to unlock the mail vault",
-    fr: "Entrez la cle privee pour deverrouiller le coffre mail",
-    ja: "秘密鍵を入力してメール保管庫を解除してください",
-    ko: "개인 키를 입력해 메일 보관함을 여세요",
-    ru: "Введите закрытый ключ, чтобы открыть почтовое хранилище"
+    "zh-CN": "此设备没有邮箱库恢复钥匙，请从已解锁设备复制后在这里解锁",
+    "zh-TW": "此裝置沒有信箱庫恢復鑰匙，請從已解鎖裝置複製後在這裡解鎖",
+    en: "This device has no mail recovery key. Copy it from an unlocked device, then unlock here.",
+    fr: "Cet appareil n'a pas de clé de récupération. Copiez-la depuis un appareil déverrouillé, puis déverrouillez ici.",
+    ja: "この端末には復旧キーがありません。解除済み端末からコピーして、ここで解除してください。",
+    ko: "이 기기에 메일 복구 키가 없습니다. 잠금이 해제된 기기에서 복사해 여기서 잠금을 해제하세요.",
+    ru: "На этом устройстве нет ключа восстановления. Скопируйте его с открытого устройства и вставьте здесь."
   },
   "private.mail.noVault": {
-    "zh-CN": "还没有邮箱，请点左下角 + 添加",
-    "zh-TW": "還沒有信箱，請點左下角 + 添加",
-    en: "No mailbox yet. Use the + button at the lower left.",
-    fr: "Aucun coffre mail. Generez ou saisissez une cle, puis enregistrez le premier compte.",
-    ja: "メール保管庫はまだありません。鍵を生成または入力して最初のアカウントを保存してください。",
-    ko: "메일 보관함이 없습니다. 키를 만들거나 입력한 뒤 첫 계정을 저장하세요.",
-    ru: "Хранилища еще нет. Создайте или введите ключ, затем сохраните первый аккаунт."
+    "zh-CN": "还没有邮箱，请添加第一个邮箱",
+    "zh-TW": "還沒有信箱，請添加第一個信箱",
+    en: "No mailbox yet. Add your first mailbox.",
+    fr: "Aucune boîte mail pour le moment. Ajoutez la première.",
+    ja: "メールはまだありません。最初のメールを追加してください。",
+    ko: "아직 메일 계정이 없습니다. 첫 메일을 추가하세요.",
+    ru: "Почтовых ящиков пока нет. Добавьте первый."
   },
   "private.mail.keyRequired": {
     "zh-CN": "请先输入邮箱库私钥",
@@ -1791,7 +2097,7 @@ const copy = {
     "zh-CN": "邮箱库已解锁",
     "zh-TW": "信箱庫已解鎖",
     en: "Mail vault unlocked",
-    fr: "Coffre mail deverrouille",
+    fr: "Messagerie déverrouillée",
     ja: "メール保管庫を解除しました",
     ko: "메일 보관함 잠금 해제됨",
     ru: "Почтовое хранилище открыто"
@@ -1800,7 +2106,7 @@ const copy = {
     "zh-CN": "私钥不正确，无法解开邮箱库",
     "zh-TW": "私鑰不正確，無法解開信箱庫",
     en: "The private key is wrong; the mail vault cannot be decrypted.",
-    fr: "La cle privee est incorrecte; le coffre mail ne peut pas etre dechiffre.",
+    fr: "La clé de récupération est incorrecte ; la messagerie ne peut pas être déchiffrée.",
     ja: "秘密鍵が違うため、メール保管庫を復号できません。",
     ko: "개인 키가 올바르지 않아 메일 보관함을 복호화할 수 없습니다.",
     ru: "Ключ неверный; хранилище нельзя расшифровать."
@@ -1809,7 +2115,7 @@ const copy = {
     "zh-CN": "邮箱库读取失败",
     "zh-TW": "信箱庫讀取失敗",
     en: "Mail vault load failed",
-    fr: "Echec du chargement du coffre mail",
+    fr: "Échec du chargement de la messagerie",
     ja: "メール保管庫の読み込みに失敗しました",
     ko: "메일 보관함을 불러오지 못했습니다",
     ru: "Не удалось загрузить почтовое хранилище"
@@ -1842,41 +2148,85 @@ const copy = {
     ru: "Заполните аккаунт и зашифрованное содержимое"
   },
   "private.mail.saved": {
-    "zh-CN": "邮箱已加入总站并加密保存",
-    "zh-TW": "信箱已加入總站並加密保存",
-    en: "Mailbox added to the hub and encrypted",
-    fr: "Compte mail chiffre et enregistre",
-    ja: "メールアカウントを暗号化して保存しました",
-    ko: "메일 계정을 암호화해 저장했습니다",
-    ru: "Почтовый аккаунт зашифрован и сохранен"
+    "zh-CN": "邮箱已加密保存；可在“设备同步”复制恢复钥匙",
+    "zh-TW": "信箱已加密保存；可在「裝置同步」複製恢復鑰匙",
+    en: "Mailbox encrypted and saved. Use Device access to copy the recovery key.",
+    fr: "Boîte chiffrée et enregistrée. Utilisez Accès sur les appareils pour copier la clé de récupération.",
+    ja: "メールを暗号化して保存しました。端末同期から復旧キーをコピーできます。",
+    ko: "메일을 암호화해 저장했습니다. 기기 동기화에서 복구 키를 복사할 수 있습니다.",
+    ru: "Ящик зашифрован и сохранён. Ключ можно скопировать в разделе доступа с устройств."
   },
   "private.mail.keyTooShort": {
-    "zh-CN": "私钥至少需要 24 个字符",
-    "zh-TW": "私鑰至少需要 24 個字元",
-    en: "The private key must be at least 24 characters",
-    fr: "La cle privee doit contenir au moins 24 caracteres",
-    ja: "秘密鍵は 24 文字以上必要です",
-    ko: "개인 키는 최소 24자여야 합니다",
+    "zh-CN": "恢复钥匙至少需要 24 个字符",
+    "zh-TW": "恢復鑰匙至少需要 24 個字元",
+    en: "The recovery key must be at least 24 characters",
+    fr: "La clé de récupération doit contenir au moins 24 caractères",
+    ja: "復旧キーは 24 文字以上必要です",
+    ko: "복구 키는 최소 24자여야 합니다",
     ru: "Ключ должен быть не короче 24 символов"
   },
   "private.mail.saveFailed": {
     "zh-CN": "邮箱库保存失败",
     "zh-TW": "信箱庫保存失敗",
     en: "Mail vault save failed",
-    fr: "Echec de l'enregistrement du coffre mail",
+    fr: "Échec de l'enregistrement de la messagerie",
     ja: "メール保管庫の保存に失敗しました",
     ko: "메일 보관함 저장 실패",
     ru: "Не удалось сохранить почтовое хранилище"
   },
   "private.mail.lockedHint": {
-    "zh-CN": "此设备没有邮箱库钥匙。请重新添加邮箱或导入恢复钥匙。",
-    "zh-TW": "此裝置沒有信箱庫鑰匙。請重新添加信箱或匯入恢復鑰匙。",
-    en: "This device does not have the mail vault key. Re-add a mailbox or import the recovery key."
+    "zh-CN": "此设备尚未解锁邮箱库，请使用恢复钥匙解锁。",
+    "zh-TW": "此裝置尚未解鎖信箱庫，請使用恢復鑰匙解鎖。",
+    en: "The mail vault is not unlocked on this device. Use the recovery key to unlock it.",
+    fr: "La messagerie n'est pas déverrouillée sur cet appareil. Utilisez la clé de récupération.",
+    ja: "この端末ではメール保管庫が未解除です。復旧キーで解除してください。",
+    ko: "이 기기에서 메일 보관함이 잠겨 있습니다. 복구 키로 잠금을 해제하세요.",
+    ru: "Почтовое хранилище на этом устройстве закрыто. Используйте ключ восстановления."
   },
   "private.mail.selected": {
     "zh-CN": "当前邮箱",
     "zh-TW": "目前信箱",
-    en: "Current mailbox"
+    en: "Current mailbox",
+    fr: "Boîte actuelle",
+    ja: "現在のメール",
+    ko: "현재 메일",
+    ru: "Текущий ящик"
+  },
+  "private.mail.unlocking": {
+    "zh-CN": "正在解锁邮箱库",
+    "zh-TW": "正在解鎖信箱庫",
+    en: "Unlocking the mail vault",
+    fr: "Déverrouillage de la messagerie",
+    ja: "メール保管庫を解除中",
+    ko: "메일 보관함 잠금 해제 중",
+    ru: "Открытие почтового хранилища"
+  },
+  "private.mail.deviceUnlocked": {
+    "zh-CN": "邮箱库已在此设备解锁",
+    "zh-TW": "信箱庫已在此裝置解鎖",
+    en: "Mail vault unlocked on this device",
+    fr: "Messagerie déverrouillée sur cet appareil",
+    ja: "この端末でメール保管庫を解除しました",
+    ko: "이 기기에서 메일 보관함 잠금이 해제되었습니다",
+    ru: "Почтовое хранилище открыто на этом устройстве"
+  },
+  "private.mail.keyCopied": {
+    "zh-CN": "恢复钥匙已复制",
+    "zh-TW": "恢復鑰匙已複製",
+    en: "Recovery key copied",
+    fr: "Clé de récupération copiée",
+    ja: "復旧キーをコピーしました",
+    ko: "복구 키가 복사되었습니다",
+    ru: "Ключ восстановления скопирован"
+  },
+  "private.mail.copyKeyFallback": {
+    "zh-CN": "请手动复制已选中的恢复钥匙",
+    "zh-TW": "請手動複製已選取的恢復鑰匙",
+    en: "Copy the selected recovery key manually",
+    fr: "Copiez manuellement la clé de récupération sélectionnée",
+    ja: "選択された復旧キーを手動でコピーしてください",
+    ko: "선택된 복구 키를 직접 복사하세요",
+    ru: "Скопируйте выделенный ключ вручную"
   },
   "private.mail.connectorPending": {
     "zh-CN": "收发信连接器待配置：需要为该邮箱完成 OAuth 或 IMAP/SMTP 接入",
@@ -1886,52 +2236,92 @@ const copy = {
   "private.mail.composeRequired": {
     "zh-CN": "请填写收件人和主题",
     "zh-TW": "請填寫收件人和主題",
-    en: "Fill in recipient and subject"
+    en: "Fill in recipient and subject",
+    fr: "Saisissez le destinataire et l'objet",
+    ja: "宛先と件名を入力してください",
+    ko: "받는 사람과 제목을 입력하세요",
+    ru: "Укажите получателя и тему"
   },
   "private.mail.fetching": {
     "zh-CN": "正在收取邮件",
     "zh-TW": "正在收取郵件",
-    en: "Fetching mail"
+    en: "Fetching mail",
+    fr: "Réception des messages",
+    ja: "メールを受信中",
+    ko: "메일 받는 중",
+    ru: "Получение почты"
   },
   "private.mail.fetched": {
     "zh-CN": "邮件已收取",
     "zh-TW": "郵件已收取",
-    en: "Mail fetched"
+    en: "Mail fetched",
+    fr: "Messages reçus",
+    ja: "メールを受信しました",
+    ko: "메일을 받았습니다",
+    ru: "Почта получена"
   },
   "private.mail.fetchFailed": {
     "zh-CN": "收取失败",
     "zh-TW": "收取失敗",
-    en: "Fetch failed"
+    en: "Fetch failed",
+    fr: "Échec de la réception",
+    ja: "受信に失敗しました",
+    ko: "메일 받기 실패",
+    ru: "Не удалось получить почту"
   },
   "private.mail.sending": {
     "zh-CN": "正在发送邮件",
     "zh-TW": "正在發送郵件",
-    en: "Sending mail"
+    en: "Sending mail",
+    fr: "Envoi du message",
+    ja: "メールを送信中",
+    ko: "메일 보내는 중",
+    ru: "Отправка сообщения"
   },
   "private.mail.sent": {
     "zh-CN": "邮件已发送",
     "zh-TW": "郵件已發送",
-    en: "Mail sent"
+    en: "Mail sent",
+    fr: "Message envoyé",
+    ja: "メールを送信しました",
+    ko: "메일을 보냈습니다",
+    ru: "Сообщение отправлено"
   },
   "private.mail.sendFailed": {
     "zh-CN": "发送失败",
     "zh-TW": "發送失敗",
-    en: "Send failed"
+    en: "Send failed",
+    fr: "Échec de l'envoi",
+    ja: "送信に失敗しました",
+    ko: "메일 보내기 실패",
+    ru: "Не удалось отправить"
   },
   "private.mail.noMessages": {
     "zh-CN": "暂无邮件",
     "zh-TW": "暫無郵件",
-    en: "No messages"
+    en: "No messages",
+    fr: "Aucun message",
+    ja: "メールはありません",
+    ko: "메일 없음",
+    ru: "Нет сообщений"
   },
   "private.mail.noMessagesCopy": {
     "zh-CN": "邮箱连接成功，但当前没有可显示的收件。",
     "zh-TW": "信箱連接成功，但目前沒有可顯示的收件。",
-    en: "The mailbox connected, but there are no messages to show."
+    en: "The mailbox connected, but there are no messages to show.",
+    fr: "La boîte est connectée, mais aucun message n'est disponible.",
+    ja: "メールには接続できましたが、表示できる受信メールはありません。",
+    ko: "메일에 연결되었지만 표시할 받은 메일이 없습니다.",
+    ru: "Подключение установлено, но сообщений для отображения нет."
   },
   "private.mail.noSubject": {
     "zh-CN": "无主题",
     "zh-TW": "無主題",
-    en: "No subject"
+    en: "No subject",
+    fr: "Sans objet",
+    ja: "件名なし",
+    ko: "제목 없음",
+    ru: "Без темы"
   },
   "private.devices.eyebrow": {
     "zh-CN": "可信设备",
@@ -2032,6 +2422,33 @@ const copy = {
     ko: "데이터 관리",
     ru: "Управление данными"
   },
+  "private.data.copy": {
+    "zh-CN": "把私人资料下载到当前设备，或从你选择的备份文件恢复。",
+    "zh-TW": "把私人資料下載到目前裝置，或從你選擇的備份檔案恢復。",
+    en: "Download private data to this device, or restore it from a backup file you choose.",
+    fr: "Téléchargez les données privées sur cet appareil ou restaurez-les depuis le fichier de sauvegarde de votre choix.",
+    ja: "個人データをこの端末へダウンロードするか、選択したバックアップから復元します。",
+    ko: "개인 데이터를 이 기기에 내려받거나 선택한 백업 파일에서 복원합니다.",
+    ru: "Скачайте личные данные на это устройство или восстановите их из выбранной резервной копии."
+  },
+  "private.data.persistenceTitle": {
+    "zh-CN": "当前服务器存储不是永久存储",
+    "zh-TW": "目前伺服器儲存不是永久儲存",
+    en: "Current server storage is not permanent",
+    fr: "Le stockage actuel du serveur n'est pas permanent",
+    ja: "現在のサーバー保存領域は永続的ではありません",
+    ko: "현재 서버 저장소는 영구 저장소가 아닙니다",
+    ru: "Текущее хранилище сервера не является постоянным"
+  },
+  "private.data.persistenceCopy": {
+    "zh-CN": "Render 免费实例在重启或重新部署后可能清空服务器文件。请定期下载备份；长期保存需要持久磁盘或外部存储。",
+    "zh-TW": "Render 免費執行個體在重新啟動或重新部署後可能清空伺服器檔案。請定期下載備份；長期保存需要持久磁碟或外部儲存。",
+    en: "A free Render instance can lose server files after a restart or redeploy. Download backups regularly; long-term storage needs a persistent disk or external storage.",
+    fr: "Une instance Render gratuite peut perdre ses fichiers après un redémarrage ou un redéploiement. Téléchargez régulièrement des sauvegardes ; la conservation durable nécessite un disque persistant ou un stockage externe.",
+    ja: "Render の無料インスタンスは再起動や再デプロイ後にサーバーファイルを失うことがあります。定期的にバックアップし、長期保存には永続ディスクか外部ストレージを使用してください。",
+    ko: "Render 무료 인스턴스는 재시작이나 재배포 후 서버 파일이 사라질 수 있습니다. 정기적으로 백업하고 장기 보관에는 영구 디스크나 외부 저장소를 사용하세요.",
+    ru: "Бесплатный экземпляр Render может потерять файлы после перезапуска или повторного развёртывания. Регулярно скачивайте копии; для долгого хранения нужен постоянный диск или внешнее хранилище."
+  },
   "private.data.save": {
     "zh-CN": "保存",
     "zh-TW": "儲存",
@@ -2051,13 +2468,31 @@ const copy = {
     ru: "Импорт"
   },
   "private.data.exportLocal": {
-    "zh-CN": "保存信息至本地",
-    "zh-TW": "儲存資訊至本機",
-    en: "Save information locally",
-    fr: "Enregistrer en local",
-    ja: "情報をローカルへ保存",
-    ko: "정보를 로컬에 저장",
-    ru: "Сохранить локально"
+    "zh-CN": "下载本地备份",
+    "zh-TW": "下載本機備份",
+    en: "Download backup",
+    fr: "Télécharger une sauvegarde",
+    ja: "バックアップをダウンロード",
+    ko: "백업 다운로드",
+    ru: "Скачать резервную копию"
+  },
+  "private.data.exportLocalCopy": {
+    "zh-CN": "ZIP 包含简介和加密邮箱库，但不包含浏览器里的恢复钥匙；请在“设备同步”中另行保存钥匙。",
+    "zh-TW": "ZIP 包含簡介和加密信箱庫，但不包含瀏覽器裡的恢復鑰匙；請在「裝置同步」中另行保存鑰匙。",
+    en: "The ZIP contains your profile and encrypted mail vault, but not the browser recovery key. Save that key separately under Device sync.",
+    fr: "Le ZIP contient votre profil et le coffre mail chiffré, mais pas la clé de récupération du navigateur. Enregistrez-la séparément via Synchronisation des appareils.",
+    ja: "ZIP にはプロフィールと暗号化メール保管庫が含まれますが、ブラウザーの復旧キーは含まれません。「端末同期」で別途保存してください。",
+    ko: "ZIP에는 프로필과 암호화된 메일 보관함이 포함되지만 브라우저 복구 키는 포함되지 않습니다. 기기 동기화에서 키를 따로 보관하세요.",
+    ru: "ZIP содержит профиль и зашифрованное почтовое хранилище, но не ключ восстановления браузера. Сохраните ключ отдельно в разделе синхронизации устройств."
+  },
+  "private.data.download": {
+    "zh-CN": "下载备份",
+    "zh-TW": "下載備份",
+    en: "Download backup",
+    fr: "Télécharger",
+    ja: "ダウンロード",
+    ko: "백업 다운로드",
+    ru: "Скачать"
   },
   "private.data.exportSubsite": {
     "zh-CN": "传输信息至子网站",
@@ -2069,13 +2504,31 @@ const copy = {
     ru: "Передать на поддомен"
   },
   "private.data.importLocal": {
-    "zh-CN": "从本地导入",
-    "zh-TW": "從本機匯入",
-    en: "Import from local",
-    fr: "Importer du local",
-    ja: "ローカルから読み込み",
-    ko: "로컬에서 가져오기",
-    ru: "Импорт из локального архива"
+    "zh-CN": "从备份文件恢复",
+    "zh-TW": "從備份檔案恢復",
+    en: "Restore from backup",
+    fr: "Restaurer une sauvegarde",
+    ja: "バックアップから復元",
+    ko: "백업에서 복원",
+    ru: "Восстановить из копии"
+  },
+  "private.data.importLocalCopy": {
+    "zh-CN": "选择之前下载的 ZIP 文件，恢复简介与加密邮箱库。",
+    "zh-TW": "選擇之前下載的 ZIP 檔案，恢復簡介與加密信箱庫。",
+    en: "Choose a previously downloaded ZIP file to restore the profile and encrypted mail vault.",
+    fr: "Choisissez un fichier ZIP téléchargé auparavant pour restaurer le profil et la messagerie chiffrée.",
+    ja: "以前ダウンロードした ZIP を選び、プロフィールと暗号化メール保管庫を復元します。",
+    ko: "이전에 내려받은 ZIP 파일을 선택해 프로필과 암호화된 메일 보관함을 복원합니다.",
+    ru: "Выберите ранее скачанный ZIP-файл, чтобы восстановить профиль и зашифрованную почту."
+  },
+  "private.data.chooseFile": {
+    "zh-CN": "选择备份文件",
+    "zh-TW": "選擇備份檔案",
+    en: "Choose backup file",
+    fr: "Choisir le fichier",
+    ja: "バックアップを選択",
+    ko: "백업 파일 선택",
+    ru: "Выбрать файл"
   },
   "private.data.importSubsite": {
     "zh-CN": "从子网站导入",
@@ -2087,22 +2540,76 @@ const copy = {
     ru: "Импорт с поддомена"
   },
   "private.data.savedLocal": {
-    "zh-CN": "已保存到本地：",
-    "zh-TW": "已儲存到本機：",
-    en: "Saved locally: ",
-    fr: "Enregistre en local : ",
-    ja: "ローカルへ保存しました：",
-    ko: "로컬에 저장됨: ",
-    ru: "Сохранено локально: "
+    "zh-CN": "备份已下载：",
+    "zh-TW": "備份已下載：",
+    en: "Backup downloaded: ",
+    fr: "Sauvegarde téléchargée : ",
+    ja: "バックアップをダウンロードしました：",
+    ko: "백업 다운로드 완료: ",
+    ru: "Резервная копия скачана: "
   },
   "private.data.importedLocal": {
-    "zh-CN": "已从本地导入：",
-    "zh-TW": "已從本機匯入：",
-    en: "Imported from local: ",
-    fr: "Importe du local : ",
-    ja: "ローカルから読み込みました：",
-    ko: "로컬에서 가져옴: ",
-    ru: "Импортировано локально: "
+    "zh-CN": "已从备份恢复：",
+    "zh-TW": "已從備份恢復：",
+    en: "Restored from backup: ",
+    fr: "Restauration effectuée : ",
+    ja: "バックアップから復元しました：",
+    ko: "백업에서 복원됨: ",
+    ru: "Восстановлено из копии: "
+  },
+  "private.data.subsite": {
+    "zh-CN": "子网站传输",
+    "zh-TW": "子網站傳輸",
+    en: "Subsite transfer",
+    fr: "Transfert vers le sous-site",
+    ja: "サブサイト転送",
+    ko: "하위 사이트 전송",
+    ru: "Передача на поддомен"
+  },
+  "private.data.subsiteCopy": {
+    "zh-CN": "子网站接口已预留，目前尚未配置。",
+    "zh-TW": "子網站介面已預留，目前尚未設定。",
+    en: "The subsite interface is reserved but not configured yet.",
+    fr: "L'interface du sous-site est réservée mais n'est pas encore configurée.",
+    ja: "サブサイト連携用インターフェースは予約済みですが、まだ構成されていません。",
+    ko: "하위 사이트 인터페이스는 준비되어 있지만 아직 구성되지 않았습니다.",
+    ru: "Интерфейс поддомена зарезервирован, но ещё не настроен."
+  },
+  "private.data.preparing": {
+    "zh-CN": "正在准备备份文件",
+    "zh-TW": "正在準備備份檔案",
+    en: "Preparing backup file",
+    fr: "Préparation de la sauvegarde",
+    ja: "バックアップを準備中",
+    ko: "백업 파일 준비 중",
+    ru: "Подготовка резервной копии"
+  },
+  "private.data.importing": {
+    "zh-CN": "正在检查并恢复备份",
+    "zh-TW": "正在檢查並恢復備份",
+    en: "Checking and restoring the backup",
+    fr: "Vérification et restauration de la sauvegarde",
+    ja: "バックアップを検証して復元中",
+    ko: "백업 확인 및 복원 중",
+    ru: "Проверка и восстановление копии"
+  },
+  "private.data.tooLarge": {
+    "zh-CN": "备份文件过大，最大支持 4 MB",
+    "zh-TW": "備份檔案過大，最大支援 4 MB",
+    en: "The backup is too large; the limit is 4 MB",
+    fr: "La sauvegarde est trop volumineuse ; la limite est de 4 Mo",
+    ja: "バックアップが大きすぎます。上限は 4 MB です",
+    ko: "백업 파일이 너무 큽니다. 최대 4MB까지 지원합니다",
+    ru: "Резервная копия слишком велика; максимум 4 МБ"
+  },
+  "private.data.invalidArchive": {
+    "zh-CN": "这不是有效的私人空间备份文件",
+    "zh-TW": "這不是有效的私人空間備份檔案",
+    en: "This is not a valid private-space backup",
+    fr: "Ce fichier n'est pas une sauvegarde valide de l'espace privé",
+    ja: "有効なプライベート空間バックアップではありません",
+    ko: "올바른 개인 공간 백업 파일이 아닙니다",
+    ru: "Это недопустимая резервная копия личного пространства"
   },
   "private.data.subsitePending": {
     "zh-CN": "子网站接口已预留",

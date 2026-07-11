@@ -6,7 +6,7 @@
   <title>我的私人空间 · Small Magellanic Cloud</title>
   <meta name="description" content="Small Magellanic Cloud private space." />
   <link rel="icon" href="/favicon.png" type="image/png" />
-  <link rel="stylesheet" href="/styles.css?v=20260709c" />
+  <link rel="stylesheet" href="/styles.css?v=20260712a" />
 </head>
 <body>
   <div class="site-shell">
@@ -77,7 +77,7 @@
             </button>
             <button class="private-nav-button" type="button" data-private-nav="mail" aria-pressed="false">
               <span class="private-nav-mark" aria-hidden="true"></span>
-              <span data-i18n="private.nav.mail">邮箱登录</span>
+              <span data-i18n="private.nav.mail">邮箱管理</span>
             </button>
             <button class="private-nav-button" type="button" data-private-nav="data" aria-pressed="false">
               <span class="private-nav-mark" aria-hidden="true"></span>
@@ -150,18 +150,27 @@
               <aside class="mail-account-rail" aria-label="邮箱列表" data-i18n-aria-label="private.mail.accounts">
                 <div class="mail-account-head">
                   <span data-i18n="private.mail.accounts">邮箱列表</span>
-                  <button class="mail-icon-button" type="button" data-mail-refresh aria-label="刷新" data-i18n-aria-label="private.mail.refresh">↻</button>
+                  <button class="mail-icon-button" type="button" data-mail-refresh aria-label="刷新" data-i18n-aria-label="private.mail.refresh">
+                    <span aria-hidden="true">↻</span>
+                  </button>
                 </div>
                 <div class="mail-account-list" data-mail-account-list></div>
-                <button class="mail-add-button" type="button" data-mail-add aria-label="添加邮箱" data-i18n-aria-label="private.mail.add">+</button>
+                <div class="mail-rail-actions">
+                  <button class="mail-add-button" type="button" data-mail-add>
+                    <span class="mail-button-mark" aria-hidden="true">+</span>
+                    <span data-i18n="private.mail.add">添加邮箱</span>
+                  </button>
+                  <button class="mail-vault-button" type="button" data-mail-key-manage data-i18n="private.mail.deviceSync">设备同步</button>
+                </div>
               </aside>
 
               <section class="mail-client" aria-label="个人邮箱总站" data-i18n-aria-label="private.mail.hubTitle">
                 <div class="mail-client-head">
-                  <div>
+                  <div class="mail-client-copy">
                     <p class="eyebrow" data-i18n="private.mail.eyebrow">mail hub</p>
                     <h2 data-i18n="private.mail.hubTitle">个人邮箱总站</h2>
-                    <p data-mail-vault-note data-i18n="private.mail.hubCopy">一次进入私人空间后，在这里切换多个邮箱、查看收件和写邮件。邮箱密钥会二次加密后保存。</p>
+                    <p data-i18n="private.mail.hubCopy">集中切换邮箱与查看收件。秘密信息在浏览器内加密后保存，服务端只保存密文。</p>
+                    <p class="mail-current-account" data-mail-vault-note data-i18n="private.mail.noAccount">未选择邮箱</p>
                   </div>
                   <div class="mail-client-actions">
                     <button class="button" type="button" data-mail-sync data-i18n="private.mail.sync">收取</button>
@@ -169,10 +178,15 @@
                   </div>
                 </div>
 
-                <div class="mail-client-grid">
-                  <section class="mail-thread-list">
+                <div class="mail-transport-note" data-mail-transport-note role="note" hidden>
+                  <strong data-i18n="private.mail.receiveOnlyTitle">当前部署仅支持直接收件</strong>
+                  <span data-i18n="private.mail.receiveOnlyCopy">Render 免费实例禁止连接 SMTP 发件端口；可继续在这里收件，并用“打开网页版邮箱”完成发送。</span>
+                </div>
+
+                <div class="mail-client-grid" data-mail-client-grid>
+                  <section class="mail-thread-list" aria-labelledby="mail-inbox-title">
                     <div class="mail-section-title">
-                      <span data-i18n="private.mail.inbox">收件箱</span>
+                      <h3 id="mail-inbox-title" data-i18n="private.mail.inbox">收件箱</h3>
                       <small data-mail-active-account data-i18n="private.mail.noAccount">未选择邮箱</small>
                     </div>
                     <div class="mail-thread-empty" data-mail-thread-empty>
@@ -181,24 +195,30 @@
                     </div>
                   </section>
 
-                  <form class="mail-compose-box" data-mail-compose-form>
+                  <form class="mail-compose-box" data-mail-compose-form aria-labelledby="mail-compose-title" hidden>
                     <div class="mail-section-title">
-                      <span data-i18n="private.mail.compose">写邮件</span>
-                      <small data-mail-compose-from data-i18n="private.mail.noAccount">未选择邮箱</small>
+                      <div>
+                        <h3 id="mail-compose-title" data-i18n="private.mail.compose">写邮件</h3>
+                        <small data-mail-compose-from data-i18n="private.mail.noAccount">未选择邮箱</small>
+                      </div>
+                      <button class="mail-icon-button" type="button" data-mail-compose-close aria-label="关闭写信" data-i18n-aria-label="private.mail.closeCompose">×</button>
                     </div>
                     <label>
                       <span data-i18n="private.mail.to">收件人</span>
-                      <input type="email" autocomplete="off" data-mail-to placeholder="to@example.com" />
+                      <input type="email" autocomplete="off" data-mail-to data-i18n-placeholder="private.mail.toPlaceholder" placeholder="to@example.com" />
                     </label>
                     <label>
                       <span data-i18n="private.mail.subject">主题</span>
-                      <input type="text" autocomplete="off" data-mail-subject placeholder="Subject" />
+                      <input type="text" autocomplete="off" data-mail-subject data-i18n-placeholder="private.mail.subjectPlaceholder" placeholder="填写主题" />
                     </label>
                     <label>
                       <span data-i18n="private.mail.body">正文</span>
-                      <textarea rows="8" data-mail-body placeholder="写下邮件内容"></textarea>
+                      <textarea rows="8" data-mail-body data-i18n-placeholder="private.mail.bodyPlaceholder" placeholder="写下邮件内容"></textarea>
                     </label>
-                    <button class="button primary" type="submit" data-i18n="private.mail.send">发送</button>
+                    <div class="mail-compose-actions">
+                      <a class="button subtle" href="#" target="_blank" rel="noreferrer" data-mail-webmail hidden data-i18n="private.mail.openWebmail">打开网页版邮箱</a>
+                      <button class="button primary" type="submit" data-i18n="private.mail.send">发送</button>
+                    </div>
                   </form>
                 </div>
 
@@ -206,24 +226,28 @@
               </section>
             </div>
 
-            <div class="mail-modal" data-mail-add-dialog hidden>
-              <form class="mail-modal-card" data-mail-form>
+            <div class="mail-modal" data-mail-add-dialog role="dialog" aria-modal="true" aria-labelledby="mail-add-title" hidden>
+              <form class="mail-modal-card mail-form" data-mail-form>
                 <input type="hidden" data-mail-id />
                 <div class="mail-modal-head">
                   <div>
                     <p class="eyebrow" data-i18n="private.mail.addEyebrow">add mailbox</p>
-                    <h3 data-i18n="private.mail.addTitle">添加邮箱</h3>
+                    <h3 id="mail-add-title" data-i18n="private.mail.addTitle">添加邮箱</h3>
                   </div>
-                  <button class="mail-icon-button" type="button" data-mail-close aria-label="关闭">×</button>
+                  <button class="mail-icon-button" type="button" data-mail-close aria-label="关闭" data-i18n-aria-label="private.mail.close">×</button>
                 </div>
-                <div class="mail-provider-grid" data-mail-provider-grid>
-                  <button type="button" data-provider-choice="gmail">Gmail</button>
-                  <button type="button" data-provider-choice="qq">QQ</button>
-                  <button type="button" data-provider-choice="163">163</button>
-                  <button type="button" data-provider-choice="icloud">iCloud</button>
-                  <button type="button" data-provider-choice="hrbeu">HRBEU</button>
-                  <button type="button" data-provider-choice="custom" data-i18n="private.mail.providerCustom">自定义</button>
-                </div>
+                <p class="mail-modal-copy" data-i18n="private.mail.addCopy">选择邮箱服务，并填写该服务提供的授权码或应用专用密码。不要填写网页登录密码。</p>
+                <fieldset class="mail-provider-fieldset">
+                  <legend data-i18n="private.mail.provider">邮箱服务</legend>
+                  <div class="mail-provider-grid" data-mail-provider-grid>
+                    <button type="button" data-provider-choice="gmail">Gmail</button>
+                    <button type="button" data-provider-choice="qq">QQ</button>
+                    <button type="button" data-provider-choice="163">163</button>
+                    <button type="button" data-provider-choice="icloud">iCloud</button>
+                    <button type="button" data-provider-choice="hrbeu">HRBEU</button>
+                    <button type="button" data-provider-choice="custom" data-i18n="private.mail.providerCustom">自定义</button>
+                  </div>
+                </fieldset>
                 <p class="mail-provider-hint" data-mail-provider-hint></p>
                 <input type="hidden" data-mail-provider value="gmail" />
                 <div class="mail-form-grid">
@@ -234,7 +258,7 @@
                   <label>
                     <span data-i18n="private.mail.authType">授权方式</span>
                     <select data-mail-secret-type>
-                      <option value="oauth" data-i18n="private.mail.secretOauth">OAuth 授权令牌</option>
+                      <option value="oauth" data-i18n="private.mail.secretOauth" hidden>OAuth 访问令牌（高级）</option>
                       <option value="app-password" data-i18n="private.mail.secretAppPassword">应用专用密码</option>
                       <option value="imap-smtp" data-i18n="private.mail.secretImapSmtp">IMAP/SMTP 密钥</option>
                     </select>
@@ -242,7 +266,7 @@
                 </div>
                 <label>
                   <span data-i18n="private.mail.secret">令牌或应用专用密码</span>
-                  <textarea rows="4" autocomplete="off" spellcheck="false" data-mail-secret data-i18n-placeholder="private.mail.secretPlaceholder" placeholder="粘贴授权令牌、应用专用密码或 IMAP/SMTP 密钥"></textarea>
+                  <textarea rows="3" autocomplete="new-password" spellcheck="false" data-mail-secret data-i18n-placeholder="private.mail.secretPlaceholder" placeholder="粘贴授权令牌、应用专用密码或 IMAP/SMTP 密钥"></textarea>
                 </label>
                 <label>
                   <span data-i18n="private.mail.note">备注</span>
@@ -254,29 +278,68 @@
                 </div>
               </form>
             </div>
+
+            <div class="mail-modal" data-mail-key-dialog role="dialog" aria-modal="true" aria-labelledby="mail-key-title" hidden>
+              <form class="mail-modal-card mail-key-card" data-mail-key-form>
+                <div class="mail-modal-head">
+                  <div>
+                    <p class="eyebrow" data-i18n="private.mail.deviceSyncEyebrow">device sync</p>
+                    <h3 id="mail-key-title" data-i18n="private.mail.deviceSyncTitle">在其他设备解锁邮箱</h3>
+                  </div>
+                  <button class="mail-icon-button" type="button" data-mail-key-close aria-label="关闭" data-i18n-aria-label="private.mail.close">×</button>
+                </div>
+                <p class="mail-modal-copy" data-i18n="private.mail.deviceSyncCopy">在已解锁的设备复制恢复钥匙，再粘贴到其他设备。恢复钥匙不会上传到服务端。</p>
+                <label>
+                  <span data-i18n="private.mail.keyLabel">邮箱库恢复钥匙</span>
+                  <textarea rows="3" autocomplete="off" autocapitalize="off" spellcheck="false" data-mail-key-input data-i18n-placeholder="private.mail.keyPlaceholder" placeholder="粘贴恢复钥匙"></textarea>
+                </label>
+                <p class="mail-key-hint" data-i18n="private.mail.keyHint">请把恢复钥匙保存在网站之外；丢失后无法在新设备解开邮箱库。</p>
+                <div class="mail-actions mail-key-actions">
+                  <button class="button" type="button" data-mail-key-copy data-i18n="private.mail.copyKey">复制恢复钥匙</button>
+                  <button class="button primary" type="submit" data-i18n="private.mail.unlockDevice">在此设备解锁</button>
+                </div>
+                <p class="mail-key-status" data-mail-key-status role="status" aria-live="polite"></p>
+              </form>
+            </div>
           </article>
 
           <article class="private-panel data-panel" data-private-panel="data" data-reveal hidden>
             <div class="data-head">
               <p class="eyebrow" data-i18n="private.data.eyebrow">data archive</p>
               <h2 data-i18n="private.data.title">数据管理</h2>
+              <p data-i18n="private.data.copy">把私人资料下载到当前设备，或从你选择的备份文件恢复。</p>
             </div>
-            <div class="data-menu-grid">
-              <div class="data-menu-group">
-                <button class="data-menu-trigger" type="button" data-data-menu="save" aria-expanded="false" data-i18n="private.data.save">保存</button>
-                <div class="data-menu-options" data-data-menu-panel="save" hidden>
-                  <button type="button" data-data-action="export-local" data-i18n="private.data.exportLocal">保存信息至本地</button>
-                  <button type="button" data-data-action="export-subsite" data-i18n="private.data.exportSubsite">传输信息至子网站</button>
-                </div>
-              </div>
-              <div class="data-menu-group">
-                <button class="data-menu-trigger" type="button" data-data-menu="import" aria-expanded="false" data-i18n="private.data.import">导入</button>
-                <div class="data-menu-options" data-data-menu-panel="import" hidden>
-                  <button type="button" data-data-action="import-local" data-i18n="private.data.importLocal">从本地导入</button>
-                  <button type="button" data-data-action="import-subsite" data-i18n="private.data.importSubsite">从子网站导入</button>
-                </div>
-              </div>
+            <div class="data-persistence-note" role="note">
+              <strong data-i18n="private.data.persistenceTitle">当前服务器存储不是永久存储</strong>
+              <span data-i18n="private.data.persistenceCopy">Render 免费实例在重启或重新部署后可能清空服务器文件。请定期下载备份；长期保存需要持久磁盘或外部存储。</span>
             </div>
+            <div class="data-action-grid">
+              <section class="data-action-card">
+                <div>
+                  <span class="data-action-kicker" data-i18n="private.data.save">保存</span>
+                  <h3 data-i18n="private.data.exportLocal">下载本地备份</h3>
+                  <p data-i18n="private.data.exportLocalCopy">ZIP 包含简介和加密邮箱库，但不包含浏览器里的恢复钥匙；请在“设备同步”中另行保存钥匙。</p>
+                </div>
+                <button class="button primary" type="button" data-data-action="export-local" data-i18n="private.data.download">下载备份</button>
+              </section>
+              <section class="data-action-card">
+                <div>
+                  <span class="data-action-kicker" data-i18n="private.data.import">导入</span>
+                  <h3 data-i18n="private.data.importLocal">从备份文件恢复</h3>
+                  <p data-i18n="private.data.importLocalCopy">选择之前下载的 ZIP 文件，恢复简介与加密邮箱库。</p>
+                </div>
+                <button class="button" type="button" data-data-action="import-local" data-i18n="private.data.chooseFile">选择备份文件</button>
+                <input type="file" accept=".zip,application/zip" data-data-import-file hidden />
+              </section>
+            </div>
+            <details class="data-subsite">
+              <summary data-i18n="private.data.subsite">子网站传输</summary>
+              <p data-i18n="private.data.subsiteCopy">子网站接口已预留，目前尚未配置。</p>
+              <div class="data-subsite-actions">
+                <button class="button subtle" type="button" data-data-action="export-subsite" data-i18n="private.data.exportSubsite">传输信息至子网站</button>
+                <button class="button subtle" type="button" data-data-action="import-subsite" data-i18n="private.data.importSubsite">从子网站导入</button>
+              </div>
+            </details>
             <p class="data-status" data-data-status role="status" aria-live="polite"></p>
           </article>
         </div>
@@ -288,6 +351,6 @@
       <span data-i18n="footer.built">一个持续生长的个人网站。</span>
     </footer>
   </div>
-  <script type="module" src="/private/private.mjs?v=20260709d"></script>
+  <script type="module" src="/private/private.mjs?v=20260712a"></script>
 </body>
 </html>
