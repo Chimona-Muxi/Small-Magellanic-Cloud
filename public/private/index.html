@@ -79,6 +79,14 @@
               <span class="private-nav-mark" aria-hidden="true"></span>
               <span data-i18n="private.nav.mail">邮箱管理</span>
             </button>
+            <button class="private-nav-button" type="button" data-private-nav="phones" aria-pressed="false">
+              <span class="private-nav-mark" aria-hidden="true"></span>
+              <span data-i18n="private.nav.phones">手机号管理</span>
+            </button>
+            <button class="private-nav-button" type="button" data-private-nav="ledger" aria-pressed="false">
+              <span class="private-nav-mark" aria-hidden="true"></span>
+              <span data-i18n="private.nav.ledger">账目管理</span>
+            </button>
             <button class="private-nav-button" type="button" data-private-nav="data" aria-pressed="false">
               <span class="private-nav-mark" aria-hidden="true"></span>
               <span data-i18n="private.nav.data">数据管理</span>
@@ -160,7 +168,7 @@
                     <span class="mail-button-mark" aria-hidden="true">+</span>
                     <span data-i18n="private.mail.add">添加邮箱</span>
                   </button>
-                  <button class="mail-vault-button" type="button" data-mail-key-manage data-i18n="private.mail.deviceSync">设备同步</button>
+                  <button class="mail-vault-button" type="button" data-mail-key-manage data-i18n="private.mail.deviceSync">恢复选项</button>
                 </div>
               </aside>
 
@@ -183,8 +191,17 @@
                   <span data-i18n="private.mail.receiveOnlyCopy">Render 免费实例禁止连接 SMTP 发件端口；可继续在这里收件，并用“打开网页版邮箱”完成发送。</span>
                 </div>
 
+                <div class="mail-view-tabs" role="tablist" aria-label="邮箱视图" data-i18n-aria-label="private.mail.viewsLabel">
+                  <button id="mail-inbox-tab" type="button" role="tab" aria-selected="true" aria-controls="mail-inbox-view" data-mail-view="inbox">
+                    <span data-i18n="private.mail.inbox">收件箱</span>
+                  </button>
+                  <button id="mail-insights-tab" type="button" role="tab" aria-selected="false" aria-controls="mail-insights-view" data-mail-view="insights">
+                    <span data-i18n="private.mail.insightsTab">账号与订阅</span>
+                  </button>
+                </div>
+
                 <div class="mail-client-grid" data-mail-client-grid>
-                  <section class="mail-thread-list" aria-labelledby="mail-inbox-title">
+                  <section class="mail-thread-list" id="mail-inbox-view" role="tabpanel" aria-labelledby="mail-inbox-tab" data-mail-view-panel="inbox">
                     <div class="mail-section-title">
                       <h3 id="mail-inbox-title" data-i18n="private.mail.inbox">收件箱</h3>
                       <small data-mail-active-account data-i18n="private.mail.noAccount">未选择邮箱</small>
@@ -193,6 +210,33 @@
                       <strong data-i18n="private.mail.readyTitle">邮箱总站已就绪</strong>
                       <span data-i18n="private.mail.readyCopy">添加邮箱后，这里会显示对应邮箱的收件列表。</span>
                     </div>
+                  </section>
+
+                  <section class="mail-insights-view" id="mail-insights-view" role="tabpanel" aria-labelledby="mail-insights-tab" data-mail-view-panel="insights" hidden>
+                    <div class="mail-insights-head">
+                      <div>
+                        <p class="eyebrow" data-i18n="private.mail.insightsEyebrow">mail discovery</p>
+                        <h3 data-i18n="private.mail.insightsTitle">从邮件中发现的账号与订阅</h3>
+                        <p data-i18n="private.mail.insightsCopy">从最近 365 天的最多 500 封收件中，寻找可能的注册账号、周期订阅、购买记录和邮件简报。</p>
+                      </div>
+                      <div class="mail-insights-actions">
+                        <button class="button primary" type="button" data-mail-insights-scan data-i18n="private.mail.scanThisMailbox">扫描此邮箱</button>
+                        <button class="button subtle" type="button" data-mail-insights-clear data-i18n="private.mail.clearInsights" hidden>清除结果</button>
+                      </div>
+                    </div>
+                    <div class="mail-insights-privacy" role="note">
+                      <strong data-i18n="private.mail.insightsPrivacyTitle">只分析邮件头，不读取正文</strong>
+                      <span data-i18n="private.mail.insightsPrivacyCopy">只检查发件人、主题、日期及邮件列表标记；扫描结果仅留在当前页面内存中，关闭或刷新页面后即清除。</span>
+                    </div>
+                    <div class="mail-insights-summary" data-mail-insights-summary hidden></div>
+                    <p class="mail-insights-status" data-mail-insights-status role="status" aria-live="polite"></p>
+                    <div class="mail-insights-results" data-mail-insights-results>
+                      <div class="mail-insights-empty">
+                        <strong data-i18n="private.mail.insightsEmptyTitle">尚未扫描此邮箱</strong>
+                        <span data-i18n="private.mail.insightsEmptyCopy">扫描结果是邮件线索推断，不代表你仍持有账号或正在付费。</span>
+                      </div>
+                    </div>
+                    <p class="mail-insights-disclaimer" data-mail-insights-disclaimer data-i18n="private.mail.insightsDisclaimer">结果可能遗漏或误判；营销邮件订阅不等于付费订阅，请以服务商账户和账单为准。</p>
                   </section>
 
                   <form class="mail-compose-box" data-mail-compose-form aria-labelledby="mail-compose-title" hidden>
@@ -226,13 +270,42 @@
               </section>
             </div>
 
+            <div class="mail-modal" id="mail-message-dialog" data-mail-message-dialog role="dialog" aria-modal="true" aria-labelledby="mail-message-title" aria-describedby="mail-message-status" hidden>
+              <article class="mail-modal-card mail-reader-card" data-mail-message-card aria-busy="false">
+                <div class="mail-modal-head">
+                  <div>
+                    <p class="eyebrow" data-i18n="private.mail.readerEyebrow">message</p>
+                    <h3 id="mail-message-title" data-mail-message-subject>查看邮件</h3>
+                  </div>
+                  <button class="mail-icon-button" type="button" data-mail-message-close aria-label="关闭邮件" data-i18n-aria-label="private.mail.closeMessage">×</button>
+                </div>
+                <p class="mail-reader-status" id="mail-message-status" data-mail-message-status role="status" aria-live="polite"></p>
+                <div class="mail-reader-content" data-mail-message-content role="document" tabindex="0" hidden>
+                  <dl class="mail-reader-meta">
+                    <div>
+                      <dt data-i18n="private.mail.from">发件人</dt>
+                      <dd data-mail-message-from></dd>
+                    </div>
+                    <div>
+                      <dt data-i18n="private.mail.receivedAt">时间</dt>
+                      <dd data-mail-message-date></dd>
+                    </div>
+                  </dl>
+                  <section class="mail-reader-body" aria-labelledby="mail-message-body-title">
+                    <h4 id="mail-message-body-title" data-i18n="private.mail.messageBody">正文</h4>
+                    <pre data-mail-message-body></pre>
+                  </section>
+                </div>
+              </article>
+            </div>
+
             <div class="mail-modal" data-mail-add-dialog role="dialog" aria-modal="true" aria-labelledby="mail-add-title" hidden>
               <form class="mail-modal-card mail-form" data-mail-form>
                 <input type="hidden" data-mail-id />
                 <div class="mail-modal-head">
                   <div>
                     <p class="eyebrow" data-i18n="private.mail.addEyebrow">add mailbox</p>
-                    <h3 id="mail-add-title" data-i18n="private.mail.addTitle">添加邮箱</h3>
+                    <h3 id="mail-add-title" data-mail-dialog-title data-i18n="private.mail.addTitle">添加邮箱</h3>
                   </div>
                   <button class="mail-icon-button" type="button" data-mail-close aria-label="关闭" data-i18n-aria-label="private.mail.close">×</button>
                 </div>
@@ -273,9 +346,11 @@
                   <textarea rows="3" data-mail-note data-i18n-placeholder="private.mail.notePlaceholder" placeholder="例如：学校邮箱、备用 Gmail、QQ 主邮箱"></textarea>
                 </label>
                 <div class="mail-actions">
-                  <button class="button primary" type="submit" data-i18n="private.mail.saveAccount">添加邮箱</button>
+                  <button class="button subtle danger" type="button" data-mail-delete hidden data-i18n="private.common.delete">删除</button>
+                  <button class="button primary" type="submit" data-mail-save data-i18n="private.mail.saveAccount">添加邮箱</button>
                   <button class="button subtle" type="button" data-mail-clear data-i18n="private.mail.clear">清空</button>
                 </div>
+                <p class="mail-key-status mail-form-status" data-mail-form-status role="alert" aria-live="assertive"></p>
               </form>
             </div>
 
@@ -283,22 +358,187 @@
               <form class="mail-modal-card mail-key-card" data-mail-key-form>
                 <div class="mail-modal-head">
                   <div>
-                    <p class="eyebrow" data-i18n="private.mail.deviceSyncEyebrow">device sync</p>
-                    <h3 id="mail-key-title" data-i18n="private.mail.deviceSyncTitle">在其他设备解锁邮箱</h3>
+                    <p class="eyebrow" data-i18n="private.mail.deviceSyncEyebrow">advanced recovery</p>
+                    <h3 id="mail-key-title" data-i18n="private.mail.deviceSyncTitle">邮箱恢复选项</h3>
                   </div>
                   <button class="mail-icon-button" type="button" data-mail-key-close aria-label="关闭" data-i18n-aria-label="private.mail.close">×</button>
                 </div>
-                <p class="mail-modal-copy" data-i18n="private.mail.deviceSyncCopy">在已解锁的设备复制恢复钥匙，再粘贴到其他设备。恢复钥匙不会上传到服务端。</p>
+                <p class="mail-modal-copy" data-mail-key-dialog-copy data-i18n="private.mail.autoSyncCopy">在其他设备登录私人空间后会自动解锁。只有迁移旧数据或恢复到其他服务器时，才需要保存恢复钥匙。</p>
                 <label>
-                  <span data-i18n="private.mail.keyLabel">邮箱库恢复钥匙</span>
+                  <span data-i18n="private.mail.keyLabel">高级恢复钥匙</span>
                   <textarea rows="3" autocomplete="off" autocapitalize="off" spellcheck="false" data-mail-key-input data-i18n-placeholder="private.mail.keyPlaceholder" placeholder="粘贴恢复钥匙"></textarea>
                 </label>
-                <p class="mail-key-hint" data-i18n="private.mail.keyHint">请把恢复钥匙保存在网站之外；丢失后无法在新设备解开邮箱库。</p>
+                <p class="mail-key-hint" data-i18n="private.mail.keyHint">仅在迁移旧数据或恢复到其他服务器时使用。请像密码一样保管，不要分享或截图。</p>
                 <div class="mail-actions mail-key-actions">
+                  <button class="button subtle danger" type="button" data-mail-key-reset hidden data-i18n="private.mail.resetVault">清空旧资料并重新开始</button>
                   <button class="button" type="button" data-mail-key-copy data-i18n="private.mail.copyKey">复制恢复钥匙</button>
                   <button class="button primary" type="submit" data-i18n="private.mail.unlockDevice">在此设备解锁</button>
                 </div>
                 <p class="mail-key-status" data-mail-key-status role="status" aria-live="polite"></p>
+              </form>
+            </div>
+          </article>
+
+          <article class="private-panel records-panel phone-panel" data-private-panel="phones" data-reveal hidden>
+            <div class="records-head">
+              <div>
+                <p class="eyebrow" data-i18n="private.phones.eyebrow">phone registry</p>
+                <h2 data-i18n="private.phones.title">手机号管理</h2>
+                <p data-i18n="private.phones.copy">记录号码的用途、运营商和使用状态。内容与邮箱账号一同加密保存。</p>
+              </div>
+              <button class="button primary" type="button" data-phone-add data-i18n="private.phones.add">添加手机号</button>
+            </div>
+            <div class="records-security-note" role="note">
+              <strong data-i18n="private.phones.encryptedTitle">加密资料</strong>
+              <span data-i18n="private.phones.encryptedCopy">手机号只会进入当前私人空间的加密资料库，并随设备同步和备份迁移。</span>
+            </div>
+            <div class="record-card-list phone-card-list" data-phone-list></div>
+            <p class="record-status" data-phone-status role="status" aria-live="polite"></p>
+
+            <div class="mail-modal private-record-modal" data-phone-dialog role="dialog" aria-modal="true" aria-labelledby="phone-dialog-title" hidden>
+              <form class="mail-modal-card record-form" data-phone-form novalidate>
+                <input type="hidden" data-phone-id />
+                <div class="mail-modal-head">
+                  <div>
+                    <p class="eyebrow" data-i18n="private.phones.formEyebrow">phone details</p>
+                    <h3 id="phone-dialog-title" data-phone-dialog-title>添加手机号</h3>
+                  </div>
+                  <button class="mail-icon-button" type="button" data-phone-close aria-label="关闭手机号编辑" data-i18n-aria-label="private.phones.close">×</button>
+                </div>
+                <div class="record-form-grid">
+                  <label>
+                    <span data-i18n="private.phones.label">名称</span>
+                    <input type="text" maxlength="80" autocomplete="off" data-phone-label placeholder="例如：主号码" data-i18n-placeholder="private.phones.labelPlaceholder" />
+                  </label>
+                  <label>
+                    <span data-i18n="private.phones.number">手机号</span>
+                    <input type="tel" maxlength="40" autocomplete="tel" inputmode="tel" data-phone-number placeholder="+86 138 0000 0000" data-i18n-placeholder="private.phones.numberPlaceholder" />
+                  </label>
+                  <label>
+                    <span data-i18n="private.phones.carrier">运营商</span>
+                    <input type="text" maxlength="80" autocomplete="off" data-phone-carrier placeholder="例如：中国移动" data-i18n-placeholder="private.phones.carrierPlaceholder" />
+                  </label>
+                  <label>
+                    <span data-i18n="private.phones.status">状态</span>
+                    <select data-phone-status-input>
+                      <option value="active" data-i18n="private.phones.statusActive">使用中</option>
+                      <option value="spare" data-i18n="private.phones.statusSpare">备用</option>
+                      <option value="inactive" data-i18n="private.phones.statusInactive">已停用</option>
+                    </select>
+                  </label>
+                </div>
+                <label>
+                  <span data-i18n="private.phones.purpose">用途</span>
+                  <input type="text" maxlength="120" autocomplete="off" data-phone-purpose placeholder="例如：银行与重要账号验证" data-i18n-placeholder="private.phones.purposePlaceholder" />
+                </label>
+                <label>
+                  <span data-i18n="private.phones.note">备注</span>
+                  <textarea rows="4" maxlength="600" data-phone-note placeholder="补充套餐、漫游或换号安排" data-i18n-placeholder="private.phones.notePlaceholder"></textarea>
+                </label>
+                <div class="record-form-actions">
+                  <button class="button subtle danger" type="button" data-phone-delete hidden data-i18n="private.common.delete">删除</button>
+                  <span></span>
+                  <button class="button" type="button" data-phone-cancel data-i18n="private.common.cancel">取消</button>
+                  <button class="button primary" type="submit" data-i18n="private.common.save">保存</button>
+                </div>
+                <p class="record-dialog-status" data-phone-dialog-status role="alert" aria-live="polite"></p>
+              </form>
+            </div>
+          </article>
+
+          <article class="private-panel records-panel ledger-panel" data-private-panel="ledger" data-reveal hidden>
+            <div class="records-head">
+              <div>
+                <p class="eyebrow" data-i18n="private.ledger.eyebrow">personal ledger</p>
+                <h2 data-i18n="private.ledger.title">账目管理</h2>
+                <p data-i18n="private.ledger.copy">按月记录收支和订阅。不同币种分别统计，不进行推测性汇率换算。</p>
+              </div>
+              <button class="button primary" type="button" data-ledger-add data-i18n="private.ledger.add">记一笔</button>
+            </div>
+            <div class="ledger-toolbar">
+              <label>
+                <span data-i18n="private.ledger.month">月份</span>
+                <input type="month" data-ledger-month-filter />
+              </label>
+              <button class="button subtle" type="button" data-ledger-all-months data-i18n="private.ledger.allMonths">全部月份</button>
+              <span class="ledger-filter-count" data-ledger-filter-count aria-live="polite"></span>
+            </div>
+            <div class="ledger-summary" data-ledger-summary aria-label="按币种收支统计" data-i18n-aria-label="private.ledger.summaryLabel"></div>
+            <div class="record-card-list ledger-entry-list" data-ledger-list></div>
+            <p class="record-status" data-ledger-status role="status" aria-live="polite"></p>
+
+            <div class="mail-modal private-record-modal" data-ledger-dialog role="dialog" aria-modal="true" aria-labelledby="ledger-dialog-title" hidden>
+              <form class="mail-modal-card record-form" data-ledger-form novalidate>
+                <input type="hidden" data-ledger-id />
+                <div class="mail-modal-head">
+                  <div>
+                    <p class="eyebrow" data-i18n="private.ledger.formEyebrow">transaction details</p>
+                    <h3 id="ledger-dialog-title" data-ledger-dialog-title>记录账目</h3>
+                  </div>
+                  <button class="mail-icon-button" type="button" data-ledger-close aria-label="关闭账目编辑" data-i18n-aria-label="private.ledger.close">×</button>
+                </div>
+                <div class="record-form-grid ledger-form-grid">
+                  <label>
+                    <span data-i18n="private.ledger.date">日期</span>
+                    <input type="date" data-ledger-date />
+                  </label>
+                  <label>
+                    <span data-i18n="private.ledger.type">类型</span>
+                    <select data-ledger-type>
+                      <option value="expense" data-i18n="private.ledger.typeExpense">支出</option>
+                      <option value="income" data-i18n="private.ledger.typeIncome">收入</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span data-i18n="private.ledger.category">分类</span>
+                    <select data-ledger-category>
+                      <option value="subscription" data-i18n="private.ledger.categorySubscription">订阅服务</option>
+                      <option value="food" data-i18n="private.ledger.categoryFood">餐饮</option>
+                      <option value="transport" data-i18n="private.ledger.categoryTransport">交通</option>
+                      <option value="housing" data-i18n="private.ledger.categoryHousing">居住</option>
+                      <option value="shopping" data-i18n="private.ledger.categoryShopping">购物</option>
+                      <option value="health" data-i18n="private.ledger.categoryHealth">健康</option>
+                      <option value="education" data-i18n="private.ledger.categoryEducation">教育</option>
+                      <option value="entertainment" data-i18n="private.ledger.categoryEntertainment">娱乐</option>
+                      <option value="salary" data-i18n="private.ledger.categorySalary">工资</option>
+                      <option value="transfer" data-i18n="private.ledger.categoryTransfer">转账</option>
+                      <option value="other" data-i18n="private.ledger.categoryOther">其他</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span data-i18n="private.ledger.currency">币种</span>
+                    <select data-ledger-currency>
+                      <option value="CNY">CNY</option>
+                      <option value="USD">USD</option>
+                      <option value="EUR">EUR</option>
+                      <option value="JPY">JPY</option>
+                      <option value="GBP">GBP</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span data-i18n="private.ledger.amount">金额</span>
+                    <input type="text" inputmode="decimal" maxlength="14" autocomplete="off" data-ledger-amount placeholder="0.00" data-i18n-placeholder="private.ledger.amountPlaceholder" />
+                  </label>
+                  <label>
+                    <span data-i18n="private.ledger.merchant">商户或来源</span>
+                    <input type="text" maxlength="120" autocomplete="off" data-ledger-merchant placeholder="例如：Apple、工资" data-i18n-placeholder="private.ledger.merchantPlaceholder" />
+                  </label>
+                </div>
+                <label class="record-checkbox">
+                  <input type="checkbox" data-ledger-recurring />
+                  <span data-i18n="private.ledger.recurring">周期性账目或订阅</span>
+                </label>
+                <label>
+                  <span data-i18n="private.ledger.note">备注</span>
+                  <textarea rows="4" maxlength="600" data-ledger-note placeholder="补充账单周期、报销或退款信息" data-i18n-placeholder="private.ledger.notePlaceholder"></textarea>
+                </label>
+                <div class="record-form-actions">
+                  <button class="button subtle danger" type="button" data-ledger-delete hidden data-i18n="private.common.delete">删除</button>
+                  <span></span>
+                  <button class="button" type="button" data-ledger-cancel data-i18n="private.common.cancel">取消</button>
+                  <button class="button primary" type="submit" data-i18n="private.common.save">保存</button>
+                </div>
+                <p class="record-dialog-status" data-ledger-dialog-status role="alert" aria-live="polite"></p>
               </form>
             </div>
           </article>
@@ -318,7 +558,7 @@
                 <div>
                   <span class="data-action-kicker" data-i18n="private.data.save">保存</span>
                   <h3 data-i18n="private.data.exportLocal">下载本地备份</h3>
-                  <p data-i18n="private.data.exportLocalCopy">ZIP 包含简介和加密邮箱库，但不包含浏览器里的恢复钥匙；请在“设备同步”中另行保存钥匙。</p>
+                  <p data-i18n="private.data.exportLocalCopy">ZIP 包含简介和加密的邮箱、手机号与账目资料，但不包含高级恢复钥匙；请在“恢复选项”中另行保存钥匙。</p>
                 </div>
                 <button class="button primary" type="button" data-data-action="export-local" data-i18n="private.data.download">下载备份</button>
               </section>
@@ -326,7 +566,7 @@
                 <div>
                   <span class="data-action-kicker" data-i18n="private.data.import">导入</span>
                   <h3 data-i18n="private.data.importLocal">从备份文件恢复</h3>
-                  <p data-i18n="private.data.importLocalCopy">选择之前下载的 ZIP 文件，恢复简介与加密邮箱库。</p>
+                  <p data-i18n="private.data.importLocalCopy">选择之前下载的 ZIP 文件，恢复简介以及加密的邮箱、手机号与账目资料。</p>
                 </div>
                 <button class="button" type="button" data-data-action="import-local" data-i18n="private.data.chooseFile">选择备份文件</button>
                 <input type="file" accept=".zip,application/zip" data-data-import-file hidden />
@@ -351,6 +591,7 @@
       <span data-i18n="footer.built">一个持续生长的个人网站。</span>
     </footer>
   </div>
+  <div class="private-context-menu" data-private-context-menu role="menu" aria-label="快捷操作" data-i18n-aria-label="private.context.label" tabindex="-1" hidden></div>
   <script type="module" src="/private/private.mjs?v=20260712a"></script>
 </body>
 </html>

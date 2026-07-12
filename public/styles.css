@@ -30,6 +30,459 @@
   --icon-private: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='5' y='10' width='14' height='10' rx='2' fill='none' stroke='black' stroke-width='2'/%3E%3Cpath d='M8 10V7a4 4 0 0 1 8 0v3' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'/%3E%3Cpath d='M12 14v2' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
 }
 
+/* Encrypted phone registry and personal ledger. */
+.records-panel[data-reveal].visible {
+  transform: none;
+}
+
+.records-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.records-head > div {
+  min-width: 0;
+}
+
+.records-head h2 {
+  margin: 6px 0 0;
+  font-size: clamp(28px, 3.2vw, 38px);
+  line-height: 1.05;
+}
+
+.records-head p:not(.eyebrow) {
+  max-width: 700px;
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.records-security-note {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 11px 13px;
+  border: 1px solid color-mix(in srgb, var(--green) 28%, var(--line));
+  border-radius: 9px;
+  color: var(--muted);
+  background: color-mix(in srgb, var(--green) 6%, var(--private-surface-soft));
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.records-security-note strong {
+  flex: 0 0 auto;
+  color: var(--status-ok);
+  font-size: 13px;
+}
+
+.record-card-list {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.phone-card-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.record-card {
+  position: relative;
+  display: grid;
+  gap: 11px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--private-surface-soft);
+}
+
+.record-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+
+.record-card-identity {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.record-card-identity strong,
+.record-primary-value {
+  overflow-wrap: anywhere;
+}
+
+.record-card-identity strong {
+  color: var(--ink);
+  font-size: 16px;
+}
+
+.record-card-identity span {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.record-primary-value {
+  color: color-mix(in srgb, var(--ink) 88%, var(--green)) !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.record-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.record-meta > span:not(.record-badge) {
+  padding-right: 8px;
+  border-right: 1px solid var(--line);
+}
+
+.record-badge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  min-height: 25px;
+  padding: 2px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  background: var(--control-surface);
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.record-badge[data-status="active"] {
+  border-color: color-mix(in srgb, var(--status-ok) 36%, var(--line));
+  color: var(--status-ok);
+}
+
+.record-badge[data-status="spare"],
+.record-badge.recurring {
+  border-color: color-mix(in srgb, var(--status-pending) 36%, var(--line));
+  color: var(--status-pending);
+}
+
+.record-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.record-edit-button {
+  justify-self: end;
+  min-width: 54px;
+  min-height: 38px;
+  padding: 0 11px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--muted);
+  background: var(--control-surface);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.record-edit-button:hover,
+.record-edit-button:focus-visible {
+  color: var(--ink);
+  border-color: color-mix(in srgb, var(--green) 48%, var(--line));
+  outline: 2px solid color-mix(in srgb, var(--green) 58%, transparent);
+  outline-offset: 2px;
+}
+
+.record-empty {
+  grid-column: 1 / -1;
+  min-height: 150px;
+  padding: 32px 20px;
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+  color: var(--muted);
+  background: var(--private-surface-soft);
+  font-size: 13px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.record-empty.compact {
+  min-height: 0;
+  padding: 16px;
+}
+
+.record-status,
+.record-dialog-status {
+  min-height: 22px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.record-status[data-tone="ok"],
+.record-dialog-status[data-tone="ok"] {
+  color: var(--status-ok);
+}
+
+.record-status[data-tone="error"],
+.record-dialog-status[data-tone="error"] {
+  color: var(--status-error);
+}
+
+.record-form {
+  width: min(720px, 100%);
+}
+
+.record-form,
+.record-form label {
+  display: grid;
+  gap: 9px;
+}
+
+.record-form label > span,
+.ledger-toolbar label > span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0.06em;
+}
+
+.record-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.record-form input:not([type="checkbox"]),
+.record-form select,
+.record-form textarea,
+.ledger-toolbar input {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  color: var(--ink);
+  background: var(--control-surface);
+  font: inherit;
+  outline: 0;
+}
+
+.record-form input:not([type="checkbox"]),
+.record-form select,
+.ledger-toolbar input {
+  min-height: 44px;
+  padding: 0 13px;
+}
+
+.record-form textarea {
+  min-height: 104px;
+  padding: 11px 13px;
+  line-height: 1.6;
+  resize: vertical;
+}
+
+.record-form input:focus,
+.record-form select:focus,
+.record-form textarea:focus,
+.ledger-toolbar input:focus {
+  border-color: color-mix(in srgb, var(--green) 56%, var(--line));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--green) 16%, transparent);
+}
+
+.record-checkbox {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  justify-content: start;
+  width: fit-content;
+  min-height: 42px;
+}
+
+.record-checkbox input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--green);
+}
+
+.record-form-actions {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.record-form-actions .button {
+  min-width: 92px;
+}
+
+.ledger-toolbar {
+  display: flex;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: 9px;
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--private-surface-soft);
+}
+
+.ledger-toolbar label {
+  display: grid;
+  gap: 6px;
+  min-width: 190px;
+}
+
+.ledger-filter-count {
+  margin-left: auto;
+  padding: 0 4px 8px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.ledger-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 10px;
+}
+
+.ledger-summary-card {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--private-surface-soft);
+}
+
+.ledger-summary-card h3 {
+  margin: 0 0 11px;
+  color: var(--ink);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+}
+
+.ledger-summary-card dl {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+}
+
+.ledger-summary-card dl > div {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: baseline;
+}
+
+.ledger-summary-card dt {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.ledger-summary-card dd {
+  margin: 0;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 850;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.ledger-summary-card [data-tone="income"] dd,
+.ledger-entry-card[data-type="income"] .ledger-entry-amount {
+  color: var(--status-ok);
+}
+
+.ledger-summary-card [data-tone="expense"] dd,
+.ledger-entry-card[data-type="expense"] .ledger-entry-amount {
+  color: var(--status-error);
+}
+
+.ledger-entry-amount {
+  flex: 0 0 auto;
+  font-size: 17px;
+  text-align: right;
+}
+
+.records-panel .button:disabled {
+  cursor: not-allowed;
+  opacity: 0.46;
+  transform: none;
+}
+
+@media (min-width: 721px) and (max-width: 1120px) {
+  .private-side-nav {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .records-head {
+    display: grid;
+  }
+
+  .records-head .button,
+  .phone-card-list,
+  .record-form-grid {
+    width: 100%;
+    grid-template-columns: 1fr;
+  }
+
+  .records-security-note {
+    display: grid;
+  }
+
+  .record-form-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .record-form-actions > span {
+    display: none;
+  }
+
+  .record-form-actions .button {
+    width: 100%;
+  }
+
+  .record-form-actions .danger {
+    grid-column: 1 / -1;
+  }
+
+  .ledger-toolbar {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .ledger-toolbar label,
+  .ledger-toolbar .button {
+    width: 100%;
+  }
+
+  .ledger-filter-count {
+    margin-left: 0;
+    padding: 0;
+  }
+
+  .ledger-entry-card .record-card-head {
+    display: grid;
+  }
+
+  .ledger-entry-amount {
+    text-align: left;
+  }
+}
+
 html[data-theme="light"] {
   color-scheme: light;
   --ink: #14201d;
@@ -3271,7 +3724,25 @@ html[data-theme="light"] .settings-field:nth-child(2)::before {
   border-radius: 9px;
   color: var(--ink);
   background: var(--control-surface);
+  font: inherit;
   text-align: left;
+  cursor: pointer;
+  transition: border-color 160ms ease, background-color 160ms ease, transform 160ms ease;
+}
+
+.mail-message-row:hover,
+.mail-message-row:focus-visible {
+  border-color: color-mix(in srgb, var(--green) 46%, var(--line));
+  background: color-mix(in srgb, var(--green) 9%, var(--control-surface));
+}
+
+.mail-message-row:hover {
+  transform: translateY(-1px);
+}
+
+.mail-message-row:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--green) 62%, transparent);
+  outline-offset: 2px;
 }
 
 .mail-message-row strong,
@@ -3437,6 +3908,99 @@ html[data-theme="light"] .settings-field:nth-child(2)::before {
   width: min(600px, 100%);
 }
 
+.mail-reader-card {
+  width: min(820px, 100%);
+}
+
+.mail-reader-status {
+  min-height: 22px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.mail-reader-status:empty {
+  display: none;
+}
+
+.mail-reader-status[data-tone="pending"] {
+  color: var(--status-pending);
+}
+
+.mail-reader-status[data-tone="error"] {
+  color: var(--status-error);
+}
+
+.mail-reader-content {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+  outline: 0;
+}
+
+.mail-reader-content:focus-visible {
+  border-radius: 8px;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--green) 16%, transparent);
+}
+
+.mail-reader-meta {
+  display: grid;
+  gap: 9px;
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--private-surface-soft);
+}
+
+.mail-reader-meta > div {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: 10px;
+  align-items: baseline;
+}
+
+.mail-reader-meta dt {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.mail-reader-meta dd {
+  min-width: 0;
+  margin: 0;
+  color: var(--ink);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.mail-reader-body {
+  min-width: 0;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+
+.mail-reader-body h4 {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+}
+
+.mail-reader-body pre {
+  min-height: 180px;
+  margin: 0;
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.75;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
 .mail-key-card textarea[readonly] {
   color: var(--ink);
   background: var(--private-surface-soft);
@@ -3573,7 +4137,7 @@ html[data-theme="light"] .settings-field:nth-child(2)::before {
   }
 
   .private-side-nav {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
@@ -3705,4 +4269,376 @@ html[data-theme="light"] .settings-field:nth-child(2)::before {
   .data-subsite-actions .button {
     width: 100%;
   }
+}
+
+/* Mail discovery and keyboard-accessible contextual actions. */
+.mail-client {
+  grid-template-rows: none;
+  align-content: start;
+}
+
+.mail-view-tabs {
+  display: inline-grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: fit-content;
+  max-width: 100%;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--private-surface-soft);
+}
+
+.mail-view-tabs button {
+  min-width: 132px;
+  min-height: 36px;
+  padding: 7px 12px;
+  border: 0;
+  border-radius: 7px;
+  color: var(--muted);
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.mail-view-tabs button[aria-selected="true"] {
+  color: var(--ink);
+  background: var(--control-surface);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--green) 34%, var(--line));
+}
+
+.mail-view-tabs button:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--green) 62%, transparent);
+  outline-offset: 2px;
+}
+
+.mail-insights-view {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+  min-height: clamp(390px, 54vh, 590px);
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--private-surface-soft);
+}
+
+.mail-insights-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 13px;
+  border-bottom: 1px solid var(--line);
+}
+
+.mail-insights-head > div:first-child {
+  min-width: 0;
+}
+
+.mail-insights-head h3 {
+  margin: 6px 0 0;
+  color: var(--ink);
+  font-size: clamp(20px, 2.6vw, 28px);
+  line-height: 1.12;
+}
+
+.mail-insights-head p:not(.eyebrow) {
+  max-width: 650px;
+  margin: 9px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.mail-insights-actions {
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.mail-insights-privacy {
+  display: grid;
+  gap: 3px;
+  padding: 11px 13px;
+  border: 1px solid color-mix(in srgb, var(--green) 30%, var(--line));
+  border-radius: 9px;
+  color: var(--muted);
+  background: color-mix(in srgb, var(--green) 6%, var(--private-surface-soft));
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.mail-insights-privacy strong {
+  color: var(--status-ok);
+  font-size: 13px;
+}
+
+.mail-insights-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.mail-insights-scope,
+.mail-insights-summary-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 4px 9px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  background: var(--control-surface);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.mail-insights-summary-chip[data-category="recurring"] {
+  border-color: color-mix(in srgb, var(--status-pending) 38%, var(--line));
+  color: var(--status-pending);
+}
+
+.mail-insights-status {
+  min-height: 20px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.mail-insights-status[data-tone="ok"] { color: var(--status-ok); }
+.mail-insights-status[data-tone="pending"] { color: var(--status-pending); }
+.mail-insights-status[data-tone="error"] { color: var(--status-error); }
+
+.mail-insights-results {
+  display: grid;
+  align-content: start;
+  gap: 18px;
+  min-height: 180px;
+  max-height: min(58vh, 650px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 4px;
+}
+
+.mail-insights-empty {
+  display: grid;
+  place-content: center;
+  gap: 7px;
+  min-height: 180px;
+  padding: 24px;
+  border: 1px dashed var(--line);
+  border-radius: 9px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.mail-insights-empty strong { color: var(--ink); }
+.mail-insights-empty span { max-width: 620px; font-size: 13px; line-height: 1.6; }
+
+.mail-insight-group {
+  display: grid;
+  gap: 9px;
+}
+
+.mail-insight-group-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.mail-insight-group-head h4 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 15px;
+}
+
+.mail-insight-group-head span {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.mail-insight-card-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.mail-insight-card {
+  display: grid;
+  align-content: start;
+  gap: 11px;
+  min-width: 0;
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--control-surface);
+}
+
+.mail-insight-card:focus-visible,
+.record-card[tabindex]:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--green) 62%, transparent);
+  outline-offset: 2px;
+  border-color: color-mix(in srgb, var(--green) 46%, var(--line));
+}
+
+.mail-insight-card-head {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 9px;
+}
+
+.mail-insight-mark {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid color-mix(in srgb, var(--green) 34%, var(--line));
+  border-radius: 9px;
+  color: var(--status-ok);
+  background: color-mix(in srgb, var(--green) 8%, var(--private-surface-soft));
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.mail-insight-identity {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.mail-insight-identity strong,
+.mail-insight-identity span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mail-insight-identity strong { color: var(--ink); font-size: 14px; }
+.mail-insight-identity span { color: var(--muted); font-size: 11px; }
+
+.mail-insight-status-badge {
+  max-width: 150px;
+  padding: 3px 7px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.mail-insight-status-badge[data-status="active"] { color: var(--status-ok); }
+.mail-insight-status-badge[data-status="failed"] { color: var(--status-error); }
+.mail-insight-status-badge[data-status="cancelled"] { color: var(--status-pending); }
+
+.mail-insight-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 10px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.mail-insight-evidence {
+  display: grid;
+  gap: 6px;
+  padding-top: 9px;
+  border-top: 1px solid var(--line);
+}
+
+.mail-insight-evidence > strong {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.mail-insight-evidence-button {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  padding: 7px 8px;
+  border: 0;
+  border-radius: 7px;
+  color: var(--ink);
+  background: var(--private-surface-soft);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.mail-insight-evidence-button:hover,
+.mail-insight-evidence-button:focus-visible {
+  background: color-mix(in srgb, var(--green) 9%, var(--private-surface-soft));
+}
+
+.mail-insight-evidence-button span,
+.mail-insight-evidence-button small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mail-insight-evidence-button span { font-size: 12px; }
+.mail-insight-evidence-button small { color: var(--muted); font-size: 10px; }
+
+.mail-insights-disclaimer {
+  margin: 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.private-context-menu {
+  position: fixed;
+  z-index: 120;
+  display: grid;
+  min-width: 210px;
+  max-width: min(320px, calc(100vw - 16px));
+  padding: 5px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: var(--settings-surface);
+  box-shadow: var(--shadow);
+}
+
+.private-context-menu button {
+  width: 100%;
+  min-height: 36px;
+  padding: 7px 10px;
+  border: 0;
+  border-radius: 7px;
+  color: var(--ink);
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 760;
+  text-align: left;
+  cursor: pointer;
+}
+
+.private-context-menu button:hover,
+.private-context-menu button:focus-visible {
+  outline: none;
+  background: var(--settings-hover);
+}
+
+.private-context-menu button.danger { color: var(--status-error); }
+
+@media (max-width: 760px) {
+  .mail-view-tabs { width: 100%; }
+  .mail-view-tabs button { min-width: 0; }
+  .mail-insights-head { display: grid; }
+  .mail-insights-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .mail-insights-actions .button { width: 100%; }
+  .mail-insight-card-list { grid-template-columns: 1fr; }
+  .mail-insight-card-head { grid-template-columns: 34px minmax(0, 1fr); }
+  .mail-insight-status-badge { grid-column: 2; justify-self: start; }
 }

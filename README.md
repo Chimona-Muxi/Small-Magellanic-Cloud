@@ -80,6 +80,68 @@ npm run install:study
 npm run install:study:plot
 ```
 
+## 私人数据的加密 GitHub 备份
+
+私人空间可以把完整 ZIP 归档先在服务端用随机 AES-256-GCM 加密，再用 RSA-OAEP-SHA256 公钥封装本次 AES 密钥，最后只把版本化的 `.smcbackup` 密文写入一个专用 GitHub 私有仓库。RSA 私钥和私钥口令只由使用者离线保管，不上传 GitHub，也不提供给网站服务端。
+
+### 1. 准备专用私有仓库
+
+- 仓库必须是 **Private**，建议只用于这一项备份，并先创建一次 README 或初始提交。
+- 如果使用 `Chimona-Muxi/sirenshuju`，必须先在 GitHub 设置中将其改为 Private；接入检查时它还是空的 Public 仓库，当前服务会在上传前强制查询仓库属性并拒绝任何公开仓库。
+- 创建一个 fine-grained personal access token，只授权这个仓库，授予 Metadata 读取和 Contents 读写权限。不要把 token 写入源码、提交、浏览器或备份仓库。
+
+服务不会创建仓库，也不会自动把既有仓库改成私有。GitHub 不允许给完全空的仓库创建第一个引用，所以应先初始化一个 `main` 分支提交（例如创建 README）。
+
+### 2. 在本机生成密钥
+
+```bash
+npm run backup:keygen -- --bits 4096 --out-dir ~/smc-backup-key
+```
+
+脚本会在交互终端中两次询问口令，生成：
+
+- `smc-backup-private.pem`：AES-256-CBC 口令加密的 PKCS#8 私钥，权限设为 `600`；
+- `smc-backup-public.json`：SPKI DER 公钥的 Base64 值和 SHA-256 指纹，可用于服务端配置。
+
+不指定输出目录时默认写入 `~/.smc-backup-keys/`，避免私钥意外落入项目仓库。脚本绝不显示私钥内容。私钥和口令应分别保存在可靠的离线位置；任一丢失都会导致备份无法恢复。更换公钥后也必须保留旧私钥，才能解密旧备份。
+
+### 3. 配置服务端
+
+| 环境变量 | 必需 | 说明 |
+| --- | --- | --- |
+| `SMC_BACKUP_GITHUB_REPO` | 是 | `owner/repository`，例如 `Chimona-Muxi/sirenshuju` |
+| `SMC_BACKUP_GITHUB_TOKEN` | 是 | 仅授权上述私有仓库的 fine-grained token |
+| `SMC_BACKUP_PUBLIC_KEY_B64` | 是 | `smc-backup-public.json` 中的 `publicKeyB64`，只放公钥 |
+| `SMC_BACKUP_GITHUB_BRANCH` | 否 | 专用分支，默认 `smc-private-backup` |
+| `SMC_BACKUP_DEBOUNCE_MINUTES` | 否 | 数据最后一次保存后等待多久备份，默认 15，范围 1–1440 分钟 |
+| `SMC_BACKUP_RETENTION_DAYS` | 否 | 保留最近多少个每日副本，默认 30，范围 1–365 |
+
+配置完整后，个人资料或加密私人库成功保存、以及本地 ZIP 恢复成功后，会重新开始防抖计时。备份失败不会让原本的数据保存失败。已登录的私人会话还可调用：
+
+- `GET /api/private/backup/status`：查看配置、等待、运行和上次结果；
+- `POST /api/private/backup/run`：立即执行一次备份。
+
+首次运行前应确认状态接口返回的 `recipientFingerprintSha256` 与本机 `smc-backup-public.json` 中的 `fingerprintSha256` 完全一致，防止把数据加密给错误公钥。
+
+每次写入只让专用分支指向一个没有父提交的新快照；快照中只有 `latest.smcbackup` 和最近 N 个 `daily/YYYY-MM-DD.smcbackup`。内容没有变化且无需清理超额旧副本时不写新提交；降低保留数量后可只重建索引，不重复上传密文。为防止误删，若专用分支已经含有其他文件、子模块或异常树结构，服务会拒绝覆盖。这会控制可达 Git 历史的体积，但 GitHub 何时回收不可达对象由 GitHub 决定，不能保证对象立即物理删除。
+
+`.smcbackup` 公开了格式版本、时间、密文长度、公钥指纹以及用于去重的 HMAC-SHA256 指纹；它不含明文 ZIP、私钥或原始数据哈希。ZIP 的 SHA-256 被放在 AES-GCM 密文载荷内部。HMAC 密钥由服务端 token 做域隔离派生，因此更换 token 会产生一次新的快照；去重指纹仍会暴露“两次数据是否相同”这一关系，所以仓库必须保持私有。
+
+### 4. 恢复
+
+从私有仓库下载 `latest.smcbackup` 或某个每日副本，在持有私钥的本机运行：
+
+```bash
+npm run backup:restore -- \
+  --input latest.smcbackup \
+  --private ~/smc-backup-key/smc-backup-private.pem \
+  --output smc-private-data-restored.zip
+```
+
+恢复脚本在终端中隐藏输入口令，用 RSA 私钥解封装 AES 密钥，验证 GCM 认证标签、已认证元数据、ZIP 结构、长度和 SHA-256 后才写出权限为 `600` 的 ZIP。随后可在私人空间的数据管理页面选择该 ZIP 恢复。不指定输出路径时默认写入 `~/.smc-backup-restores/`；默认不覆盖已有文件，确需覆盖时显式添加 `--force`。
+
+安全边界：GitHub token 与公钥存在服务端环境中，私钥只在恢复设备上；拥有服务端控制权的人可以读取备份前的运行时数据，因此这套设计保护的是 GitHub 仓库中的静态备份，不替代服务器本身的访问控制、更新和审计。AES-GCM 能发现容器被改动，但本格式没有另加发送方数字签名；RSA 公钥的持有者都能生成可解密容器，所以恢复时仍需确认文件确实来自受控的专用私有仓库。
+
 ## 维护规则
 
 - UI 修改先看 `STYLE_GUIDE.md`，保持安静、清楚、深远、克制、有秩序。

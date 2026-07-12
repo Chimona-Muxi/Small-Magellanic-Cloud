@@ -9,3 +9,5 @@ services:
     envVars:
       - key: SMC_MAIL_SMTP_BLOCKED
         value: render-free
+      - key: SMC_BACKUP_GITHUB_REPO
+        value: Chimona-Muxi/sirenshuju

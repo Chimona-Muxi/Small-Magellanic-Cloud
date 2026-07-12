@@ -7,6 +7,8 @@
     "node": ">=18"
   },
   "scripts": {
+    "backup:keygen": "node scripts/private-backup-keygen.mjs",
+    "backup:restore": "node scripts/private-backup-restore.mjs",
     "install:study": "node scripts/install-study-deps.mjs",
     "install:study:plot": "node scripts/install-study-deps.mjs --plot",
     "postinstall": "node scripts/install-study-deps.mjs",

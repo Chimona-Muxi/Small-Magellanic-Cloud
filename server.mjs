@@ -1,7 +1,17 @@
 import { createServer } from "node:http";
 import { spawn } from "node:child_process";
-import { randomBytes, scryptSync, timingSafeEqual, createHash } from "node:crypto";
-import { access, mkdir, mkdtemp, readFile, rename, rm, writeFile } from "node:fs/promises";
+import {
+  constants as cryptoConstants,
+  createCipheriv,
+  createHash,
+  createHmac,
+  createPublicKey,
+  publicEncrypt,
+  randomBytes,
+  scryptSync,
+  timingSafeEqual
+} from "node:crypto";
+import { access, mkdir, mkdtemp, readFile, rename, rm, stat, writeFile } from "node:fs/promises";
 import { connect as netConnect } from "node:net";
 import { tmpdir } from "node:os";
 import { delimiter, dirname, extname, join, normalize } from "node:path";
@@ -144,7 +154,25 @@ const privateLoginMaxFailures = 6;
 const privateLoginAttempts = new Map();
 const privateDefaultProfile = privateProfileSeed();
 const privateArchiveType = "smc.private.archive";
-const privateArchiveVersion = 1;
+const privateArchiveVersion = 2;
+const privateBackupRepo = String(process.env.SMC_BACKUP_GITHUB_REPO || "").trim();
+const privateBackupToken = String(process.env.SMC_BACKUP_GITHUB_TOKEN || "").trim();
+const privateBackupPublicKeyB64 = String(process.env.SMC_BACKUP_PUBLIC_KEY_B64 || "").trim();
+const privateBackupBranch = String(process.env.SMC_BACKUP_GITHUB_BRANCH || "smc-private-backup").trim();
+const privateBackupDebounceMinutes = Math.min(1440, Math.max(1, Number(process.env.SMC_BACKUP_DEBOUNCE_MINUTES) || 15));
+const privateBackupRetentionCount = Math.min(365, Math.max(1, Number(process.env.SMC_BACKUP_RETENTION_DAYS) || 30));
+const privateBackupFormat = "smc.encrypted.private-backup";
+const privateBackupVersion = 1;
+const privateBackupPayloadMagic = Buffer.from("SMC-BACKUP-PAYLOAD-V1\0", "utf8");
+let privateBackupTimer = null;
+let privateBackupScheduledForAt = null;
+let privateBackupPromise = null;
+let privateBackupState = {
+  lastAttemptAt: null,
+  lastSuccessAt: null,
+  lastResult: null,
+  lastError: null
+};
 let zipCrcTable = null;
 
 function cleanPath(pathname) {
@@ -275,14 +303,14 @@ function cleanPrivateMailVault(vault = {}) {
     };
   }
   return {
-    vaultVersion: 1,
+    vaultVersion: Math.min(2, Math.max(1, Number(vault.vaultVersion) || 1)),
     updatedAt: String(vault.updatedAt || new Date().toISOString()).slice(0, 40),
     algorithm: "AES-GCM",
     kdf: "PBKDF2-SHA-256",
     iterations: Math.min(600000, Math.max(120000, Number(vault.iterations) || 240000)),
     salt: String(vault.salt || "").slice(0, 256),
     iv: String(vault.iv || "").slice(0, 256),
-    ciphertext: String(vault.ciphertext || "").slice(0, 256 * 1024)
+    ciphertext: String(vault.ciphertext || "").slice(0, 3 * 1024 * 1024)
   };
 }
 
@@ -329,6 +357,7 @@ async function loadPrivateProfile() {
 async function savePrivateProfile(profile) {
   privateProfileStore = cleanPrivateProfile(profile);
   await writePrivateJsonFile(privateProfileFile, privateProfileStore);
+  schedulePrivateBackup();
   return privateProfileStore;
 }
 
@@ -341,6 +370,7 @@ async function loadPrivateMailVault() {
 async function savePrivateMailVault(vault) {
   privateMailVaultStore = cleanPrivateMailVault(vault);
   await writePrivateJsonFile(privateMailVaultFile, privateMailVaultStore);
+  schedulePrivateBackup();
   return privateMailVaultStore;
 }
 
@@ -461,7 +491,7 @@ function readZipEntries(buffer) {
     const localOffset = buffer.readUInt32LE(cursor + 42);
     const name = buffer.subarray(cursor + 46, cursor + 46 + nameLength).toString("utf8");
     if (!name || name.includes("..") || name.startsWith("/") || name.includes("\\")) throw new Error("Invalid archive");
-    if (uncompressedSize > 2 * 1024 * 1024) throw new Error("Archive too large");
+    if (uncompressedSize > Math.floor(3.5 * 1024 * 1024)) throw new Error("Archive too large");
     totalUncompressed += uncompressedSize;
     if (totalUncompressed > 4 * 1024 * 1024) throw new Error("Archive too large");
 
@@ -475,7 +505,7 @@ function readZipEntries(buffer) {
     const data = method === 0
       ? compressed
       : method === 8
-        ? inflateRawSync(compressed, { maxOutputLength: 2 * 1024 * 1024 })
+        ? inflateRawSync(compressed, { maxOutputLength: Math.floor(3.5 * 1024 * 1024) })
         : null;
     if (!data) throw new Error("Unsupported archive compression");
     if (data.length !== uncompressedSize) throw new Error("Invalid archive");
@@ -497,10 +527,12 @@ async function makePrivateArchive() {
     archiveVersion: privateArchiveVersion,
     createdAt,
     source: "Small Magellanic Cloud",
-    modules: ["profile", "mail-vault"],
+    modules: ["profile", "encrypted-private-vault"],
     compatibility: {
       profile: 1,
-      mailVault: 1,
+      encryptedPrivateVault: 2,
+      legacyMailVaultPath: "data/mail-vault.json",
+      encryptedPrivateVaultModules: ["mail-accounts", "phone-accounts", "ledger"],
       reserved: ["temporary-files", "subsite-transfer"]
     }
   };
@@ -526,11 +558,408 @@ function privateArchiveFileName(createdAt) {
   return `smc-private-data-${stamp}.zip`;
 }
 
+class PrivateBackupError extends Error {
+  constructor(message, code = "BACKUP_FAILED", httpStatus = 502) {
+    super(message);
+    this.name = "PrivateBackupError";
+    this.code = code;
+    this.httpStatus = httpStatus;
+  }
+}
+
+function safePrivateBackupError(error) {
+  let message = String(typeof error === "string" ? error : error?.message || "Encrypted backup failed");
+  for (const secret of [privateBackupToken, privateBackupPublicKeyB64]) {
+    if (secret && message.includes(secret)) message = message.split(secret).join("[redacted]");
+  }
+  return message.replace(/[\r\n\t]+/g, " ").slice(0, 280);
+}
+
+function privateBackupConfiguration() {
+  const missing = [];
+  if (!privateBackupRepo) missing.push("SMC_BACKUP_GITHUB_REPO");
+  if (!privateBackupToken) missing.push("SMC_BACKUP_GITHUB_TOKEN");
+  if (!privateBackupPublicKeyB64) missing.push("SMC_BACKUP_PUBLIC_KEY_B64");
+  if (missing.length) {
+    return {
+      configured: false,
+      error: missing.length === 3 ? "Encrypted GitHub backup is not configured" : `Missing configuration: ${missing.join(", ")}`
+    };
+  }
+
+  const repoMatch = privateBackupRepo.match(/^([A-Za-z0-9](?:[A-Za-z0-9-]{0,38}))\/([A-Za-z0-9_.-]{1,100})$/);
+  if (!repoMatch || repoMatch[2] === "." || repoMatch[2] === "..") {
+    return { configured: false, error: "SMC_BACKUP_GITHUB_REPO must use owner/repository format" };
+  }
+  if (
+    !/^[A-Za-z0-9][A-Za-z0-9._/-]{0,199}$/.test(privateBackupBranch)
+    || privateBackupBranch.includes("..")
+    || privateBackupBranch.includes("//")
+    || privateBackupBranch.endsWith("/")
+    || privateBackupBranch.split("/").some((part) => part.startsWith(".") || part.endsWith(".") || part.endsWith(".lock"))
+  ) {
+    return { configured: false, error: "SMC_BACKUP_GITHUB_BRANCH is invalid" };
+  }
+
+  try {
+    const compact = privateBackupPublicKeyB64.replace(/\s+/g, "");
+    if (compact.length > 4096 || !/^[A-Za-z0-9+/]+={0,2}$/.test(compact)) throw new Error("invalid base64");
+    const publicDer = Buffer.from(compact, "base64");
+    if (!publicDer.length || publicDer.toString("base64").replace(/=+$/, "") !== compact.replace(/=+$/, "")) {
+      throw new Error("invalid base64");
+    }
+    const publicKey = createPublicKey({ key: publicDer, format: "der", type: "spki" });
+    const modulusLength = Number(publicKey.asymmetricKeyDetails?.modulusLength || 0);
+    if (publicKey.asymmetricKeyType !== "rsa" || modulusLength < 3072 || publicKey.asymmetricKeyDetails?.publicExponent !== 65537n) {
+      throw new Error("RSA key must be at least 3072 bits and use public exponent 65537");
+    }
+    return {
+      configured: true,
+      owner: repoMatch[1],
+      repositoryName: repoMatch[2],
+      publicDer,
+      publicKey,
+      publicKeyFingerprint: `SHA256:${createHash("sha256").update(publicDer).digest("base64url")}`
+    };
+  } catch (error) {
+    return { configured: false, error: `SMC_BACKUP_PUBLIC_KEY_B64 is invalid: ${safePrivateBackupError(error)}` };
+  }
+}
+
+function privateBackupSourceFingerprint(archiveBuffer) {
+  const entries = readZipEntries(archiveBuffer);
+  const dedupKey = createHash("sha256").update("smc-private-backup-dedup-key-v1\0", "utf8").update(privateBackupToken, "utf8").digest();
+  try {
+    const hash = createHmac("sha256", dedupKey);
+    hash.update(`smc-private-backup-source-v1:archive-${privateArchiveVersion}\0`, "utf8");
+    hash.update(entries.get("data/profile.json") || Buffer.alloc(0));
+    hash.update("\0", "utf8");
+    hash.update(entries.get("data/mail-vault.json") || Buffer.alloc(0));
+    return hash.digest("hex");
+  } finally {
+    dedupKey.fill(0);
+  }
+}
+
+function encryptPrivateArchive(archive, sourceFingerprintHmacSha256, configuration) {
+  const aesKey = randomBytes(32);
+  const iv = randomBytes(12);
+  try {
+    const metadata = {
+      format: privateBackupFormat,
+      version: privateBackupVersion,
+      createdAt: archive.createdAt,
+      sourceFingerprintHmacSha256,
+      recipientFingerprintSha256: configuration.publicKeyFingerprint,
+      archive: {
+        format: "zip",
+        fileName: privateArchiveFileName(archive.createdAt),
+        bytes: archive.buffer.length,
+        sha256Location: "encrypted-payload"
+      }
+    };
+    const cipher = createCipheriv("aes-256-gcm", aesKey, iv);
+    cipher.setAAD(Buffer.from(JSON.stringify(metadata), "utf8"));
+    const archiveSha256 = createHash("sha256").update(archive.buffer).digest();
+    const payload = Buffer.concat([privateBackupPayloadMagic, archiveSha256, archive.buffer]);
+    let ciphertext;
+    try {
+      ciphertext = Buffer.concat([cipher.update(payload), cipher.final()]);
+    } finally {
+      archiveSha256.fill(0);
+      payload.fill(0);
+    }
+    const authTag = cipher.getAuthTag();
+    const wrappedKey = publicEncrypt({
+      key: configuration.publicKey,
+      padding: cryptoConstants.RSA_PKCS1_OAEP_PADDING,
+      oaepHash: "sha256"
+    }, aesKey);
+    const document = {
+      ...metadata,
+      encryption: {
+        cipher: "AES-256-GCM",
+        keyWrap: "RSA-OAEP-SHA256",
+        ivB64: iv.toString("base64"),
+        authTagB64: authTag.toString("base64"),
+        wrappedKeyB64: wrappedKey.toString("base64")
+      },
+      ciphertextB64: ciphertext.toString("base64")
+    };
+    return Buffer.from(`${JSON.stringify(document)}\n`, "utf8");
+  } finally {
+    aesKey.fill(0);
+  }
+}
+
+async function readPrivateBackupGithubResponse(response, maxBytes = 12 * 1024 * 1024) {
+  const declaredLength = Number(response.headers.get("content-length") || 0);
+  if (declaredLength > maxBytes) throw new PrivateBackupError("GitHub API response was too large");
+  const chunks = [];
+  let size = 0;
+  if (response.body) {
+    const reader = response.body.getReader();
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      size += value.byteLength;
+      if (size > maxBytes) {
+        await reader.cancel().catch(() => {});
+        throw new PrivateBackupError("GitHub API response was too large");
+      }
+      chunks.push(Buffer.from(value));
+    }
+  }
+  const text = Buffer.concat(chunks).toString("utf8");
+  if (!text) return {};
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new PrivateBackupError("GitHub API returned invalid JSON");
+  }
+}
+
+async function privateBackupGithubRequest(configuration, path, { method = "GET", body, allow404 = false } = {}) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 25000);
+  try {
+    const response = await fetch(`https://api.github.com${path}`, {
+      method,
+      headers: {
+        Accept: "application/vnd.github+json",
+        Authorization: `Bearer ${privateBackupToken}`,
+        "Content-Type": "application/json",
+        "User-Agent": "Small-Magellanic-Cloud-private-backup",
+        "X-GitHub-Api-Version": "2022-11-28"
+      },
+      body: body === undefined ? undefined : JSON.stringify(body),
+      signal: controller.signal
+    });
+    const data = await readPrivateBackupGithubResponse(response);
+    if (allow404 && response.status === 404) return null;
+    if (!response.ok) {
+      const detail = safePrivateBackupError(data?.message || response.statusText || "request failed").slice(0, 180);
+      throw new PrivateBackupError(`GitHub API ${response.status}: ${detail}`, "GITHUB_API_ERROR", response.status === 401 || response.status === 403 ? 503 : 502);
+    }
+    return data;
+  } catch (error) {
+    if (error instanceof PrivateBackupError) throw error;
+    const message = error?.name === "AbortError" ? "GitHub API request timed out" : `GitHub API request failed: ${safePrivateBackupError(error)}`;
+    throw new PrivateBackupError(message);
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+function privateBackupRepoPath(configuration) {
+  return `/repos/${encodeURIComponent(configuration.owner)}/${encodeURIComponent(configuration.repositoryName)}`;
+}
+
+async function loadPrivateBackupBranch(configuration) {
+  const repoPath = privateBackupRepoPath(configuration);
+  const branchPath = privateBackupBranch.split("/").map(encodeURIComponent).join("/");
+  const ref = await privateBackupGithubRequest(configuration, `${repoPath}/git/ref/heads/${branchPath}`, { allow404: true });
+  if (!ref) return { ref: null, entries: [] };
+  const commitSha = String(ref.object?.sha || "");
+  if (ref.object?.type !== "commit" || !/^[a-f0-9]{40,64}$/i.test(commitSha)) {
+    throw new PrivateBackupError("Backup branch does not point to a valid commit", "BACKUP_BRANCH_NOT_DEDICATED", 409);
+  }
+  const commit = await privateBackupGithubRequest(configuration, `${repoPath}/git/commits/${encodeURIComponent(commitSha)}`);
+  const treeSha = String(commit.tree?.sha || "");
+  if (!/^[a-f0-9]{40,64}$/i.test(treeSha)) throw new PrivateBackupError("Backup branch commit has no valid tree");
+  const tree = await privateBackupGithubRequest(configuration, `${repoPath}/git/trees/${encodeURIComponent(treeSha)}?recursive=1`);
+  if (!Array.isArray(tree.tree)) throw new PrivateBackupError("GitHub returned an invalid backup branch tree");
+  if (tree.truncated) throw new PrivateBackupError("Backup branch tree is too large to verify safely", "BACKUP_BRANCH_NOT_DEDICATED", 409);
+  const allEntries = tree.tree.filter((entry) => typeof entry?.path === "string");
+  if (allEntries.length !== tree.tree.length) throw new PrivateBackupError("GitHub returned malformed backup branch entries");
+  const unsafeEntry = allEntries.find((entry) => {
+    if (entry.type === "tree") return entry.path !== "daily" || entry.mode !== "040000";
+    if (entry.type === "blob") return entry.mode !== "100644";
+    return true;
+  });
+  if (unsafeEntry) {
+    throw new PrivateBackupError("Refusing backup: the configured branch contains unsupported Git entries", "BACKUP_BRANCH_NOT_DEDICATED", 409);
+  }
+  const entries = allEntries.filter((entry) => entry.type === "blob");
+  if (entries.some((entry) => !/^[a-f0-9]{40,64}$/i.test(String(entry.sha || "")))) {
+    throw new PrivateBackupError("GitHub returned an invalid backup branch blob SHA");
+  }
+  const unexpected = entries.find((entry) => entry.path !== "latest.smcbackup" && !/^daily\/\d{4}-\d{2}-\d{2}\.smcbackup$/.test(entry.path));
+  if (unexpected) {
+    throw new PrivateBackupError("Refusing backup: the configured branch contains non-backup files", "BACKUP_BRANCH_NOT_DEDICATED", 409);
+  }
+  return { ref, entries };
+}
+
+async function remotePrivateBackupFingerprint(configuration, entries) {
+  const latest = entries.find((entry) => entry.path === "latest.smcbackup" && /^[a-f0-9]{40,64}$/i.test(String(entry.sha || "")));
+  if (!latest) return null;
+  try {
+    const blob = await privateBackupGithubRequest(configuration, `${privateBackupRepoPath(configuration)}/git/blobs/${encodeURIComponent(latest.sha)}`);
+    if (blob.encoding !== "base64" || typeof blob.content !== "string") return null;
+    const raw = Buffer.from(blob.content.replace(/\s+/g, ""), "base64");
+    const document = JSON.parse(raw.toString("utf8"));
+    if (document.format !== privateBackupFormat || Number(document.version) !== privateBackupVersion) return null;
+    const fingerprint = String(document.sourceFingerprintHmacSha256 || "");
+    const recipientFingerprint = String(document.recipientFingerprintSha256 || "");
+    return /^[a-f0-9]{64}$/.test(fingerprint) && /^SHA256:[A-Za-z0-9_-]{43}$/.test(recipientFingerprint)
+      ? { source: fingerprint, recipient: recipientFingerprint }
+      : null;
+  } catch (error) {
+    if (error instanceof PrivateBackupError) throw error;
+    return null;
+  }
+}
+
+async function updatePrivateBackupBranch(configuration, branch, treeEntries, message) {
+  const repoPath = privateBackupRepoPath(configuration);
+  const tree = await privateBackupGithubRequest(configuration, `${repoPath}/git/trees`, {
+    method: "POST",
+    body: { tree: treeEntries }
+  });
+  if (!/^[a-f0-9]{40,64}$/i.test(String(tree.sha || ""))) throw new PrivateBackupError("GitHub did not return a valid backup tree SHA");
+  const commit = await privateBackupGithubRequest(configuration, `${repoPath}/git/commits`, {
+    method: "POST",
+    body: {
+      message,
+      tree: tree.sha,
+      parents: []
+    }
+  });
+  if (!/^[a-f0-9]{40,64}$/i.test(String(commit.sha || ""))) throw new PrivateBackupError("GitHub did not return a valid backup commit SHA");
+  const branchPath = privateBackupBranch.split("/").map(encodeURIComponent).join("/");
+  if (branch.ref) {
+    await privateBackupGithubRequest(configuration, `${repoPath}/git/refs/heads/${branchPath}`, {
+      method: "PATCH",
+      body: { sha: commit.sha, force: true }
+    });
+  } else {
+    await privateBackupGithubRequest(configuration, `${repoPath}/git/refs`, {
+      method: "POST",
+      body: { ref: `refs/heads/${privateBackupBranch}`, sha: commit.sha }
+    });
+  }
+  return commit.sha;
+}
+
+async function performPrivateBackup() {
+  const configuration = privateBackupConfiguration();
+  if (!configuration.configured) throw new PrivateBackupError(configuration.error, "BACKUP_NOT_CONFIGURED", 503);
+  const repoPath = privateBackupRepoPath(configuration);
+
+  const repository = await privateBackupGithubRequest(configuration, repoPath);
+  if (repository.private !== true) {
+    throw new PrivateBackupError("Refusing backup: the configured GitHub repository is not private", "PRIVATE_REPOSITORY_REQUIRED", 409);
+  }
+
+  const branch = await loadPrivateBackupBranch(configuration);
+  const remoteFingerprint = await remotePrivateBackupFingerprint(configuration, branch.entries);
+  const archive = await makePrivateArchive();
+  try {
+    const sourceFingerprintHmacSha256 = privateBackupSourceFingerprint(archive.buffer);
+    const dailyEntries = branch.entries
+      .filter((entry) => /^daily\/\d{4}-\d{2}-\d{2}\.smcbackup$/.test(entry.path))
+      .sort((a, b) => b.path.localeCompare(a.path));
+    if (remoteFingerprint?.source === sourceFingerprintHmacSha256 && remoteFingerprint.recipient === configuration.publicKeyFingerprint) {
+      if (dailyEntries.length > privateBackupRetentionCount) {
+        const latest = branch.entries.find((entry) => entry.path === "latest.smcbackup");
+        await updatePrivateBackupBranch(configuration, branch, [
+          { path: "latest.smcbackup", mode: "100644", type: "blob", sha: latest.sha },
+          ...dailyEntries.slice(0, privateBackupRetentionCount).map((entry) => ({ path: entry.path, mode: "100644", type: "blob", sha: entry.sha }))
+        ], `Prune encrypted private backups ${archive.createdAt}`);
+        return { result: "pruned", uploaded: false, removed: dailyEntries.length - privateBackupRetentionCount };
+      }
+      return { result: "unchanged", uploaded: false };
+    }
+    const encrypted = encryptPrivateArchive(archive, sourceFingerprintHmacSha256, configuration);
+    const blob = await privateBackupGithubRequest(configuration, `${repoPath}/git/blobs`, {
+      method: "POST",
+      body: { content: encrypted.toString("base64"), encoding: "base64" }
+    });
+    if (!/^[a-f0-9]{40,64}$/i.test(String(blob.sha || ""))) throw new PrivateBackupError("GitHub did not return a valid backup blob SHA");
+    const todayPath = `daily/${archive.createdAt.slice(0, 10)}.smcbackup`;
+    const priorDaily = branch.entries
+      .filter((entry) => /^daily\/\d{4}-\d{2}-\d{2}\.smcbackup$/.test(entry.path) && entry.path !== todayPath && /^[a-f0-9]{40,64}$/i.test(String(entry.sha || "")))
+      .sort((a, b) => b.path.localeCompare(a.path))
+      .slice(0, Math.max(0, privateBackupRetentionCount - 1));
+    await updatePrivateBackupBranch(configuration, branch, [
+      { path: "latest.smcbackup", mode: "100644", type: "blob", sha: blob.sha },
+      { path: todayPath, mode: "100644", type: "blob", sha: blob.sha },
+      ...priorDaily.map((entry) => ({ path: entry.path, mode: "100644", type: "blob", sha: entry.sha }))
+    ], `Encrypted private backup ${archive.createdAt}`);
+    return { result: "uploaded", uploaded: true, createdAt: archive.createdAt };
+  } finally {
+    archive.buffer.fill(0);
+  }
+}
+
+async function runPrivateBackup() {
+  if (privateBackupPromise) return privateBackupPromise;
+  if (privateBackupTimer) clearTimeout(privateBackupTimer);
+  privateBackupTimer = null;
+  privateBackupScheduledForAt = null;
+  privateBackupState.lastAttemptAt = new Date().toISOString();
+  privateBackupState.lastError = null;
+  privateBackupPromise = performPrivateBackup()
+    .then((result) => {
+      const now = new Date().toISOString();
+      privateBackupState = { ...privateBackupState, lastSuccessAt: now, lastResult: result.result, lastError: null };
+      return result;
+    })
+    .catch((error) => {
+      privateBackupState = { ...privateBackupState, lastResult: "failed", lastError: safePrivateBackupError(error) };
+      throw error;
+    })
+    .finally(() => {
+      privateBackupPromise = null;
+    });
+  return privateBackupPromise;
+}
+
+function schedulePrivateBackup() {
+  try {
+    if (!privateBackupConfiguration().configured) return;
+    if (privateBackupTimer) clearTimeout(privateBackupTimer);
+    privateBackupScheduledForAt = new Date(Date.now() + privateBackupDebounceMinutes * 60 * 1000).toISOString();
+    privateBackupTimer = setTimeout(() => {
+      privateBackupTimer = null;
+      privateBackupScheduledForAt = null;
+      runPrivateBackup().catch((error) => {
+        console.error(`[private-backup] ${safePrivateBackupError(error)}`);
+      });
+    }, privateBackupDebounceMinutes * 60 * 1000);
+    privateBackupTimer.unref?.();
+  } catch (error) {
+    privateBackupScheduledForAt = null;
+    privateBackupState = { ...privateBackupState, lastResult: "failed", lastError: safePrivateBackupError(error) };
+    console.error(`[private-backup] scheduling failed: ${safePrivateBackupError(error)}`);
+  }
+}
+
+function publicPrivateBackupStatus() {
+  const configuration = privateBackupConfiguration();
+  return {
+    configured: configuration.configured,
+    configurationError: configuration.configured ? null : configuration.error,
+    repository: privateBackupRepo || null,
+    branch: privateBackupBranch,
+    retentionDailyCopies: privateBackupRetentionCount,
+    debounceMinutes: privateBackupDebounceMinutes,
+    recipientFingerprintSha256: configuration.configured ? configuration.publicKeyFingerprint : null,
+    scheduled: Boolean(privateBackupTimer),
+    scheduledForAt: privateBackupScheduledForAt,
+    running: Boolean(privateBackupPromise),
+    ...privateBackupState
+  };
+}
+
 async function importPrivateArchiveBuffer(buffer, fileName = "smc-private-data.zip") {
   const entries = readZipEntries(buffer);
   const manifest = JSON.parse(entries.get("manifest.json")?.toString("utf8") || "{}");
   if (manifest.archiveType !== privateArchiveType) throw new Error("Unsupported archive");
-  if (Number(manifest.archiveVersion) > privateArchiveVersion) throw new Error("Archive version is newer");
+  const archiveVersion = Number(manifest.archiveVersion);
+  if (!Number.isInteger(archiveVersion) || archiveVersion < 1) throw new Error("Unsupported archive version");
+  if (archiveVersion > privateArchiveVersion) throw new Error("Archive version is newer");
 
   const profile = cleanPrivateProfile(JSON.parse(entries.get("data/profile.json")?.toString("utf8") || "{}"));
   const mailVaultEntry = entries.get("data/mail-vault.json");
@@ -544,6 +973,7 @@ async function importPrivateArchiveBuffer(buffer, fileName = "smc-private-data.z
     if (parsedMailVault) await writePrivateJsonFile(privateMailVaultFile, parsedMailVault);
     privateProfileStore = profile;
     if (parsedMailVault) privateMailVaultStore = parsedMailVault;
+    schedulePrivateBackup();
   } catch (error) {
     await Promise.allSettled([
       writePrivateJsonFile(privateProfileFile, previousProfile),
@@ -901,36 +1331,55 @@ function normalizeMailBody(value = "") {
 }
 
 function socketLineClient(socket, timeoutMs = 25000) {
-  let buffer = "";
+  let buffer = Buffer.alloc(0);
+  const maxBufferedBytes = 8 * 1024 * 1024;
   const waiters = [];
+  const takeLine = () => {
+    const index = buffer.indexOf(0x0a);
+    if (index < 0) return null;
+    const raw = buffer.subarray(0, index + 1);
+    buffer = buffer.subarray(index + 1);
+    return raw.toString("utf8").replace(/\r?\n$/, "");
+  };
+  const pump = () => {
+    while (waiters.length) {
+      const waiter = waiters[0];
+      if (waiter.type === "line") {
+        const line = takeLine();
+        if (line === null) return;
+        waiters.shift();
+        waiter.resolve(line);
+        continue;
+      }
+      if (buffer.length < waiter.length) return;
+      const bytes = buffer.subarray(0, waiter.length);
+      buffer = buffer.subarray(waiter.length);
+      waiters.shift();
+      waiter.resolve(bytes);
+    }
+  };
   const fail = (error) => {
     while (waiters.length) waiters.shift().reject(error);
   };
-  socket.setEncoding("utf8");
   socket.on("data", (chunk) => {
-    buffer += chunk;
-    while (waiters.length) {
-      const index = buffer.indexOf("\n");
-      if (index < 0) break;
-      const line = buffer.slice(0, index + 1).replace(/\r?\n$/, "");
-      buffer = buffer.slice(index + 1);
-      waiters.shift().resolve(line);
+    const bytes = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+    buffer = buffer.length ? Buffer.concat([buffer, bytes]) : bytes;
+    if (buffer.length > maxBufferedBytes) {
+      socket.destroy(new Error("Mail response buffer exceeded"));
+      return;
     }
+    pump();
   });
   socket.on("error", fail);
   socket.on("close", () => fail(new Error("Mail connection closed")));
   return {
     socket,
     readLine() {
-      const index = buffer.indexOf("\n");
-      if (index >= 0) {
-        const line = buffer.slice(0, index + 1).replace(/\r?\n$/, "");
-        buffer = buffer.slice(index + 1);
-        return Promise.resolve(line);
-      }
+      const line = takeLine();
+      if (line !== null) return Promise.resolve(line);
       return new Promise((resolve, reject) => {
-        const timer = setTimeout(() => reject(new Error("Mail connection timed out")), timeoutMs);
-        waiters.push({
+        const waiter = {
+          type: "line",
           resolve(line) {
             clearTimeout(timer);
             resolve(line);
@@ -939,7 +1388,41 @@ function socketLineClient(socket, timeoutMs = 25000) {
             clearTimeout(timer);
             reject(error);
           }
-        });
+        };
+        const timer = setTimeout(() => {
+          const index = waiters.indexOf(waiter);
+          if (index >= 0) waiters.splice(index, 1);
+          reject(new Error("Mail connection timed out"));
+        }, timeoutMs);
+        waiters.push(waiter);
+      });
+    },
+    readBytes(length) {
+      if (!Number.isSafeInteger(length) || length < 0) return Promise.reject(new Error("Invalid mail literal length"));
+      if (buffer.length >= length) {
+        const bytes = buffer.subarray(0, length);
+        buffer = buffer.subarray(length);
+        return Promise.resolve(bytes);
+      }
+      return new Promise((resolve, reject) => {
+        const waiter = {
+          type: "bytes",
+          length,
+          resolve(bytes) {
+            clearTimeout(timer);
+            resolve(bytes);
+          },
+          reject(error) {
+            clearTimeout(timer);
+            reject(error);
+          }
+        };
+        const timer = setTimeout(() => {
+          const index = waiters.indexOf(waiter);
+          if (index >= 0) waiters.splice(index, 1);
+          reject(new Error("Mail connection timed out"));
+        }, timeoutMs);
+        waiters.push(waiter);
       });
     },
     writeLine(line) {
@@ -1063,13 +1546,64 @@ function quoteImap(value = "") {
 async function imapCommand(client, tag, command) {
   client.writeLine(`${tag} ${command}`);
   const lines = [];
+  let responseBytes = 0;
   while (true) {
     const line = await client.readLine();
+    responseBytes += Buffer.byteLength(line, "utf8");
+    if (lines.length >= 10000 || responseBytes > 4 * 1024 * 1024) throw new Error("IMAP response too large");
     lines.push(line);
     if (line.startsWith(`${tag} `)) break;
   }
   if (!new RegExp(`^${tag} OK`, "i").test(lines.at(-1) || "")) throw new Error(lines.at(-1) || "IMAP command failed");
   return lines;
+}
+
+const mailMessageFetchBytes = 512 * 1024;
+const mailMessageTextChars = 120000;
+const mailInsightHeaderBytes = 2 * 1024 * 1024;
+const mailInsightDefaultDays = 180;
+const mailInsightDefaultMessages = 200;
+const mailInsightMaxDays = 365;
+const mailInsightMaxMessages = 500;
+const mailInsightMaxItems = 200;
+const mailInsightPublicSuffix2 = new Set([
+  "com.cn", "net.cn", "org.cn", "gov.cn", "co.uk", "org.uk", "me.uk", "co.jp", "ne.jp",
+  "com.au", "net.au", "org.au", "co.nz", "com.sg", "com.hk", "com.tw", "com.br", "com.mx"
+]);
+
+function cleanMailUid(value) {
+  const uid = String(value ?? "").trim();
+  if (!/^[1-9]\d{0,9}$/.test(uid) || Number(uid) > 0xffffffff) throw new Error("Invalid mail UID");
+  return uid;
+}
+
+async function imapLiteralCommand(client, tag, command, maxLiteralBytes = mailMessageFetchBytes) {
+  client.writeLine(`${tag} ${command}`);
+  const lines = [];
+  const literals = [];
+  let metadataBytes = 0;
+  let literalBytes = 0;
+  while (true) {
+    const line = await client.readLine();
+    metadataBytes += Buffer.byteLength(line, "utf8");
+    if (lines.length >= 2000 || metadataBytes > 256 * 1024) throw new Error("IMAP response too large");
+    lines.push(line);
+    const literalMatch = line.match(/\{(\d+)\+?\}$/);
+    if (literalMatch) {
+      const length = Number(literalMatch[1]);
+      if (!Number.isSafeInteger(length) || length < 0 || length > maxLiteralBytes || literalBytes + length > maxLiteralBytes) {
+        throw new Error("Mail message is too large");
+      }
+      const bytes = await client.readBytes(length);
+      literalBytes += bytes.length;
+      literals.push({ prefix: line, bytes });
+    }
+    if (line.startsWith(`${tag} `)) {
+      if (!new RegExp(`^${tag} OK`, "i").test(line)) throw new Error(line || "IMAP command failed");
+      break;
+    }
+  }
+  return { lines, literals };
 }
 
 async function imapAuth(client, account) {
@@ -1092,14 +1626,160 @@ async function imapAuth(client, account) {
   throw lastError || new Error("IMAP authentication failed");
 }
 
-function decodeMailHeader(value = "") {
-  return String(value || "").replace(/=\?utf-8\?b\?([^?]+)\?=/ig, (_, encoded) => {
-    try {
-      return Buffer.from(encoded, "base64").toString("utf8");
-    } catch {
-      return _;
+function decodeMailBytes(bytes, charset = "utf-8") {
+  const label = String(charset || "utf-8").trim().replace(/^['"]|['"]$/g, "").toLowerCase();
+  try {
+    return new TextDecoder(label || "utf-8", { fatal: false }).decode(bytes);
+  } catch {
+    return bytes.toString(label === "iso-8859-1" || label === "latin1" ? "latin1" : "utf8");
+  }
+}
+
+function decodeQuotedPrintable(bytes, mimeWord = false) {
+  const source = bytes.toString("latin1").replace(mimeWord ? /_/g : /$^/, " ");
+  const output = [];
+  for (let index = 0; index < source.length; index += 1) {
+    if (source[index] === "=" && (source.slice(index + 1, index + 3) === "\r\n" || source[index + 1] === "\n")) {
+      index += source[index + 1] === "\r" ? 2 : 1;
+      continue;
     }
-  });
+    const hex = source.slice(index + 1, index + 3);
+    if (source[index] === "=" && /^[0-9a-f]{2}$/i.test(hex)) {
+      output.push(Number.parseInt(hex, 16));
+      index += 2;
+    } else {
+      output.push(source.charCodeAt(index) & 0xff);
+    }
+  }
+  return Buffer.from(output);
+}
+
+function decodeMailHeader(value = "") {
+  const input = String(value || "").replace(/\r?\n[ \t]+/g, " ");
+  return input.replace(/=\?([^?]+)\?([bq])\?([^?]*)\?=(?:\s+(?==\?))?/ig, (match, charset, encoding, encoded) => {
+    try {
+      const bytes = encoding.toLowerCase() === "b"
+        ? Buffer.from(encoded.replace(/\s+/g, ""), "base64")
+        : decodeQuotedPrintable(Buffer.from(encoded, "latin1"), true);
+      return decodeMailBytes(bytes, charset);
+    } catch {
+      return match;
+    }
+  }).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, "").trim();
+}
+
+function parseMailHeaders(bytes) {
+  let splitAt = bytes.indexOf(Buffer.from("\r\n\r\n"));
+  let separatorLength = 4;
+  if (splitAt < 0) {
+    splitAt = bytes.indexOf(Buffer.from("\n\n"));
+    separatorLength = 2;
+  }
+  if (splitAt < 0 || splitAt > 128 * 1024) return { headers: new Map(), body: Buffer.alloc(0) };
+  const headers = new Map();
+  const unfolded = bytes.subarray(0, splitAt).toString("latin1").replace(/\r?\n[ \t]+/g, " ");
+  for (const line of unfolded.split(/\r?\n/)) {
+    const match = line.match(/^([^:\s]+):\s*(.*)$/);
+    if (!match) continue;
+    const key = match[1].toLowerCase();
+    headers.set(key, headers.has(key) ? `${headers.get(key)}, ${match[2]}` : match[2]);
+  }
+  return { headers, body: bytes.subarray(splitAt + separatorLength) };
+}
+
+function parseMailContentType(value = "text/plain") {
+  const source = String(value || "text/plain");
+  const type = source.split(";", 1)[0].trim().toLowerCase() || "text/plain";
+  const params = new Map();
+  const pattern = /;\s*([^=;\s]+)\s*=\s*(?:"([^"]*)"|([^;\s]*))/g;
+  let match;
+  while ((match = pattern.exec(source))) params.set(match[1].toLowerCase(), match[2] ?? match[3] ?? "");
+  return { type, params };
+}
+
+function splitMailMultipart(body, boundary) {
+  if (!boundary || boundary.length > 200 || /[\r\n\0]/.test(boundary)) return [];
+  const marker = `--${boundary}`;
+  const parts = [];
+  let current = null;
+  for (const line of body.toString("latin1").replace(/\r\n/g, "\n").split("\n")) {
+    if (line === marker || line === `${marker}--`) {
+      if (current) parts.push(Buffer.from(current.join("\n"), "latin1"));
+      current = line.endsWith("--") ? null : [];
+      if (line.endsWith("--")) break;
+    } else if (current) {
+      current.push(line);
+    }
+  }
+  if (current?.length) parts.push(Buffer.from(current.join("\n"), "latin1"));
+  return parts.slice(0, 60);
+}
+
+function mailHtmlToText(html = "") {
+  const entities = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: " " };
+  return String(html)
+    .replace(/<!--[\s\S]*?-->/g, "")
+    .replace(/<(script|style|noscript|template|svg|object)[^>]*>[\s\S]*?<\/\1\s*>/gi, "")
+    .replace(/<(br|\/p|\/div|\/li|\/tr|\/h[1-6])\s*\/?>/gi, "\n")
+    .replace(/<li\b[^>]*>/gi, "• ")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&(#x[0-9a-f]+|#\d+|amp|lt|gt|quot|apos|nbsp);/gi, (_, entity) => {
+      if (entity[0] !== "#") return entities[entity.toLowerCase()] ?? "";
+      const code = Number.parseInt(entity.slice(entity[1]?.toLowerCase() === "x" ? 2 : 1), entity[1]?.toLowerCase() === "x" ? 16 : 10);
+      return Number.isFinite(code) && code > 0 && code <= 0x10ffff ? String.fromCodePoint(code) : "";
+    });
+}
+
+function normalizeMailText(text = "") {
+  return String(text).replace(/\r\n?/g, "\n")
+    .replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, "")
+    .replace(/[ \t]+\n/g, "\n").replace(/\n{4,}/g, "\n\n\n").trim();
+}
+
+function decodeMailPart(body, transferEncoding, charset) {
+  const encoding = String(transferEncoding || "").trim().toLowerCase();
+  let bytes = body;
+  if (encoding === "base64") bytes = Buffer.from(body.toString("latin1").replace(/[^a-z0-9+/=]/gi, ""), "base64");
+  if (encoding === "quoted-printable") bytes = decodeQuotedPrintable(body);
+  return decodeMailBytes(bytes, charset);
+}
+
+function parseMailMimeEntity(bytes, depth = 0, state = { parts: 0 }) {
+  if (depth > 8 || state.parts >= 60) return [];
+  state.parts += 1;
+  const { headers, body } = parseMailHeaders(bytes);
+  const contentType = parseMailContentType(headers.get("content-type") || "text/plain; charset=utf-8");
+  const disposition = parseMailContentType(headers.get("content-disposition") || "");
+  if (disposition.type === "attachment" || disposition.params.has("filename") || contentType.params.has("name")) return [];
+  if (contentType.type.startsWith("multipart/")) {
+    const children = splitMailMultipart(body, contentType.params.get("boundary"))
+      .flatMap((part) => parseMailMimeEntity(part, depth + 1, state));
+    if (contentType.type === "multipart/alternative") {
+      const plain = children.filter((item) => item.kind === "plain");
+      return plain.length ? plain : children.filter((item) => item.kind === "html").slice(0, 1);
+    }
+    return children;
+  }
+  if (contentType.type !== "text/plain" && contentType.type !== "text/html") return [];
+  const decoded = decodeMailPart(body, headers.get("content-transfer-encoding"), contentType.params.get("charset") || "utf-8");
+  const text = normalizeMailText(contentType.type === "text/html" ? mailHtmlToText(decoded) : decoded);
+  return text ? [{ kind: contentType.type === "text/html" ? "html" : "plain", text }] : [];
+}
+
+function parseFetchedMessage(bytes, uid, declaredSize = bytes.length) {
+  const { headers } = parseMailHeaders(bytes);
+  const parts = parseMailMimeEntity(bytes);
+  const combined = normalizeMailText(parts.map((part) => part.text).join("\n\n"));
+  const bodyWasCut = combined.length > mailMessageTextChars;
+  return {
+    id: uid,
+    from: decodeMailHeader(headers.get("from") || "").slice(0, 500),
+    subject: decodeMailHeader(headers.get("subject") || "").slice(0, 500),
+    date: decodeMailHeader(headers.get("date") || "").slice(0, 160),
+    body: combined.slice(0, mailMessageTextChars),
+    bodyFormat: "plain",
+    truncated: declaredSize > bytes.length || bodyWasCut
+  };
 }
 
 function parseFetchedHeaders(lines) {
@@ -1118,6 +1798,236 @@ function parseFetchedHeaders(lines) {
     current[key] = decodeMailHeader(header[2].trim()).slice(0, 260);
   }
   return messages.filter((item) => item.id).slice(-20).reverse();
+}
+
+function cleanMailInsightOptions(input = {}) {
+  const readInteger = (value, fallback, max, label) => {
+    if (value === undefined || value === null || value === "") return fallback;
+    const number = Number(value);
+    if (!Number.isInteger(number) || number < 1 || number > max) throw new Error(`Invalid ${label}`);
+    return number;
+  };
+  return {
+    sinceDays: readInteger(input.sinceDays, mailInsightDefaultDays, mailInsightMaxDays, "sinceDays"),
+    maxMessages: readInteger(input.maxMessages, mailInsightDefaultMessages, mailInsightMaxMessages, "maxMessages")
+  };
+}
+
+function safeMailInsightText(value = "", maxLength = 240) {
+  return String(value || "")
+    .normalize("NFKC")
+    .replace(/[\u0000-\u001f\u007f]/g, " ")
+    .replace(/[<>]/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, maxLength);
+}
+
+function mailInsightBaseDomain(hostname = "") {
+  const domain = String(hostname || "").trim().toLowerCase().replace(/^\.+|\.+$/g, "");
+  if (!/^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/i.test(domain)) return "";
+  const labels = domain.split(".");
+  const suffix = labels.slice(-2).join(".");
+  const count = mailInsightPublicSuffix2.has(suffix) ? 3 : 2;
+  return labels.slice(-Math.min(count, labels.length)).join(".");
+}
+
+function mailInsightSender(fromHeader = "") {
+  const from = safeMailInsightText(decodeMailHeader(fromHeader), 500);
+  const addresses = [...from.matchAll(/(?:^|[^a-z0-9.!#$%&'*+/=?^_`{|}~-])([a-z0-9.!#$%&'*+/=?^_`{|}~-]{1,64}@([a-z0-9.-]{1,253}\.[a-z]{2,63}))/ig)];
+  const match = addresses.at(-1);
+  const domain = mailInsightBaseDomain(match?.[2] || "");
+  if (!domain) return null;
+  let name = safeMailInsightText(from.replace(/<[^>]*>/g, "").replace(match?.[1] || "", "").replace(/^['\"]+|['\"]+$/g, ""), 120);
+  if (!name || /^(?:no[._ -]?reply|do[._ -]?not[._ -]?reply|mailer|mail|support|service|team|notification|notifications|account|billing)$/i.test(name)) {
+    const root = domain.split(".")[0].replace(/[-_]+/g, " ");
+    name = root.replace(/\b[a-z]/g, (letter) => letter.toUpperCase()).slice(0, 120);
+  }
+  return { service: domain, name, domain };
+}
+
+function mailInsightEvidence(uid, headers) {
+  const subject = safeMailInsightText(decodeMailHeader(headers.get("subject") || ""), 300);
+  const normalized = subject.toLowerCase();
+  const has = (pattern) => pattern.test(normalized);
+  const listSignals = [];
+  if (headers.get("list-id")) listSignals.push("list-id");
+  if (headers.get("list-unsubscribe")) listSignals.push("list-unsubscribe");
+
+  const failed = has(/\b(?:payment|renewal|charge|billing|card)\s+(?:has\s+)?(?:failed|declined|unsuccessful)\b|\b(?:past due|billing problem|payment issue)\b|(?:付款|支付|扣款|续费|账单)(?:失败|未成功|被拒)|付款方式(?:失效|有问题)|逾期/iu);
+  const cancelled = has(/\b(?:subscription|membership|plan|auto[ -]?renew(?:al)?)\s+(?:has\s+been\s+)?(?:cancelled|canceled|ended|expired|disabled|turned off)\b|\b(?:cancelled|canceled)\s+(?:subscription|membership|plan)\b|(?:订阅|会员|套餐)(?:已)?(?:取消|终止|到期)|自动续费(?:已)?(?:关闭|取消)/iu);
+  const recurringStrong = has(/\b(?:auto[ -]?renew(?:al|ed|ing)?|recurring (?:payment|charge|billing)|next billing|renews? (?:on|soon)|renewal (?:confirmation|notice|receipt)|subscription (?:renewed|renewal|payment|receipt)|membership (?:renewed|renewal))\b|自动续费|续费(?:成功|确认|通知|收据)|周期(?:扣款|账单)|下次扣款|订阅(?:续订|扣款|账单)/iu);
+  const recurringContext = has(/\b(?:subscription|membership|premium|paid plan|billing cycle|renewal)\b|订阅|会员|付费套餐|续费|自动续费/iu);
+  const moneyContext = has(/\b(?:charged|payment|paid|billing|bill|invoice|receipt|price|amount)\b|(?:扣款|付款|支付|账单|发票|收据|金额)|[$¥￥€£]\s*\d|\b(?:usd|cny|rmb|eur|gbp)\b/iu);
+  const purchaseStrong = has(/\b(?:order|purchase|payment) (?:confirmation|confirmed|complete|completed|successful|receipt)\b|\byour (?:order|receipt|invoice)\b|\binvoice\s*(?:#|no\.?|number)\b|订单(?:确认|已完成|成功)|购买(?:成功|确认)|(?:支付|付款)(?:成功|确认)|电子发票|付款收据/iu);
+  const accountStrong = has(/\b(?:verify|confirm|activate) (?:your )?(?:email|account)\b|\b(?:account|registration) (?:created|confirmed|complete|activated)\b|\bwelcome to\b|验证(?:您的)?邮箱|确认(?:您的)?邮箱|激活(?:您的)?账户|账号(?:注册|创建)(?:成功|完成)|注册(?:成功|完成)|欢迎(?:加入|使用)/iu);
+  const accountWeak = has(/\b(?:password reset|sign[ -]?in code|login code|security code|new (?:sign[ -]?in|login))\b|密码重置|登录验证码|安全验证码|新(?:设备)?登录/iu);
+  const newsletterSubject = has(/\b(?:newsletter|weekly digest|daily digest|unsubscribe)\b|新闻简报|每周(?:摘要|速递)|每日(?:摘要|速递)|退订/iu);
+
+  let category = "";
+  let status = "possible";
+  let confidence = 0;
+  const signals = [];
+  if (failed && (recurringContext || recurringStrong)) {
+    category = "recurring";
+    status = "failed";
+    confidence = 0.94;
+    signals.push("payment-failed", "subscription-context");
+  } else if (cancelled && (recurringContext || recurringStrong)) {
+    category = "recurring";
+    status = "cancelled";
+    confidence = 0.94;
+    signals.push("subscription-cancelled");
+  } else if (recurringStrong || (recurringContext && moneyContext)) {
+    category = "recurring";
+    status = failed ? "failed" : "active";
+    confidence = recurringStrong && moneyContext ? 0.95 : 0.84;
+    signals.push(recurringStrong ? "subscription-renewal" : "subscription-billing");
+    if (moneyContext) signals.push("payment-language");
+  } else if (failed && moneyContext) {
+    category = "purchase";
+    status = "failed";
+    confidence = 0.88;
+    signals.push("payment-failed");
+  } else if (purchaseStrong) {
+    category = "purchase";
+    status = "completed";
+    confidence = moneyContext ? 0.94 : 0.86;
+    signals.push("purchase-confirmation");
+    if (moneyContext) signals.push("payment-language");
+  } else if (accountStrong || accountWeak) {
+    category = "account";
+    status = "possible";
+    confidence = accountStrong ? 0.86 : 0.62;
+    signals.push(accountStrong ? "account-registration" : "account-security-mail");
+  } else if (listSignals.length || newsletterSubject) {
+    category = "newsletter";
+    status = /\b(?:unsubscribed|unsubscribe confirmation)\b|退订(?:成功|确认)/iu.test(normalized) ? "cancelled" : "possible";
+    confidence = listSignals.length >= 2 ? 0.93 : listSignals.length ? 0.84 : 0.64;
+    signals.push(...listSignals);
+    if (newsletterSubject) signals.push("newsletter-subject");
+  }
+  if (!category) return null;
+
+  const parsedDate = Date.parse(headers.get("date") || "");
+  return {
+    category,
+    status,
+    confidence,
+    evidence: {
+      uid: cleanMailUid(uid),
+      date: Number.isFinite(parsedDate) ? new Date(parsedDate).toISOString() : safeMailInsightText(decodeMailHeader(headers.get("date") || ""), 100),
+      subject,
+      signals: [...new Set(signals)].slice(0, 5)
+    },
+    sortTime: Number.isFinite(parsedDate) ? parsedDate : Number(uid)
+  };
+}
+
+function parseMailInsightHeaders(response) {
+  const records = [];
+  for (const literal of response.literals) {
+    const uid = literal.prefix.match(/\bUID\s+(\d+)\b/i)?.[1];
+    if (!uid) continue;
+    const { headers } = parseMailHeaders(literal.bytes);
+    if (headers.size) records.push({ uid, headers });
+  }
+  return records;
+}
+
+function aggregateMailInsights(records) {
+  const groups = new Map();
+  for (const record of records) {
+    const sender = mailInsightSender(record.headers.get("from") || "");
+    if (!sender) continue;
+    const match = mailInsightEvidence(record.uid, record.headers);
+    if (!match) continue;
+    const key = `${sender.domain}|${match.category}`;
+    let group = groups.get(key);
+    if (!group) {
+      group = { ...sender, category: match.category, matches: [] };
+      groups.set(key, group);
+    }
+    group.matches.push(match);
+    if (sender.name.length < group.name.length) group.name = sender.name;
+  }
+
+  const items = [];
+  for (const group of groups.values()) {
+    group.matches.sort((a, b) => b.sortTime - a.sortTime);
+    const latest = group.matches[0];
+    const evidence = group.matches.slice(0, 5).map((match) => match.evidence);
+    const confidence = Math.min(0.99, Math.max(...group.matches.map((match) => match.confidence)) + Math.min(0.04, (group.matches.length - 1) * 0.01));
+    items.push({
+      service: group.service,
+      name: group.name,
+      domain: group.domain,
+      category: group.category,
+      status: latest.status,
+      confidence: Number(confidence.toFixed(2)),
+      inferred: true,
+      evidence
+    });
+  }
+  const categoryOrder = { recurring: 0, purchase: 1, account: 2, newsletter: 3 };
+  const statusOrder = { failed: 0, cancelled: 1, active: 2, completed: 3, possible: 4 };
+  return items.sort((a, b) => (categoryOrder[a.category] - categoryOrder[b.category])
+    || (statusOrder[a.status] - statusOrder[b.status])
+    || (b.confidence - a.confidence)
+    || a.name.localeCompare(b.name)).slice(0, mailInsightMaxItems);
+}
+
+function mailInsightSearchDate(sinceDays) {
+  const date = new Date();
+  date.setUTCHours(0, 0, 0, 0);
+  date.setUTCDate(date.getUTCDate() - sinceDays);
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  return `${date.getUTCDate()}-${months[date.getUTCMonth()]}-${date.getUTCFullYear()}`;
+}
+
+async function fetchProviderMailInsights(accountInput, optionsInput = {}) {
+  const account = cleanMailAccount(accountInput);
+  const options = cleanMailInsightOptions(optionsInput);
+  const config = mailProviderConfig(account.provider);
+  const client = await openMailSocket(config, "imap");
+  try {
+    await client.readLine();
+    await imapAuth(client, account);
+    await imapCommand(client, "A2", "SELECT INBOX");
+    const searchLines = await imapCommand(client, "A3", `UID SEARCH SINCE ${mailInsightSearchDate(options.sinceDays)}`);
+    const ids = searchLines
+      .flatMap((line) => line.startsWith("* SEARCH") ? line.replace("* SEARCH", "").trim().split(/\s+/) : [])
+      .filter((id) => /^[1-9]\d{0,9}$/.test(id) && Number(id) <= 0xffffffff)
+      .slice(-options.maxMessages);
+    if (!ids.length) {
+      await imapCommand(client, "A5", "LOGOUT").catch(() => {});
+      return {
+        scope: { mailbox: "INBOX", ...options, scannedMessages: 0, headerOnly: true },
+        summary: { account: 0, recurring: 0, purchase: 0, newsletter: 0 },
+        items: []
+      };
+    }
+    const response = await imapLiteralCommand(
+      client,
+      "A4",
+      `UID FETCH ${ids.join(",")} (UID BODY.PEEK[HEADER.FIELDS (FROM SUBJECT DATE LIST-ID LIST-UNSUBSCRIBE)])`,
+      mailInsightHeaderBytes
+    );
+    await imapCommand(client, "A5", "LOGOUT").catch(() => {});
+    const records = parseMailInsightHeaders(response);
+    const items = aggregateMailInsights(records);
+    const summary = items.reduce((counts, item) => {
+      counts[item.category] = (counts[item.category] || 0) + 1;
+      return counts;
+    }, { account: 0, recurring: 0, purchase: 0, newsletter: 0 });
+    return {
+      scope: { mailbox: "INBOX", ...options, scannedMessages: records.length, headerOnly: true },
+      summary,
+      items
+    };
+  } finally {
+    client.end();
+  }
 }
 
 async function fetchProviderInbox(accountInput) {
@@ -1140,6 +2050,37 @@ async function fetchProviderInbox(accountInput) {
     const fetchLines = await imapCommand(client, "A4", `UID FETCH ${ids.join(",")} (UID BODY.PEEK[HEADER.FIELDS (FROM SUBJECT DATE)])`);
     await imapCommand(client, "A5", "LOGOUT").catch(() => {});
     return { messages: parseFetchedHeaders(fetchLines) };
+  } finally {
+    client.end();
+  }
+}
+
+async function fetchProviderMessage(accountInput, uidInput) {
+  const account = cleanMailAccount(accountInput);
+  const uid = cleanMailUid(uidInput);
+  const config = mailProviderConfig(account.provider);
+  const client = await openMailSocket(config, "imap");
+  try {
+    await client.readLine();
+    await imapAuth(client, account);
+    await imapCommand(client, "A2", "SELECT INBOX");
+    const response = await imapLiteralCommand(
+      client,
+      "A3",
+      `UID FETCH ${uid} (UID RFC822.SIZE BODY.PEEK[]<0.${mailMessageFetchBytes}>)`
+    );
+    const metadata = response.lines.join(" ");
+    const returnedUid = metadata.match(/\bUID\s+(\d+)/i)?.[1];
+    const literal = response.literals.length === 1 ? response.literals[0] : null;
+    if (!literal || returnedUid !== uid) {
+      const error = new Error("Mail message not found");
+      error.code = "MAIL_NOT_FOUND";
+      throw error;
+    }
+    const sizeMatch = metadata.match(/RFC822\.SIZE\s+(\d+)/i);
+    const declaredSize = sizeMatch ? Number(sizeMatch[1]) : literal.bytes.length;
+    await imapCommand(client, "A4", "LOGOUT").catch(() => {});
+    return { message: parseFetchedMessage(literal.bytes, uid, declaredSize) };
   } finally {
     client.end();
   }
@@ -1320,15 +2261,55 @@ async function handlePrivateApi(req, res, url) {
     }
     if (req.method === "PUT") {
       try {
-        const body = await readBody(req);
+        const contentType = String(req.headers["content-type"] || "").toLowerCase();
+        if (!contentType.includes("application/json")) {
+          privateJson(res, 415, { error: "Unsupported vault payload" });
+          return true;
+        }
+        const buffer = await readBufferBody(req, 4 * 1024 * 1024);
+        const body = JSON.parse(buffer.toString("utf8") || "{}");
         const vault = await savePrivateMailVault(body.vault || body);
         privateJson(res, 200, { vault });
-      } catch {
-        privateJson(res, 500, { error: "Mail vault save failed" });
+      } catch (error) {
+        const status = error.message === "Archive too large" ? 413 : error instanceof SyntaxError ? 400 : 500;
+        privateJson(res, status, { error: status === 413 ? "Mail vault too large" : status === 400 ? "Invalid vault payload" : "Mail vault save failed" });
       }
       return true;
     }
     privateJson(res, 405, { error: "Method not allowed" });
+    return true;
+  }
+
+  if (route === "/api/private/backup/status") {
+    const session = await requirePrivateSession(req, res);
+    if (!session) return true;
+    if (req.method !== "GET") {
+      privateJson(res, 405, { error: "Method not allowed" });
+      return true;
+    }
+    privateJson(res, 200, { backup: publicPrivateBackupStatus() });
+    return true;
+  }
+
+  if (route === "/api/private/backup/run") {
+    const session = await requirePrivateSession(req, res);
+    if (!session) return true;
+    if (req.method !== "POST") {
+      privateJson(res, 405, { error: "Method not allowed" });
+      return true;
+    }
+    try {
+      const result = await runPrivateBackup();
+      privateJson(res, 200, { ok: true, ...result, backup: publicPrivateBackupStatus() });
+    } catch (error) {
+      const status = error instanceof PrivateBackupError ? error.httpStatus : 502;
+      privateJson(res, status, {
+        ok: false,
+        code: error?.code || "BACKUP_FAILED",
+        error: safePrivateBackupError(error),
+        backup: publicPrivateBackupStatus()
+      });
+    }
     return true;
   }
 
@@ -1344,7 +2325,9 @@ async function handlePrivateApi(req, res, url) {
       smtpAvailable: !mailSmtpBlockedReason,
       smtpBlockedReason: mailSmtpBlockedReason || null,
       gmailAuth: "app-password",
-      portableVaultKey: true
+      portableVaultKey: true,
+      automaticVaultUnlock: true,
+      mailInsights: "header-only"
     });
     return true;
   }
@@ -1359,6 +2342,61 @@ async function handlePrivateApi(req, res, url) {
     const body = await readBody(req);
     try {
       privateJson(res, 200, { ok: true, ...(await fetchProviderInbox(body.account)) });
+    } catch (error) {
+      privateJson(res, 502, { error: mailFriendlyError(error, body.account, "fetch") });
+    }
+    return true;
+  }
+
+  if (route === "/api/private/mail/message") {
+    const session = await requirePrivateSession(req, res);
+    if (!session) return true;
+    if (req.method !== "POST") {
+      privateJson(res, 405, { error: "Method not allowed" });
+      return true;
+    }
+    const body = await readBody(req);
+    let uid;
+    try {
+      uid = cleanMailUid(body.uid ?? body.id);
+    } catch {
+      privateJson(res, 400, { error: "Invalid mail UID" });
+      return true;
+    }
+    try {
+      privateJson(res, 200, { ok: true, ...(await fetchProviderMessage(body.account, uid)) });
+    } catch (error) {
+      if (error?.code === "MAIL_NOT_FOUND") {
+        privateJson(res, 404, { error: "Mail message not found" });
+      } else {
+        privateJson(res, 502, { error: mailFriendlyError(error, body.account, "fetch") });
+      }
+    }
+    return true;
+  }
+
+  if (route === "/api/private/mail/insights") {
+    const session = await requirePrivateSession(req, res);
+    if (!session) return true;
+    if (req.method !== "POST") {
+      privateJson(res, 405, { error: "Method not allowed" });
+      return true;
+    }
+    const body = await readBody(req);
+    let options;
+    try {
+      options = cleanMailInsightOptions(body);
+    } catch (error) {
+      privateJson(res, 400, { error: error.message || "Invalid insight options" });
+      return true;
+    }
+    try {
+      privateJson(res, 200, {
+        ok: true,
+        generatedAt: new Date().toISOString(),
+        disclaimer: "结果仅由收件箱邮件头保守推断，可能遗漏或误判；营销邮件订阅不等于付费订阅，请以服务商账户和账单为准。",
+        ...(await fetchProviderMailInsights(body.account, options))
+      });
     } catch (error) {
       privateJson(res, 502, { error: mailFriendlyError(error, body.account, "fetch") });
     }
